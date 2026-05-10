@@ -1,0 +1,24 @@
+Analyzing tokomiring...                                         
+
+   info - Don't use 'BuildContext's across async gaps - lib\screens\auth\login_screen.dart:99:33 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps - lib\screens\auth\login_screen.dart:107:33 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps - lib\screens\auth\signup_screen.dart:133:31 - use_build_context_synchronously
+   info - Use 'const' with the constructor to improve performance - lib\screens\shared\loading_screen.dart:10:12 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\screens\shared\loading_screen.dart:11:13 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\screens\shared\loading_screen.dart:12:16 - prefer_const_constructors
+   info - Don't use 'BuildContext's across async gaps - lib\screens\shared\splash_screen.dart:25:11 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps - lib\screens\user\user_home_screen.dart:23:9 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps - lib\widgets\buttons\logout_button.dart:25:11 - use_build_context_synchronously
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\widgets\cards\dashboard_card.dart:34:25 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\widgets\cards\order_card.dart:67:26 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\widgets\cards\profile_card.dart:77:32 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\widgets\cards\profile_card.dart:79:32 - deprecated_member_use
+   info - Use 'const' with the constructor to improve performance - lib\widgets\dialogs\error_dialog.dart:20:18 - prefer_const_constructors
+   info - 'groupValue' is deprecated and shouldn't be used. Use a RadioGroup ancestor to manage group value instead. This feature was deprecated after v3.32.0-0.0.pre - lib\widgets\dialogs\status_update_dialog.dart:48:25 - deprecated_member_use
+   info - 'onChanged' is deprecated and shouldn't be used. Use RadioGroup to handle value change instead. This feature was deprecated after v3.32.0-0.0.pre - lib\widgets\dialogs\status_update_dialog.dart:51:25 - deprecated_member_use
+   info - Use 'const' with the constructor to improve performance - lib\widgets\dialogs\success_dialog.dart:20:18 - prefer_const_constructors
+   info - 'value' is deprecated and shouldn't be used. Use initialValue instead. This will set the initial value for the form field. This feature was deprecated after v3.33.0-1.0.pre - lib\widgets\forms\dropdown_field.dart:25:7 - deprecated_member_use
+   info - 'groupValue' is deprecated and shouldn't be used. Use a RadioGroup ancestor to manage group value instead. This feature was deprecated after v3.32.0-0.0.pre - lib\widgets\forms\payment_method_selector.dart:50:7 - deprecated_member_use
+   info - 'onChanged' is deprecated and shouldn't be used. Use RadioGroup to handle value change instead. This feature was deprecated after v3.32.0-0.0.pre - lib\widgets\forms\payment_method_selector.dart:52:7 - deprecated_member_use
+
+20 issues found. (ran in 3.7s)
