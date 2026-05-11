@@ -1,16 +1,17 @@
-// lib/providers/cart_provider.dart
-
 import 'package:flutter/material.dart';
 
 import '../models/product_model.dart';
 
 class CartItemModel {
+
   final ProductModel product;
 
   int quantity;
 
   CartItemModel({
+
     required this.product,
+
     required this.quantity,
   });
 
@@ -29,8 +30,8 @@ class CartProvider
   // CART ITEMS
   // =====================================================
 
-  final List<CartItemModel> _items =
-      [];
+  final List<CartItemModel>
+      _items = [];
 
   List<CartItemModel> get items =>
       _items;
@@ -44,6 +45,7 @@ class CartProvider
     int total = 0;
 
     for (var item in _items) {
+
       total += item.quantity;
     }
 
@@ -59,6 +61,7 @@ class CartProvider
     double total = 0;
 
     for (var item in _items) {
+
       total += item.subtotal;
     }
 
@@ -83,6 +86,14 @@ class CartProvider
     ProductModel product,
   ) {
 
+    // ===============================================
+    // PRODUCT OUT OF STOCK
+    // ===============================================
+
+    if (product.stock <= 0) {
+      return;
+    }
+
     final index =
         _items.indexWhere(
       (item) =>
@@ -90,39 +101,38 @@ class CartProvider
           product.id,
     );
 
-    // =============================================
-    // PRODUCT ALREADY EXISTS
-    // =============================================
+    // ===============================================
+    // PRODUCT EXISTS
+    // ===============================================
 
     if (index >= 0) {
 
-      // CHECK STOCK LIMIT
+      final currentItem =
+          _items[index];
 
-      if (_items[index]
-              .quantity <
+      // =============================================
+      // LIMIT STOCK
+      // =============================================
+
+      if (currentItem.quantity <
           product.stock) {
 
-        _items[index]
-            .quantity++;
+        currentItem.quantity++;
       }
-
     }
 
-    // =============================================
+    // ===============================================
     // NEW PRODUCT
-    // =============================================
+    // ===============================================
 
     else {
 
-      if (product.stock > 0) {
-
-        _items.add(
-          CartItemModel(
-            product: product,
-            quantity: 1,
-          ),
-        );
-      }
+      _items.add(
+        CartItemModel(
+          product: product,
+          quantity: 1,
+        ),
+      );
     }
 
     notifyListeners();
@@ -160,22 +170,23 @@ class CartProvider
           productId,
     );
 
-    if (index >= 0) {
+    if (index < 0) {
+      return;
+    }
 
-      final item =
-          _items[index];
+    final item =
+        _items[index];
 
-      // ===========================================
-      // LIMIT STOCK
-      // ===========================================
+    // ===============================================
+    // LIMIT STOCK
+    // ===============================================
 
-      if (item.quantity <
-          item.product.stock) {
+    if (item.quantity <
+        item.product.stock) {
 
-        item.quantity++;
+      item.quantity++;
 
-        notifyListeners();
-      }
+      notifyListeners();
     }
   }
 
@@ -194,22 +205,27 @@ class CartProvider
           productId,
     );
 
-    if (index >= 0) {
-
-      if (_items[index]
-              .quantity >
-          1) {
-
-        _items[index]
-            .quantity--;
-
-      } else {
-
-        _items.removeAt(index);
-      }
-
-      notifyListeners();
+    if (index < 0) {
+      return;
     }
+
+    final item =
+        _items[index];
+
+    // ===============================================
+    // MINIMUM QUANTITY
+    // ===============================================
+
+    if (item.quantity > 1) {
+
+      item.quantity--;
+
+    } else {
+
+      _items.removeAt(index);
+    }
+
+    notifyListeners();
   }
 
   // =====================================================
@@ -217,8 +233,11 @@ class CartProvider
   // =====================================================
 
   void updateQuantity({
+
     required String productId,
+
     required int quantity,
+
   }) {
 
     final index =
@@ -228,32 +247,38 @@ class CartProvider
           productId,
     );
 
-    if (index >= 0) {
-
-      final stock =
-          _items[index]
-              .product
-              .stock;
-
-      // ===========================================
-      // LIMIT MIN & MAX
-      // ===========================================
-
-      if (quantity <= 0) {
-
-        _items.removeAt(index);
-
-      } else {
-
-        _items[index]
-            .quantity =
-                quantity > stock
-                    ? stock
-                    : quantity;
-      }
-
-      notifyListeners();
+    if (index < 0) {
+      return;
     }
+
+    final item =
+        _items[index];
+
+    final stock =
+        item.product.stock;
+
+    // ===============================================
+    // REMOVE ITEM
+    // ===============================================
+
+    if (quantity <= 0) {
+
+      _items.removeAt(index);
+    }
+
+    // ===============================================
+    // LIMIT STOCK
+    // ===============================================
+
+    else {
+
+      item.quantity =
+          quantity > stock
+              ? stock
+              : quantity;
+    }
+
+    notifyListeners();
   }
 
   // =====================================================
@@ -323,10 +348,6 @@ class CartProvider
 
           'productName':
               item.product.name,
-
-          // =======================================
-          // BASE64 IMAGE
-          // =======================================
 
           'productImage':
               item.product

@@ -4,10 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import '../models/user_model.dart';
+
 import '../services/auth_service.dart';
 
-class AuthProvider extends ChangeNotifier {
-  final AuthService _authService =
+class AuthProvider
+    extends ChangeNotifier {
+
+  final AuthService
+      _authService =
       AuthService();
 
   // =====================================================
@@ -26,53 +30,92 @@ class AuthProvider extends ChangeNotifier {
   // GETTERS
   // =====================================================
 
-  UserModel? get user => _userModel;
+  UserModel? get user =>
+      _userModel;
 
-  bool get isLoading => _isLoading;
+  bool get isLoading =>
+      _isLoading;
 
-  bool get isLoggedIn => _isLoggedIn;
+  bool get isLoggedIn =>
+      _isLoggedIn;
 
   String? get errorMessage =>
       _errorMessage;
 
   String get role =>
-      _userModel?.role ?? 'user';
+      _userModel?.role ??
+      'user';
 
   bool get isAdmin =>
-      _userModel?.role == 'admin';
+      _userModel?.role ==
+      'admin';
 
   bool get isUser =>
-      _userModel?.role == 'user';
+      _userModel?.role ==
+      'user';
 
   // =====================================================
   // INIT AUTH
   // =====================================================
 
-  Future<void> initializeAuth() async {
+  Future<void> initializeAuth()
+      async {
+
     try {
+
       _setLoading(true);
 
       final currentUser =
-          FirebaseAuth.instance.currentUser;
+          FirebaseAuth
+              .instance
+              .currentUser;
+
+      // ===============================================
+      // USER EXISTS
+      // ===============================================
 
       if (currentUser != null) {
+
         final userData =
-            await _authService.getUserData(
+            await _authService
+                .getUserData(
           currentUser.uid,
         );
 
         if (userData != null) {
-          _userModel = userData;
 
-          _isLoggedIn = true;
+          _userModel =
+              userData;
+
+          _isLoggedIn =
+              true;
         }
       }
+
+      // ===============================================
+      // USER NOT FOUND
+      // ===============================================
+
+      else {
+
+        _userModel =
+            null;
+
+        _isLoggedIn =
+            false;
+      }
+
     } catch (e) {
+
       _errorMessage =
           'Failed to initialize auth';
 
-      debugPrint(e.toString());
+      debugPrint(
+        e.toString(),
+      );
+
     } finally {
+
       _setLoading(false);
     }
   }
@@ -82,34 +125,52 @@ class AuthProvider extends ChangeNotifier {
   // =====================================================
 
   Future<bool> register({
+
     required String name,
+
     required String username,
+
     required String email,
+
     required String password,
+
     String role = 'user',
+
   }) async {
+
     try {
+
       _setLoading(true);
 
       _clearError();
 
       final result =
-          await _authService.register(
-        name: name.trim(),
+          await _authService
+              .register(
 
-        username: username.trim(),
+        name:
+            name.trim(),
 
-        email: email.trim(),
+        username:
+            username.trim(),
 
-        password: password.trim(),
+        email:
+            email.trim(),
 
-        role: role,
+        password:
+            password.trim(),
+
+        role:
+            role,
       );
 
       if (result != null) {
-        _userModel = result;
 
-        _isLoggedIn = true;
+        _userModel =
+            result;
+
+        _isLoggedIn =
+            true;
 
         notifyListeners();
 
@@ -117,15 +178,22 @@ class AuthProvider extends ChangeNotifier {
       }
 
       return false;
-    } catch (e) {
-      _errorMessage = e.toString();
 
-      debugPrint(e.toString());
+    } catch (e) {
+
+      _errorMessage =
+          e.toString();
+
+      debugPrint(
+        e.toString(),
+      );
 
       notifyListeners();
 
       return false;
+
     } finally {
+
       _setLoading(false);
     }
   }
@@ -135,25 +203,37 @@ class AuthProvider extends ChangeNotifier {
   // =====================================================
 
   Future<bool> login({
+
     required String email,
+
     required String password,
+
   }) async {
+
     try {
+
       _setLoading(true);
 
       _clearError();
 
       final result =
-          await _authService.login(
-        email: email.trim(),
+          await _authService
+              .login(
 
-        password: password.trim(),
+        email:
+            email.trim(),
+
+        password:
+            password.trim(),
       );
 
       if (result != null) {
-        _userModel = result;
 
-        _isLoggedIn = true;
+        _userModel =
+            result;
+
+        _isLoggedIn =
+            true;
 
         notifyListeners();
 
@@ -166,15 +246,22 @@ class AuthProvider extends ChangeNotifier {
       notifyListeners();
 
       return false;
-    } catch (e) {
-      _errorMessage = e.toString();
 
-      debugPrint(e.toString());
+    } catch (e) {
+
+      _errorMessage =
+          e.toString();
+
+      debugPrint(
+        e.toString(),
+      );
 
       notifyListeners();
 
       return false;
+
     } finally {
+
       _setLoading(false);
     }
   }
@@ -184,57 +271,87 @@ class AuthProvider extends ChangeNotifier {
   // =====================================================
 
   Future<bool> updateProfile({
+
     required String name,
+
     required String username,
+
     required String phone,
+
     required String address,
+
     required String photoUrl,
+
   }) async {
+
     try {
+
       if (_userModel == null) {
         return false;
       }
 
       _setLoading(true);
 
-      await _authService.updateProfile(
-        uid: _userModel!.uid,
+      await _authService
+          .updateProfile(
 
-        name: name.trim(),
+        uid:
+            _userModel!.uid,
 
-        username: username.trim(),
+        name:
+            name.trim(),
 
-        phone: phone.trim(),
+        username:
+            username.trim(),
 
-        address: address.trim(),
+        phone:
+            phone.trim(),
 
-        photoUrl: photoUrl,
+        address:
+            address.trim(),
+
+        photoUrl:
+            photoUrl,
       );
 
-      _userModel = _userModel!.copyWith(
-        name: name,
+      _userModel =
+          _userModel!.copyWith(
 
-        username: username,
+        name:
+            name,
 
-        phone: phone,
+        username:
+            username,
 
-        address: address,
+        phone:
+            phone,
 
-        photoUrl: photoUrl,
+        address:
+            address,
+
+        photoUrl:
+            photoUrl,
       );
 
       notifyListeners();
 
       return true;
-    } catch (e) {
-      _errorMessage = e.toString();
 
-      debugPrint(e.toString());
+    } catch (e) {
+
+      _errorMessage =
+          e.toString();
+
+      debugPrint(
+        e.toString(),
+      );
 
       notifyListeners();
 
       return false;
+
     } finally {
+
       _setLoading(false);
     }
   }
@@ -246,25 +363,35 @@ class AuthProvider extends ChangeNotifier {
   Future<bool> resetPassword(
     String email,
   ) async {
+
     try {
+
       _setLoading(true);
 
       _clearError();
 
-      await _authService.resetPassword(
+      await _authService
+          .resetPassword(
         email.trim(),
       );
 
       return true;
-    } catch (e) {
-      _errorMessage = e.toString();
 
-      debugPrint(e.toString());
+    } catch (e) {
+
+      _errorMessage =
+          e.toString();
+
+      debugPrint(
+        e.toString(),
+      );
 
       notifyListeners();
 
       return false;
+
     } finally {
+
       _setLoading(false);
     }
   }
@@ -274,23 +401,37 @@ class AuthProvider extends ChangeNotifier {
   // =====================================================
 
   Future<void> logout() async {
+
     try {
+
       _setLoading(true);
 
-      await _authService.logout();
+      await _authService
+          .logout();
 
-      _userModel = null;
+      _userModel =
+          null;
 
-      _isLoggedIn = false;
+      _isLoggedIn =
+          false;
+
+      _clearError();
 
       notifyListeners();
+
     } catch (e) {
-      _errorMessage = e.toString();
 
-      debugPrint(e.toString());
+      _errorMessage =
+          e.toString();
+
+      debugPrint(
+        e.toString(),
+      );
 
       notifyListeners();
+
     } finally {
+
       _setLoading(false);
     }
   }
@@ -299,34 +440,47 @@ class AuthProvider extends ChangeNotifier {
   // DELETE ACCOUNT
   // =====================================================
 
-  Future<bool> deleteAccount() async {
+  Future<bool> deleteAccount()
+      async {
+
     try {
+
       if (_userModel == null) {
         return false;
       }
 
       _setLoading(true);
 
-      await _authService.deleteAccount(
+      await _authService
+          .deleteAccount(
         _userModel!.uid,
       );
 
-      _userModel = null;
+      _userModel =
+          null;
 
-      _isLoggedIn = false;
+      _isLoggedIn =
+          false;
 
       notifyListeners();
 
       return true;
-    } catch (e) {
-      _errorMessage = e.toString();
 
-      debugPrint(e.toString());
+    } catch (e) {
+
+      _errorMessage =
+          e.toString();
+
+      debugPrint(
+        e.toString(),
+      );
 
       notifyListeners();
 
       return false;
+
     } finally {
+
       _setLoading(false);
     }
   }
@@ -335,26 +489,37 @@ class AuthProvider extends ChangeNotifier {
   // REFRESH USER
   // =====================================================
 
-  Future<void> refreshUser() async {
+  Future<void> refreshUser()
+      async {
+
     try {
+
       if (_userModel == null) {
         return;
       }
 
       final userData =
-          await _authService.getUserData(
+          await _authService
+              .getUserData(
         _userModel!.uid,
       );
 
       if (userData != null) {
-        _userModel = userData;
+
+        _userModel =
+            userData;
 
         notifyListeners();
       }
-    } catch (e) {
-      _errorMessage = e.toString();
 
-      debugPrint(e.toString());
+    } catch (e) {
+
+      _errorMessage =
+          e.toString();
+
+      debugPrint(
+        e.toString(),
+      );
 
       notifyListeners();
     }
@@ -367,12 +532,16 @@ class AuthProvider extends ChangeNotifier {
   void _setLoading(
     bool value,
   ) {
-    _isLoading = value;
+
+    _isLoading =
+        value;
 
     notifyListeners();
   }
 
   void _clearError() {
-    _errorMessage = null;
+
+    _errorMessage =
+        null;
   }
 }

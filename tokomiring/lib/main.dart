@@ -12,25 +12,30 @@ import 'core/theme/app_theme.dart';
 import 'providers/auth_provider.dart';
 import 'providers/cart_provider.dart';
 import 'providers/product_provider.dart';
+import 'providers/order_provider.dart';
 
 import 'routes/app_routes.dart';
 
 import 'screens/shared/splash_screen.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+
+  WidgetsFlutterBinding
+      .ensureInitialized();
 
   // =====================================================
-  // FIREBASE INIT
+  // FIREBASE INITIALIZE
   // =====================================================
 
   await Firebase.initializeApp(
+
     options:
         DefaultFirebaseOptions
             .currentPlatform,
   );
 
   runApp(
+
     const TokoMiringApp(),
   );
 }
@@ -39,6 +44,7 @@ class TokoMiringApp
     extends StatelessWidget {
 
   const TokoMiringApp({
+
     super.key,
   });
 
@@ -48,6 +54,7 @@ class TokoMiringApp
   ) {
 
     return MultiProvider(
+
       providers: [
 
         // =============================================
@@ -55,6 +62,7 @@ class TokoMiringApp
         // =============================================
 
         ChangeNotifierProvider(
+
           create: (_) =>
               AuthProvider()
                 ..initializeAuth(),
@@ -65,26 +73,53 @@ class TokoMiringApp
         // =============================================
 
         ChangeNotifierProvider(
+
           create: (_) =>
               CartProvider(),
         ),
 
         // =============================================
         // PRODUCT PROVIDER
-        // FIX DOUBLE PRODUCT
         // =============================================
 
         ChangeNotifierProvider(
+
           create: (_) =>
-              ProductProvider(),
+              ProductProvider()
+                ..initializeProducts(),
+        ),
+
+        // =============================================
+        // ORDER PROVIDER
+        // =============================================
+
+        ChangeNotifierProvider(
+
+          create: (_) =>
+              OrderProvider()
+                ..initializeOrders(),
         ),
       ],
 
       child: MaterialApp(
+
+        // =============================================
+        // DEBUG
+        // =============================================
+
         debugShowCheckedModeBanner:
             false,
 
-        title: 'Toko Miring',
+        // =============================================
+        // TITLE
+        // =============================================
+
+        title:
+            'Toko Miring',
+
+        // =============================================
+        // THEME
+        // =============================================
 
         theme:
             AppTheme.lightTheme,
@@ -109,14 +144,20 @@ class TokoMiringApp
         // =============================================
 
         builder: (
+
           context,
+
           child,
+
         ) {
 
           return MediaQuery(
-            data: MediaQuery.of(
+
+            data:
+                MediaQuery.of(
               context,
             ).copyWith(
+
               textScaler:
                   const TextScaler
                       .linear(
@@ -126,7 +167,8 @@ class TokoMiringApp
 
             child:
                 child ??
-                const SizedBox(),
+
+                    const SizedBox(),
           );
         },
       ),

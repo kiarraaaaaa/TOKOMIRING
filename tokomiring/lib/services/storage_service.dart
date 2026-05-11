@@ -6,6 +6,11 @@ import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
 class StorageService {
+
+  // =====================================================
+  // STORAGE
+  // =====================================================
+
   final FirebaseStorage _storage =
       FirebaseStorage.instance;
 
@@ -13,21 +18,49 @@ class StorageService {
   // PICK IMAGE
   // =====================================================
 
-  Future<PlatformFile?> pickImage() async {
+  Future<PlatformFile?> pickImage()
+      async {
+
     try {
+
       final result =
-          await FilePicker.platform.pickFiles(
-        type: FileType.image,
-        allowMultiple: false,
-        withData: true,
+          await FilePicker.platform
+              .pickFiles(
+
+        type:
+            FileType.image,
+
+        allowMultiple:
+            false,
+
+        withData:
+            true,
       );
 
-      if (result == null) {
+      if (result == null ||
+          result.files.isEmpty) {
+
         return null;
       }
 
-      return result.files.first;
+      final file =
+          result.files.first;
+
+      // ===============================================
+      // VALIDATE EMPTY
+      // ===============================================
+
+      if (file.bytes == null) {
+
+        throw Exception(
+          'Image data not found',
+        );
+      }
+
+      return file;
+
     } catch (e) {
+
       throw Exception(
         e.toString(),
       );
@@ -39,27 +72,54 @@ class StorageService {
   // =====================================================
 
   Future<String> uploadWebImage({
-    required Uint8List imageBytes,
-    required String fileName,
-  }) async {
-    try {
-      final ref = _storage
-          .ref()
-          .child(
-            'products/$fileName',
-          );
 
-      final uploadTask =
+    required Uint8List imageBytes,
+
+    required String fileName,
+
+  }) async {
+
+    try {
+
+      final safeName =
+          fileName
+              .replaceAll(
+                ' ',
+                '_',
+              )
+              .trim();
+
+      final ref =
+          _storage
+              .ref()
+              .child(
+
+                'products/$safeName.jpg',
+              );
+
+      final metadata =
+          SettableMetadata(
+
+        contentType:
+            'image/jpeg',
+      );
+
+      final snapshot =
           await ref.putData(
+
         imageBytes,
+
+        metadata,
       );
 
       final imageUrl =
-          await uploadTask.ref
+          await snapshot.ref
               .getDownloadURL();
 
       return imageUrl;
+
     } catch (e) {
+
       throw Exception(
         e.toString(),
       );
@@ -70,31 +130,62 @@ class StorageService {
   // PRODUCT IMAGE
   // =====================================================
 
-  Future<String> uploadProductImage({
+  Future<String>
+      uploadProductImage({
+
     required PlatformFile file,
+
     required String productId,
+
   }) async {
+
     try {
-      Uint8List imageData =
+
+      if (file.bytes == null) {
+
+        throw Exception(
+          'Image data is empty',
+        );
+      }
+
+      final Uint8List
+          imageData =
           file.bytes!;
 
-      final ref = _storage
-          .ref()
-          .child(
-            'product_images/$productId.jpg',
-          );
+      final ref =
+          _storage
+              .ref()
+              .child(
 
-      UploadTask uploadTask =
-          ref.putData(imageData);
+                'product_images/$productId.jpg',
+              );
 
-      TaskSnapshot snapshot =
+      final metadata =
+          SettableMetadata(
+
+        contentType:
+            'image/jpeg',
+      );
+
+      final uploadTask =
+          ref.putData(
+
+        imageData,
+
+        metadata,
+      );
+
+      final snapshot =
           await uploadTask;
 
-      String downloadUrl =
-          await snapshot.ref.getDownloadURL();
+      final downloadUrl =
+          await snapshot.ref
+              .getDownloadURL();
 
       return downloadUrl;
+
     } catch (e) {
+
       throw Exception(
         e.toString(),
       );
@@ -105,31 +196,62 @@ class StorageService {
   // PROFILE IMAGE
   // =====================================================
 
-  Future<String> uploadProfileImage({
+  Future<String>
+      uploadProfileImage({
+
     required PlatformFile file,
+
     required String uid,
+
   }) async {
+
     try {
-      Uint8List imageData =
+
+      if (file.bytes == null) {
+
+        throw Exception(
+          'Image data is empty',
+        );
+      }
+
+      final Uint8List
+          imageData =
           file.bytes!;
 
-      final ref = _storage
-          .ref()
-          .child(
-            'profile_images/$uid.jpg',
-          );
+      final ref =
+          _storage
+              .ref()
+              .child(
 
-      UploadTask uploadTask =
-          ref.putData(imageData);
+                'profile_images/$uid.jpg',
+              );
 
-      TaskSnapshot snapshot =
+      final metadata =
+          SettableMetadata(
+
+        contentType:
+            'image/jpeg',
+      );
+
+      final uploadTask =
+          ref.putData(
+
+        imageData,
+
+        metadata,
+      );
+
+      final snapshot =
           await uploadTask;
 
-      String downloadUrl =
-          await snapshot.ref.getDownloadURL();
+      final downloadUrl =
+          await snapshot.ref
+              .getDownloadURL();
 
       return downloadUrl;
+
     } catch (e) {
+
       throw Exception(
         e.toString(),
       );
@@ -140,31 +262,62 @@ class StorageService {
   // PAYMENT PROOF
   // =====================================================
 
-  Future<String> uploadPaymentProof({
+  Future<String>
+      uploadPaymentProof({
+
     required PlatformFile file,
+
     required String orderId,
+
   }) async {
+
     try {
-      Uint8List imageData =
+
+      if (file.bytes == null) {
+
+        throw Exception(
+          'Image data is empty',
+        );
+      }
+
+      final Uint8List
+          imageData =
           file.bytes!;
 
-      final ref = _storage
-          .ref()
-          .child(
-            'payment_proofs/$orderId.jpg',
-          );
+      final ref =
+          _storage
+              .ref()
+              .child(
 
-      UploadTask uploadTask =
-          ref.putData(imageData);
+                'payment_proofs/$orderId.jpg',
+              );
 
-      TaskSnapshot snapshot =
+      final metadata =
+          SettableMetadata(
+
+        contentType:
+            'image/jpeg',
+      );
+
+      final uploadTask =
+          ref.putData(
+
+        imageData,
+
+        metadata,
+      );
+
+      final snapshot =
           await uploadTask;
 
-      String downloadUrl =
-          await snapshot.ref.getDownloadURL();
+      final downloadUrl =
+          await snapshot.ref
+              .getDownloadURL();
 
       return downloadUrl;
+
     } catch (e) {
+
       throw Exception(
         e.toString(),
       );
@@ -178,11 +331,22 @@ class StorageService {
   Future<void> deleteImage(
     String imageUrl,
   ) async {
+
     try {
+
+      if (imageUrl.isEmpty) {
+
+        return;
+      }
+
       await _storage
-          .refFromURL(imageUrl)
+          .refFromURL(
+            imageUrl,
+          )
           .delete();
+
     } catch (e) {
+
       throw Exception(
         e.toString(),
       );
@@ -194,31 +358,76 @@ class StorageService {
   // =====================================================
 
   Future<String> uploadImage({
+
     required PlatformFile file,
+
     required String folderName,
+
     required String fileName,
+
   }) async {
+
     try {
-      Uint8List imageData =
+
+      if (file.bytes == null) {
+
+        throw Exception(
+          'Image data is empty',
+        );
+      }
+
+      final Uint8List
+          imageData =
           file.bytes!;
 
-      final ref = _storage
-          .ref()
-          .child(
-            '$folderName/$fileName.jpg',
-          );
+      final safeFolder =
+          folderName
+              .replaceAll(
+                ' ',
+                '_',
+              );
 
-      UploadTask uploadTask =
-          ref.putData(imageData);
+      final safeFile =
+          fileName
+              .replaceAll(
+                ' ',
+                '_',
+              );
 
-      TaskSnapshot snapshot =
+      final ref =
+          _storage
+              .ref()
+              .child(
+
+                '$safeFolder/$safeFile.jpg',
+              );
+
+      final metadata =
+          SettableMetadata(
+
+        contentType:
+            'image/jpeg',
+      );
+
+      final uploadTask =
+          ref.putData(
+
+        imageData,
+
+        metadata,
+      );
+
+      final snapshot =
           await uploadTask;
 
-      String downloadUrl =
-          await snapshot.ref.getDownloadURL();
+      final downloadUrl =
+          await snapshot.ref
+              .getDownloadURL();
 
       return downloadUrl;
+
     } catch (e) {
+
       throw Exception(
         e.toString(),
       );

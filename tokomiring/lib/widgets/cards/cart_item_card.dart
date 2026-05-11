@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../core/constants/app_colors.dart';
 import '../../core/utils/app_format.dart';
 
 import '../../providers/cart_provider.dart';
@@ -15,7 +16,9 @@ class CartItemCard
   final CartItemModel item;
 
   const CartItemCard({
+
     super.key,
+
     required this.item,
   });
 
@@ -24,24 +27,58 @@ class CartItemCard
     BuildContext context,
   ) {
 
-    return Card(
-      elevation: 5,
+    return Container(
 
-      shape:
-          RoundedRectangleBorder(
+      margin:
+          const EdgeInsets.only(
+        bottom: 18,
+      ),
+
+      decoration:
+          BoxDecoration(
+
+        color:
+            Colors.white,
+
         borderRadius:
             BorderRadius.circular(
-          22,
+          24,
         ),
+
+        boxShadow: [
+
+          BoxShadow(
+
+            color:
+                Colors.black
+                    .withOpacity(
+              0.05,
+            ),
+
+            blurRadius:
+                18,
+
+            offset:
+                const Offset(
+              0,
+              8,
+            ),
+          ),
+        ],
       ),
 
       child: Padding(
+
         padding:
             const EdgeInsets.all(
           16,
         ),
 
         child: Row(
+
+          crossAxisAlignment:
+              CrossAxisAlignment.start,
+
           children: [
 
             // =====================================
@@ -49,64 +86,86 @@ class CartItemCard
             // =====================================
 
             ClipRRect(
+
               borderRadius:
                   BorderRadius.circular(
-                16,
+                18,
               ),
 
               child:
                   item.product
                           .imageBase64
                           .isEmpty
-                      ? Container(
-                          width: 90,
 
-                          height: 90,
+                      ? Container(
+
+                          width: 95,
+
+                          height: 95,
 
                           color:
                               Colors.grey
-                                  .shade300,
+                                  .shade200,
 
                           child:
-                              const Icon(
-                            Icons.image,
-                            size: 40,
+                              Icon(
+
+                            Icons.image_outlined,
+
+                            size: 42,
+
+                            color:
+                                Colors.grey
+                                    .shade500,
                           ),
                         )
 
                       : Image.memory(
+
                           base64Decode(
+
                             item.product
                                 .imageBase64,
                           ),
 
-                          width: 90,
+                          width: 95,
 
-                          height: 90,
+                          height: 95,
 
                           fit:
                               BoxFit.cover,
 
                           errorBuilder: (
+
                             context,
+
                             error,
+
                             stackTrace,
+
                           ) {
 
                             return Container(
-                              width: 90,
 
-                              height: 90,
+                              width: 95,
+
+                              height: 95,
 
                               color:
                                   Colors.grey
-                                      .shade300,
+                                      .shade200,
 
                               child:
-                                  const Icon(
+                                  Icon(
+
                                 Icons
-                                    .broken_image,
-                                size: 40,
+                                    .broken_image_outlined,
+
+                                size: 42,
+
+                                color:
+                                    Colors.grey
+                                        .shade500,
                               ),
                             );
                           },
@@ -114,7 +173,7 @@ class CartItemCard
             ),
 
             const SizedBox(
-              width: 20,
+              width: 18,
             ),
 
             // =====================================
@@ -122,7 +181,9 @@ class CartItemCard
             // =====================================
 
             Expanded(
+
               child: Column(
+
                 crossAxisAlignment:
                     CrossAxisAlignment
                         .start,
@@ -134,9 +195,10 @@ class CartItemCard
                   // =================================
 
                   Text(
+
                     item.product.name,
 
-                    maxLines: 1,
+                    maxLines: 2,
 
                     overflow:
                         TextOverflow
@@ -144,15 +206,18 @@ class CartItemCard
 
                     style:
                         const TextStyle(
-                      fontSize: 18,
+
+                      fontSize: 17,
 
                       fontWeight:
                           FontWeight.bold,
+
+                      height: 1.3,
                     ),
                   ),
 
                   const SizedBox(
-                    height: 10,
+                    height: 8,
                   ),
 
                   // =================================
@@ -160,8 +225,20 @@ class CartItemCard
                   // =================================
 
                   Text(
+
                     AppFormat.currency(
+
                       item.product.price,
+                    ),
+
+                    style:
+                        TextStyle(
+
+                      fontSize: 14,
+
+                      color:
+                          Colors.grey
+                              .shade700,
                     ),
                   ),
 
@@ -173,84 +250,285 @@ class CartItemCard
                   // SUBTOTAL
                   // =================================
 
-                  Text(
-                    'Subtotal: ${AppFormat.currency(item.subtotal)}',
+                  Container(
 
-                    style:
-                        const TextStyle(
-                      fontWeight:
-                          FontWeight.bold,
+                    padding:
+                        const EdgeInsets.symmetric(
+
+                      horizontal: 12,
+
+                      vertical: 8,
+                    ),
+
+                    decoration:
+                        BoxDecoration(
+
+                      color:
+                          AppColors.success
+                              .withOpacity(
+                        0.1,
+                      ),
+
+                      borderRadius:
+                          BorderRadius.circular(
+                        12,
+                      ),
+                    ),
+
+                    child: Text(
+
+                      'Subtotal: ${AppFormat.currency(item.subtotal)}',
+
+                      style:
+                          const TextStyle(
+
+                        color:
+                            AppColors.success,
+
+                        fontWeight:
+                            FontWeight.bold,
+
+                        fontSize: 13,
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(
+                    height: 14,
+                  ),
+
+                  // =================================
+                  // REMOVE
+                  // =================================
+
+                  GestureDetector(
+
+                    onTap: () {
+
+                      Provider.of<
+                          CartProvider>(
+
+                        context,
+
+                        listen: false,
+
+                      ).removeFromCart(
+                        item.product.id,
+                      );
+                    },
+
+                    child: Row(
+
+                      mainAxisSize:
+                          MainAxisSize.min,
+
+                      children: [
+
+                        const Icon(
+
+                          Icons.delete_outline,
+
+                          color:
+                              AppColors.danger,
+
+                          size: 18,
+                        ),
+
+                        const SizedBox(
+                          width: 6,
+                        ),
+
+                        const Text(
+
+                          'Remove',
+
+                          style: TextStyle(
+
+                            color:
+                                AppColors
+                                    .danger,
+
+                            fontWeight:
+                                FontWeight.bold,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
             ),
 
+            const SizedBox(
+              width: 12,
+            ),
+
             // =====================================
-            // QUANTITY
+            // QUANTITY BOX
             // =====================================
 
-            Column(
-              children: [
+            Container(
 
-                // =================================
-                // INCREASE
-                // =================================
+              padding:
+                  const EdgeInsets.symmetric(
 
-                IconButton(
-                  onPressed: () {
+                horizontal: 10,
 
-                    Provider.of<
-                        CartProvider>(
-                      context,
-                      listen: false,
-                    ).increaseQuantity(
-                      item.product.id,
-                    );
-                  },
+                vertical: 10,
+              ),
 
-                  icon: const Icon(
-                    Icons.add_circle,
-                  ),
+              decoration:
+                  BoxDecoration(
+
+                color:
+                    Colors.grey
+                        .shade100,
+
+                borderRadius:
+                    BorderRadius.circular(
+                  18,
                 ),
+              ),
 
-                // =================================
-                // QTY
-                // =================================
+              child: Column(
 
-                Text(
-                  '${item.quantity}',
+                children: [
 
-                  style:
-                      const TextStyle(
-                    fontSize: 18,
+                  // =================================
+                  // ADD
+                  // =================================
 
-                    fontWeight:
-                        FontWeight.bold,
+                  InkWell(
+
+                    borderRadius:
+                        BorderRadius.circular(
+                      100,
+                    ),
+
+                    onTap: () {
+
+                      Provider.of<
+                          CartProvider>(
+
+                        context,
+
+                        listen: false,
+
+                      ).increaseQuantity(
+                        item.product.id,
+                      );
+                    },
+
+                    child: Container(
+
+                      padding:
+                          const EdgeInsets.all(
+                        4,
+                      ),
+
+                      decoration:
+                          const BoxDecoration(
+
+                        color:
+                            AppColors.success,
+
+                        shape:
+                            BoxShape.circle,
+                      ),
+
+                      child: const Icon(
+
+                        Icons.add,
+
+                        size: 18,
+
+                        color:
+                            Colors.white,
+                      ),
+                    ),
                   ),
-                ),
 
-                // =================================
-                // DECREASE
-                // =================================
-
-                IconButton(
-                  onPressed: () {
-
-                    Provider.of<
-                        CartProvider>(
-                      context,
-                      listen: false,
-                    ).decreaseQuantity(
-                      item.product.id,
-                    );
-                  },
-
-                  icon: const Icon(
-                    Icons.remove_circle,
+                  const SizedBox(
+                    height: 12,
                   ),
-                ),
-              ],
+
+                  // =================================
+                  // QTY
+                  // =================================
+
+                  Text(
+
+                    '${item.quantity}',
+
+                    style:
+                        const TextStyle(
+
+                      fontSize: 18,
+
+                      fontWeight:
+                          FontWeight.bold,
+                    ),
+                  ),
+
+                  const SizedBox(
+                    height: 12,
+                  ),
+
+                  // =================================
+                  // MINUS
+                  // =================================
+
+                  InkWell(
+
+                    borderRadius:
+                        BorderRadius.circular(
+                      100,
+                    ),
+
+                    onTap: () {
+
+                      Provider.of<
+                          CartProvider>(
+
+                        context,
+
+                        listen: false,
+
+                      ).decreaseQuantity(
+                        item.product.id,
+                      );
+                    },
+
+                    child: Container(
+
+                      padding:
+                          const EdgeInsets.all(
+                        4,
+                      ),
+
+                      decoration:
+                          const BoxDecoration(
+
+                        color:
+                            AppColors.danger,
+
+                        shape:
+                            BoxShape.circle,
+                      ),
+
+                      child: const Icon(
+
+                        Icons.remove,
+
+                        size: 18,
+
+                        color:
+                            Colors.white,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         ),

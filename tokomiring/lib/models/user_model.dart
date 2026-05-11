@@ -1,116 +1,238 @@
 // lib/models/user_model.dart
 
 class UserModel {
+
   final String uid;
+
   final String name;
+
   final String username;
+
   final String email;
+
   final String role;
+
   final String photoUrl;
+
   final String phone;
+
   final String address;
+
   final bool isActive;
+
   final DateTime createdAt;
 
   UserModel({
+
     required this.uid,
+
     required this.name,
+
     required this.username,
+
     required this.email,
+
     required this.role,
+
     required this.photoUrl,
+
     required this.phone,
+
     required this.address,
+
     required this.isActive,
+
     required this.createdAt,
   });
 
+  // =====================================================
+  // FROM MAP
+  // =====================================================
+
   factory UserModel.fromMap(
+
     Map<dynamic, dynamic> map,
+
     String uid,
+
   ) {
+
     return UserModel(
-      uid: uid,
 
-      name: map['name'] ?? '',
+      uid:
+          uid,
 
-      username: map['username'] ?? '',
+      name:
+          map['name'] ?? '',
 
-      email: map['email'] ?? '',
+      username:
+          map['username'] ?? '',
 
-      role: map['role'] ?? 'user',
+      email:
+          map['email'] ?? '',
 
-      photoUrl: map['photoUrl'] ?? '',
+      role:
+          map['role'] ?? 'user',
 
-      phone: map['phone'] ?? '',
+      photoUrl:
+          map['photoUrl'] ?? '',
 
-      address: map['address'] ?? '',
+      phone:
+          map['phone'] ?? '',
 
-      isActive: map['isActive'] ?? true,
+      address:
+          map['address'] ?? '',
 
-      createdAt: DateTime.tryParse(
-            map['createdAt'] ?? '',
-          ) ??
-          DateTime.now(),
+      isActive:
+          map['isActive'] ?? true,
+
+      createdAt:
+          DateTime.tryParse(
+                map['createdAt']
+                        ?.toString() ??
+                    '',
+              ) ??
+              DateTime.now(),
     );
   }
 
+  // =====================================================
+  // TO MAP
+  // =====================================================
+
   Map<String, dynamic> toMap() {
+
     return {
-      'uid': uid,
 
-      'name': name,
+      'uid':
+          uid,
 
-      'username': username,
+      'name':
+          name,
 
-      'email': email,
+      'username':
+          username,
 
-      'role': role,
+      'email':
+          email,
 
-      'photoUrl': photoUrl,
+      'role':
+          role,
 
-      'phone': phone,
+      'photoUrl':
+          photoUrl,
 
-      'address': address,
+      'phone':
+          phone,
 
-      'isActive': isActive,
+      'address':
+          address,
 
-      'createdAt': createdAt.toIso8601String(),
+      'isActive':
+          isActive,
+
+      'createdAt':
+          createdAt
+              .toIso8601String(),
     };
   }
 
+  // =====================================================
+  // ROLE CHECK
+  // =====================================================
+
+  bool get isAdmin =>
+      role == 'admin';
+
+  bool get isUser =>
+      role == 'user';
+
+  // =====================================================
+  // PROFILE CHECK
+  // =====================================================
+
+  bool get hasPhoto =>
+      photoUrl.isNotEmpty;
+
+  bool get hasPhone =>
+      phone.isNotEmpty;
+
+  bool get hasAddress =>
+      address.isNotEmpty;
+
+  // =====================================================
+  // DISPLAY NAME
+  // =====================================================
+
+  String get displayName {
+
+    if (name.isNotEmpty) {
+      return name;
+    }
+
+    return username;
+  }
+
+  // =====================================================
+  // COPY WITH
+  // =====================================================
+
   UserModel copyWith({
+
     String? uid,
+
     String? name,
+
     String? username,
+
     String? email,
+
     String? role,
+
     String? photoUrl,
+
     String? phone,
+
     String? address,
+
     bool? isActive,
+
     DateTime? createdAt,
+
   }) {
+
     return UserModel(
-      uid: uid ?? this.uid,
 
-      name: name ?? this.name,
+      uid:
+          uid ?? this.uid,
 
-      username: username ?? this.username,
+      name:
+          name ?? this.name,
 
-      email: email ?? this.email,
+      username:
+          username ?? this.username,
 
-      role: role ?? this.role,
+      email:
+          email ?? this.email,
 
-      photoUrl: photoUrl ?? this.photoUrl,
+      role:
+          role ?? this.role,
 
-      phone: phone ?? this.phone,
+      photoUrl:
+          photoUrl ?? this.photoUrl,
 
-      address: address ?? this.address,
+      phone:
+          phone ?? this.phone,
 
-      isActive: isActive ?? this.isActive,
+      address:
+          address ?? this.address,
 
-      createdAt: createdAt ?? this.createdAt,
+      isActive:
+          isActive ?? this.isActive,
+
+      createdAt:
+          createdAt ??
+              this.createdAt,
     );
   }
 }

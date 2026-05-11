@@ -6,6 +6,7 @@ import 'package:firebase_database/firebase_database.dart';
 import '../models/user_model.dart';
 
 class AuthService {
+
   final FirebaseAuth _auth =
       FirebaseAuth.instance;
 
@@ -31,54 +32,102 @@ class AuthService {
   // =====================================================
 
   Future<UserModel?> register({
+
     required String name,
+
     required String username,
+
     required String email,
+
     required String password,
+
     String role = 'user',
+
   }) async {
+
     try {
-      // CREATE FIREBASE AUTH
+
+      // ===============================================
+      // CREATE AUTH
+      // ===============================================
+
       final credential =
           await _auth
               .createUserWithEmailAndPassword(
-        email: email.trim(),
-        password: password.trim(),
+
+        email:
+            email
+                .trim()
+                .toLowerCase(),
+
+        password:
+            password.trim(),
       );
 
-      final user = credential.user;
+      final user =
+          credential.user;
 
       if (user == null) {
-        return null;
+
+        throw Exception(
+          'User not found',
+        );
       }
 
+      // ===============================================
       // UPDATE DISPLAY NAME
-      await user.updateDisplayName(name);
+      // ===============================================
 
-      // CREATE USER MODEL
-      final userModel = UserModel(
-        uid: user.uid,
-
-        name: name.trim(),
-
-        username: username.trim(),
-
-        email: email.trim(),
-
-        role: role,
-
-        photoUrl: '',
-
-        phone: '',
-
-        address: '',
-
-        isActive: true,
-
-        createdAt: DateTime.now(),
+      await user.updateDisplayName(
+        name.trim(),
       );
 
-      // SAVE TO REALTIME DATABASE
+      // ===============================================
+      // USER MODEL
+      // ===============================================
+
+      final userModel =
+          UserModel(
+
+        uid:
+            user.uid,
+
+        name:
+            name.trim(),
+
+        username:
+            username
+                .trim()
+                .toLowerCase(),
+
+        email:
+            email
+                .trim()
+                .toLowerCase(),
+
+        role:
+            role,
+
+        photoUrl:
+            '',
+
+        phone:
+            '',
+
+        address:
+            '',
+
+        isActive:
+            true,
+
+        createdAt:
+            DateTime.now(),
+      );
+
+      // ===============================================
+      // SAVE DATABASE
+      // ===============================================
+
       await _database
           .child('users')
           .child(user.uid)
@@ -87,12 +136,16 @@ class AuthService {
           );
 
       return userModel;
+
     } on FirebaseAuthException catch (e) {
+
       throw Exception(
         e.message ??
             'Register failed',
       );
+
     } catch (e) {
+
       throw Exception(
         e.toString(),
       );
@@ -104,21 +157,36 @@ class AuthService {
   // =====================================================
 
   Future<UserModel?> login({
+
     required String email,
+
     required String password,
+
   }) async {
+
     try {
+
       final credential =
           await _auth
               .signInWithEmailAndPassword(
-        email: email.trim(),
-        password: password.trim(),
+
+        email:
+            email
+                .trim()
+                .toLowerCase(),
+
+        password:
+            password.trim(),
       );
 
-      final user = credential.user;
+      final user =
+          credential.user;
 
       if (user == null) {
-        return null;
+
+        throw Exception(
+          'User not found',
+        );
       }
 
       final snapshot =
@@ -127,25 +195,37 @@ class AuthService {
               .child(user.uid)
               .get();
 
-      if (!snapshot.exists) {
-        return null;
+      // ===============================================
+      // USER NOT EXISTS
+      // ===============================================
+
+      if (!snapshot.exists ||
+          snapshot.value == null) {
+
+        throw Exception(
+          'User data not found',
+        );
       }
 
       final data =
           Map<dynamic, dynamic>.from(
-        snapshot.value as dynamic,
+        snapshot.value as Map,
       );
 
       return UserModel.fromMap(
         data,
         user.uid,
       );
+
     } on FirebaseAuthException catch (e) {
+
       throw Exception(
         e.message ??
             'Login failed',
       );
+
     } catch (e) {
+
       throw Exception(
         e.toString(),
       );
@@ -159,27 +239,33 @@ class AuthService {
   Future<UserModel?> getUserData(
     String uid,
   ) async {
+
     try {
+
       final snapshot =
           await _database
               .child('users')
               .child(uid)
               .get();
 
-      if (!snapshot.exists) {
+      if (!snapshot.exists ||
+          snapshot.value == null) {
+
         return null;
       }
 
       final data =
           Map<dynamic, dynamic>.from(
-        snapshot.value as dynamic,
+        snapshot.value as Map,
       );
 
       return UserModel.fromMap(
         data,
         uid,
       );
+
     } catch (e) {
+
       throw Exception(
         e.toString(),
       );
@@ -191,32 +277,53 @@ class AuthService {
   // =====================================================
 
   Future<void> updateProfile({
+
     required String uid,
+
     required String name,
+
     required String username,
+
     required String phone,
+
     required String address,
+
     required String photoUrl,
+
   }) async {
+
     try {
+
       await _database
           .child('users')
           .child(uid)
           .update({
-        'name': name,
 
-        'username': username,
+        'name':
+            name.trim(),
 
-        'phone': phone,
+        'username':
+            username
+                .trim()
+                .toLowerCase(),
 
-        'address': address,
+        'phone':
+            phone.trim(),
 
-        'photoUrl': photoUrl,
+        'address':
+            address.trim(),
+
+        'photoUrl':
+            photoUrl.trim(),
       });
 
       await _auth.currentUser
-          ?.updateDisplayName(name);
+          ?.updateDisplayName(
+        name.trim(),
+      );
+
     } catch (e) {
+
       throw Exception(
         e.toString(),
       );
@@ -230,12 +337,20 @@ class AuthService {
   Future<void> resetPassword(
     String email,
   ) async {
+
     try {
+
       await _auth
           .sendPasswordResetEmail(
-        email: email.trim(),
+
+        email:
+            email
+                .trim()
+                .toLowerCase(),
       );
+
     } on FirebaseAuthException catch (e) {
+
       throw Exception(
         e.message ??
             'Reset password failed',
@@ -247,10 +362,15 @@ class AuthService {
   // LOGOUT
   // =====================================================
 
-  Future<void> logout() async {
+  Future<void> logout()
+      async {
+
     try {
+
       await _auth.signOut();
+
     } catch (e) {
+
       throw Exception(
         e.toString(),
       );
@@ -264,17 +384,39 @@ class AuthService {
   Future<void> deleteAccount(
     String uid,
   ) async {
+
     try {
-      // DELETE DATABASE USER
+
+      // ===============================================
+      // DELETE DATABASE
+      // ===============================================
+
       await _database
           .child('users')
           .child(uid)
           .remove();
 
-      // DELETE AUTH USER
-      await _auth.currentUser
-          ?.delete();
+      // ===============================================
+      // DELETE AUTH
+      // ===============================================
+
+      final user =
+          _auth.currentUser;
+
+      if (user != null) {
+
+        await user.delete();
+      }
+
+    } on FirebaseAuthException catch (e) {
+
+      throw Exception(
+        e.message ??
+            'Delete account failed',
+      );
+
     } catch (e) {
+
       throw Exception(
         e.toString(),
       );
@@ -288,24 +430,31 @@ class AuthService {
   Future<bool> isAdmin(
     String uid,
   ) async {
+
     try {
+
       final snapshot =
           await _database
               .child('users')
               .child(uid)
               .get();
 
-      if (!snapshot.exists) {
+      if (!snapshot.exists ||
+          snapshot.value == null) {
+
         return false;
       }
 
       final data =
           Map<dynamic, dynamic>.from(
-        snapshot.value as dynamic,
+        snapshot.value as Map,
       );
 
-      return data['role'] == 'admin';
-    } catch (e) {
+      return data['role'] ==
+          'admin';
+
+    } catch (_) {
+
       return false;
     }
   }
@@ -314,8 +463,12 @@ class AuthService {
   // CREATE DEFAULT ADMIN
   // =====================================================
 
-  Future<void> createDefaultAdmin() async {
+  Future<void>
+      createDefaultAdmin()
+      async {
+
     try {
+
       const adminEmail =
           'admin@tokomiring.com';
 
@@ -328,19 +481,31 @@ class AuthService {
         adminEmail,
       );
 
+      // ===============================================
+      // ADMIN NOT EXISTS
+      // ===============================================
+
       if (methods.isEmpty) {
+
         await register(
-          name: 'Administrator',
 
-          username: 'admin',
+          name:
+              'Administrator',
 
-          email: adminEmail,
+          username:
+              'admin',
 
-          password: adminPassword,
+          email:
+              adminEmail,
 
-          role: 'admin',
+          password:
+              adminPassword,
+
+          role:
+              'admin',
         );
       }
+
     } catch (_) {}
   }
 }

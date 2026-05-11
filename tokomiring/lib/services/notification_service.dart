@@ -4,6 +4,11 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/foundation.dart';
 
 class NotificationService {
+
+  // =====================================================
+  // DATABASE
+  // =====================================================
+
   final DatabaseReference _database =
       FirebaseDatabase.instance.ref();
 
@@ -12,37 +17,70 @@ class NotificationService {
   // =====================================================
 
   Future<void> createNotification({
+
     required String title,
+
     required String message,
+
     required String type,
+
     required String targetRole,
+
   }) async {
+
     try {
+
+      // ===============================================
+      // GENERATE UNIQUE ID
+      // ===============================================
+
       final notificationId =
-          DateTime.now()
-              .millisecondsSinceEpoch
-              .toString();
+          _database
+              .child('notifications')
+              .push()
+              .key;
+
+      if (notificationId == null) {
+
+        throw Exception(
+          'Failed to generate notification ID',
+        );
+      }
+
+      // ===============================================
+      // SAVE NOTIFICATION
+      // ===============================================
 
       await _database
           .child('notifications')
           .child(notificationId)
           .set({
-        'id': notificationId,
 
-        'title': title,
+        'id':
+            notificationId,
 
-        'message': message,
+        'title':
+            title.trim(),
 
-        'type': type,
+        'message':
+            message.trim(),
 
-        'targetRole': targetRole,
+        'type':
+            type.trim(),
 
-        'isRead': false,
+        'targetRole':
+            targetRole.trim(),
+
+        'isRead':
+            false,
 
         'createdAt':
-            DateTime.now().toIso8601String(),
+            DateTime.now()
+                .toIso8601String(),
       });
+
     } catch (e) {
+
       throw Exception(
         e.toString(),
       );
@@ -55,54 +93,123 @@ class NotificationService {
 
   Stream<List<Map<String, dynamic>>>
       getNotifications({
+
     required String role,
+
   }) {
+
     return _database
         .child('notifications')
         .onValue
         .map((event) {
-      final data = event.snapshot.value;
+
+      final data =
+          event.snapshot.value;
+
+      // ===============================================
+      // EMPTY
+      // ===============================================
 
       if (data == null) {
+
+        return [];
+      }
+
+      // ===============================================
+      // INVALID FORMAT
+      // ===============================================
+
+      if (data is! Map) {
+
         return [];
       }
 
       final map =
-          Map<dynamic, dynamic>.from(data as dynamic);
+          Map<dynamic, dynamic>.from(
+        data,
+      );
 
-      List<Map<String, dynamic>> notifications =
-          [];
+      final List<Map<String, dynamic>>
+          notifications = [];
 
       map.forEach((key, value) {
-        final item =
-            Map<dynamic, dynamic>.from(value);
 
-        if (item['targetRole'] == role ||
-            item['targetRole'] == 'all') {
-          notifications.add({
-            'id': item['id'] ?? '',
+        try {
 
-            'title': item['title'] ?? '',
+          if (value == null ||
+              value is! Map) {
 
-            'message': item['message'] ?? '',
+            return;
+          }
 
-            'type': item['type'] ?? '',
+          final item =
+              Map<dynamic, dynamic>.from(
+            value,
+          );
 
-            'targetRole':
-                item['targetRole'] ?? '',
+          // ===========================================
+          // FILTER ROLE
+          // ===========================================
 
-            'isRead':
-                item['isRead'] ?? false,
+          if (item['targetRole'] ==
+                  role ||
 
-            'createdAt':
-                item['createdAt'] ?? '',
-          });
-        }
+              item['targetRole'] ==
+                  'all') {
+
+            notifications.add({
+
+              'id':
+                  item['id'] ?? '',
+
+              'title':
+                  item['title'] ?? '',
+
+              'message':
+                  item['message'] ?? '',
+
+              'type':
+                  item['type'] ?? '',
+
+              'targetRole':
+                  item['targetRole'] ?? '',
+
+              'isRead':
+                  item['isRead'] ?? false,
+
+              'createdAt':
+                  item['createdAt'] ?? '',
+            });
+          }
+
+        } catch (_) {}
       });
 
+      // ===============================================
+      // SORT NEWEST FIRST
+      // ===============================================
+
       notifications.sort(
-        (a, b) => b['createdAt']
-            .compareTo(a['createdAt']),
+        (a, b) {
+
+          final aDate =
+              DateTime.tryParse(
+                    a['createdAt']
+                        .toString(),
+                  ) ??
+                  DateTime.now();
+
+          final bDate =
+              DateTime.tryParse(
+                    b['createdAt']
+                        .toString(),
+                  ) ??
+                  DateTime.now();
+
+          return bDate.compareTo(
+            aDate,
+          );
+        },
       );
 
       return notifications;
@@ -116,14 +223,84 @@ class NotificationService {
   Future<void> markAsRead(
     String notificationId,
   ) async {
+
     try {
+
       await _database
           .child('notifications')
           .child(notificationId)
           .update({
-        'isRead': true,
+
+        'isRead':
+            true,
       });
+
     } catch (e) {
+
+      throw Exception(
+        e.toString(),
+      );
+    }
+  }
+
+  // =====================================================
+  // MARK ALL AS READ
+  // =====================================================
+
+  Future<void>
+      markAllAsRead({
+
+    required String role,
+
+  }) async {
+
+    try {
+
+      final snapshot =
+          await _database
+              .child('notifications')
+              .get();
+
+      if (!snapshot.exists ||
+          snapshot.value == null) {
+
+        return;
+      }
+
+      final map =
+          Map<dynamic, dynamic>.from(
+        snapshot.value as Map,
+      );
+
+      for (final entry
+          in map.entries) {
+
+        final item =
+            Map<dynamic, dynamic>.from(
+          entry.value,
+        );
+
+        if (item['targetRole'] ==
+                role ||
+
+            item['targetRole'] ==
+                'all') {
+
+          await _database
+              .child('notifications')
+              .child(
+                entry.key,
+              )
+              .update({
+
+            'isRead':
+                true,
+          });
+        }
+      }
+
+    } catch (e) {
+
       throw Exception(
         e.toString(),
       );
@@ -137,12 +314,16 @@ class NotificationService {
   Future<void> deleteNotification(
     String notificationId,
   ) async {
+
     try {
+
       await _database
           .child('notifications')
           .child(notificationId)
           .remove();
+
     } catch (e) {
+
       throw Exception(
         e.toString(),
       );
@@ -150,15 +331,21 @@ class NotificationService {
   }
 
   // =====================================================
-  // CLEAR ALL NOTIFICATIONS
+  // CLEAR ALL
   // =====================================================
 
-  Future<void> clearAllNotifications() async {
+  Future<void>
+      clearAllNotifications()
+      async {
+
     try {
+
       await _database
           .child('notifications')
           .remove();
+
     } catch (e) {
+
       throw Exception(
         e.toString(),
       );
@@ -166,128 +353,188 @@ class NotificationService {
   }
 
   // =====================================================
-  // TOTAL UNREAD
+  // UNREAD COUNT
   // =====================================================
 
   Stream<int> getUnreadCount({
+
     required String role,
+
   }) {
-    return getNotifications(role: role).map(
-      (notifications) => notifications
-          .where(
-            (notification) =>
-                notification['isRead'] == false,
-          )
-          .length,
+
+    return getNotifications(
+      role: role,
+    ).map(
+
+      (notifications) {
+
+        return notifications
+            .where(
+
+              (notification) =>
+
+                  notification[
+                      'isRead'] ==
+
+                  false,
+            )
+            .length;
+      },
     );
   }
 
   // =====================================================
-  // CREATE ORDER NOTIFICATION
+  // NEW ORDER
   // =====================================================
 
-  Future<void> sendNewOrderNotification({
+  Future<void>
+      sendNewOrderNotification({
+
     required String customerName,
+
   }) async {
+
     await createNotification(
-      title: 'New Order',
+
+      title:
+          'New Order',
 
       message:
           '$customerName created a new order',
 
-      type: 'order',
+      type:
+          'order',
 
-      targetRole: 'admin',
+      targetRole:
+          'admin',
     );
   }
 
   // =====================================================
-  // CREATE PAYMENT NOTIFICATION
+  // PAYMENT
   // =====================================================
 
-  Future<void> sendPaymentNotification({
+  Future<void>
+      sendPaymentNotification({
+
     required String customerName,
+
   }) async {
+
     await createNotification(
-      title: 'Payment Uploaded',
+
+      title:
+          'Payment Uploaded',
 
       message:
           '$customerName uploaded payment proof',
 
-      type: 'payment',
+      type:
+          'payment',
 
-      targetRole: 'admin',
+      targetRole:
+          'admin',
     );
   }
 
   // =====================================================
-  // ORDER STATUS NOTIFICATION
+  // ORDER STATUS
   // =====================================================
 
-  Future<void> sendOrderStatusNotification({
+  Future<void>
+      sendOrderStatusNotification({
+
     required String status,
+
   }) async {
+
     await createNotification(
-      title: 'Order Status Updated',
+
+      title:
+          'Order Status Updated',
 
       message:
           'Your order status changed to $status',
 
-      type: 'status',
+      type:
+          'status',
 
-      targetRole: 'user',
+      targetRole:
+          'user',
     );
   }
 
   // =====================================================
-  // LOW STOCK NOTIFICATION
+  // LOW STOCK
   // =====================================================
 
-  Future<void> sendLowStockNotification({
+  Future<void>
+      sendLowStockNotification({
+
     required String productName,
+
   }) async {
+
     await createNotification(
-      title: 'Low Stock Warning',
+
+      title:
+          'Low Stock Warning',
 
       message:
           '$productName stock is running low',
 
-      type: 'stock',
+      type:
+          'stock',
 
-      targetRole: 'admin',
+      targetRole:
+          'admin',
     );
   }
 
   // =====================================================
-  // ADMIN BROADCAST
+  // BROADCAST
   // =====================================================
 
-  Future<void> sendBroadcastNotification({
+  Future<void>
+      sendBroadcastNotification({
+
     required String title,
+
     required String message,
+
   }) async {
+
     await createNotification(
-      title: title,
 
-      message: message,
+      title:
+          title,
 
-      type: 'broadcast',
+      message:
+          message,
 
-      targetRole: 'all',
+      type:
+          'broadcast',
+
+      targetRole:
+          'all',
     );
   }
 
   // =====================================================
-  // REALTIME LISTENER DEBUG
+  // DEBUG LISTENER
   // =====================================================
 
   void listenNotifications() {
+
     _database
         .child('notifications')
         .onChildAdded
         .listen((event) {
+
       if (kDebugMode) {
-        print(
+
+        debugPrint(
+
           'New notification: ${event.snapshot.value}',
         );
       }

@@ -2,50 +2,200 @@
 
 import 'package:flutter/material.dart';
 
-class IconTextButton extends StatelessWidget {
+import '../../core/constants/app_colors.dart';
+
+class IconTextButton
+    extends StatelessWidget {
+
   final String text;
 
   final IconData icon;
 
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
 
   final Color color;
 
+  final Color foregroundColor;
+
+  final double borderRadius;
+
+  final double height;
+
+  final bool isLoading;
+
+  final bool isExpanded;
+
+  final double iconSize;
+
+  final EdgeInsetsGeometry padding;
+
+  // =====================================================
+  // CONSTRUCTOR
+  // =====================================================
+
   const IconTextButton({
+
     super.key,
+
     required this.text,
+
     required this.icon,
+
     required this.onPressed,
-    this.color = const Color(0xff2563EB),
+
+    this.color =
+        AppColors.primary,
+
+    this.foregroundColor =
+        Colors.white,
+
+    this.borderRadius =
+        18,
+
+    this.height =
+        56,
+
+    this.isLoading =
+        false,
+
+    this.isExpanded =
+        false,
+
+    this.iconSize =
+        20,
+
+    this.padding =
+        const EdgeInsets.symmetric(
+
+      horizontal: 20,
+
+      vertical: 16,
+    ),
   });
 
   @override
-  Widget build(BuildContext context) {
-    return ElevatedButton.icon(
-      onPressed: onPressed,
+  Widget build(
+    BuildContext context,
+  ) {
 
-      icon: Icon(icon),
+    final button =
+        ElevatedButton.icon(
 
-      label: Text(
+      onPressed:
+          isLoading
+
+              ? null
+
+              : onPressed,
+
+      icon:
+          isLoading
+
+              ? SizedBox(
+
+                  width: 18,
+
+                  height: 18,
+
+                  child:
+                      CircularProgressIndicator(
+
+                    color:
+                        foregroundColor,
+
+                    strokeWidth:
+                        2,
+                  ),
+                )
+
+              : Icon(
+
+                  icon,
+
+                  size:
+                      iconSize,
+                ),
+
+      label:
+          Text(
+
         text,
+
+        style:
+            const TextStyle(
+
+          fontSize: 15,
+
+          fontWeight:
+              FontWeight.bold,
+        ),
       ),
 
-      style: ElevatedButton.styleFrom(
-        backgroundColor: color,
+      style:
+          ElevatedButton.styleFrom(
 
-        foregroundColor: Colors.white,
+        elevation: 0,
+
+        backgroundColor:
+            color,
+
+        foregroundColor:
+            foregroundColor,
+
+        disabledBackgroundColor:
+            color.withOpacity(
+          0.7,
+        ),
+
+        disabledForegroundColor:
+            foregroundColor,
 
         padding:
-            const EdgeInsets.symmetric(
-          horizontal: 20,
-          vertical: 16,
+            padding,
+
+        minimumSize:
+            Size(
+          0,
+          height,
         ),
 
-        shape: RoundedRectangleBorder(
+        shape:
+            RoundedRectangleBorder(
+
           borderRadius:
-              BorderRadius.circular(16),
+              BorderRadius.circular(
+            borderRadius,
+          ),
         ),
       ),
+    );
+
+    // ===================================================
+    // EXPANDED
+    // ===================================================
+
+    if (isExpanded) {
+
+      return SizedBox(
+
+        width:
+            double.infinity,
+
+        height:
+            height,
+
+        child:
+            button,
+      );
+    }
+
+    return SizedBox(
+
+      height:
+          height,
+
+      child:
+          button,
     );
   }
 }

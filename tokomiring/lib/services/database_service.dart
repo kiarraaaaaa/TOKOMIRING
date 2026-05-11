@@ -7,6 +7,7 @@ import '../models/order_model.dart';
 import '../models/product_model.dart';
 
 class DatabaseService {
+
   // =====================================================
   // DATABASE
   // =====================================================
@@ -14,7 +15,8 @@ class DatabaseService {
   final DatabaseReference _database =
       FirebaseDatabase.instance.ref();
 
-  final Uuid _uuid = const Uuid();
+  final Uuid _uuid =
+      const Uuid();
 
   // =====================================================
   // PRODUCT SECTION
@@ -23,33 +25,35 @@ class DatabaseService {
   Future<void> addProduct(
     ProductModel product,
   ) async {
-    try {
-      print(
-        'ADDING PRODUCT...',
-      );
 
-      print(
+    try {
+
+      final productRef =
+          _database
+              .child('products')
+              .child(product.id);
+
+      // ===============================================
+      // CHECK EXIST
+      // ===============================================
+
+      final snapshot =
+          await productRef.get();
+
+      // PRODUCT ALREADY EXISTS
+      if (snapshot.exists) {
+
+        throw Exception(
+          'Product already exists',
+        );
+      }
+
+      // SAVE PRODUCT
+      await productRef.set(
         product.toMap(),
       );
 
-      await _database
-          .child('products')
-          .child(product.id)
-          .set(
-            product.toMap(),
-          );
-
-      print(
-        'PRODUCT SUCCESSFULLY ADDED',
-      );
     } catch (e) {
-      print(
-        'ADD PRODUCT ERROR:',
-      );
-
-      print(
-        e.toString(),
-      );
 
       throw Exception(
         e.toString(),
@@ -64,14 +68,18 @@ class DatabaseService {
   Future<void> updateProduct(
     ProductModel product,
   ) async {
+
     try {
+
       await _database
           .child('products')
           .child(product.id)
           .update(
             product.toMap(),
           );
+
     } catch (e) {
+
       throw Exception(
         e.toString(),
       );
@@ -85,12 +93,16 @@ class DatabaseService {
   Future<void> deleteProduct(
     String productId,
   ) async {
+
     try {
+
       await _database
           .child('products')
           .child(productId)
           .remove();
+
     } catch (e) {
+
       throw Exception(
         e.toString(),
       );
@@ -102,17 +114,32 @@ class DatabaseService {
   // =====================================================
 
   Future<void> updateStock({
+
     required String productId,
+
     required int stock,
+
   }) async {
+
     try {
+
+      if (stock < 0) {
+
+        throw Exception(
+          'Stock cannot be negative',
+        );
+      }
+
       await _database
           .child('products')
           .child(productId)
           .update({
+
         'stock': stock,
       });
+
     } catch (e) {
+
       throw Exception(
         e.toString(),
       );
@@ -125,37 +152,50 @@ class DatabaseService {
 
   Stream<List<ProductModel>>
       getProducts() {
+
     return _database
         .child('products')
         .onValue
         .map((event) {
+
       final data =
           event.snapshot.value;
 
       if (data == null) {
+
         return [];
       }
 
       final map =
           Map<dynamic, dynamic>.from(
-        data as dynamic,
+        data as Map,
       );
 
-      List<ProductModel> products =
-          [];
+      final List<ProductModel>
+          products = [];
 
       map.forEach((key, value) {
-        products.add(
-          ProductModel.fromMap(
-            Map<dynamic, dynamic>.from(
-              value,
+
+        try {
+
+          products.add(
+
+            ProductModel.fromMap(
+
+              Map<dynamic, dynamic>.from(
+                value,
+              ),
+
+              key,
             ),
-            key,
-          ),
-        );
+          );
+
+        } catch (_) {}
       });
 
-      // SORT NEWEST FIRST
+      // ===============================================
+      // SORT NEWEST
+      // ===============================================
 
       products.sort(
         (a, b) =>
@@ -169,19 +209,24 @@ class DatabaseService {
   }
 
   // =====================================================
-  // GET PRODUCTS BY CATEGORY
+  // GET PRODUCTS CATEGORY
   // =====================================================
 
   Stream<List<ProductModel>>
       getProductsByCategory(
     String category,
   ) {
+
     return getProducts().map(
+
       (products) => products
           .where(
+
             (product) =>
+
                 product.category
                     .toLowerCase() ==
+
                 category.toLowerCase(),
           )
           .toList(),
@@ -195,7 +240,9 @@ class DatabaseService {
   Future<String> createOrder(
     OrderModel order,
   ) async {
+
     try {
+
       final orderId =
           _uuid.v4();
 
@@ -204,7 +251,9 @@ class DatabaseService {
         orderId: orderId,
       );
 
+      // ===============================================
       // SAVE ORDER
+      // ===============================================
 
       await _database
           .child('orders')
@@ -213,13 +262,68 @@ class DatabaseService {
             newOrder.toMap(),
           );
 
+      // ===============================================
+      // REDUCE STOCK
+      // ===============================================
+
+      for (final item
+          in order.items) {
+
+        final snapshot =
+            await _database
+                .child('products')
+                .child(
+                  item.productId,
+                )
+                .get();
+
+        if (!snapshot.exists ||
+            snapshot.value == null) {
+
+          continue;
+        }
+
+        final productData =
+            Map<dynamic, dynamic>.from(
+          snapshot.value as Map,
+        );
+
+        final currentStock =
+            productData['stock'] ?? 0;
+
+        int updatedStock =
+            currentStock -
+                item.quantity;
+
+        // PREVENT NEGATIVE
+        if (updatedStock < 0) {
+
+          updatedStock = 0;
+        }
+
+        await _database
+            .child('products')
+            .child(
+              item.productId,
+            )
+            .update({
+
+          'stock':
+              updatedStock,
+        });
+      }
+
+      // ===============================================
       // NOTIFICATION
+      // ===============================================
 
       await _database
           .child('notifications')
           .push()
           .set({
-        'title': 'New Order',
+
+        'title':
+            'New Order',
 
         'message':
             '${order.customerName} created a new order',
@@ -229,49 +333,10 @@ class DatabaseService {
                 .toIso8601String(),
       });
 
-      // REDUCE STOCK
-
-      for (var item
-          in order.items) {
-        final snapshot =
-            await _database
-                .child(
-                  'products',
-                )
-                .child(
-                  item.productId,
-                )
-                .get();
-
-        if (snapshot.exists) {
-          final productData =
-              Map<dynamic,
-                  dynamic>.from(
-            snapshot.value
-                as dynamic,
-          );
-
-          int currentStock =
-              productData['stock'] ??
-                  0;
-
-          await _database
-              .child(
-                'products',
-              )
-              .child(
-                item.productId,
-              )
-              .update({
-            'stock':
-                currentStock -
-                    item.quantity,
-          });
-        }
-      }
-
       return orderId;
+
     } catch (e) {
+
       throw Exception(
         e.toString(),
       );
@@ -284,35 +349,50 @@ class DatabaseService {
 
   Stream<List<OrderModel>>
       getOrders() {
+
     return _database
         .child('orders')
         .onValue
         .map((event) {
+
       final data =
           event.snapshot.value;
 
       if (data == null) {
+
         return [];
       }
 
       final map =
           Map<dynamic, dynamic>.from(
-        data as dynamic,
+        data as Map,
       );
 
-      List<OrderModel> orders =
-          [];
+      final List<OrderModel>
+          orders = [];
 
       map.forEach((key, value) {
-        orders.add(
-          OrderModel.fromMap(
-            Map<dynamic, dynamic>.from(
-              value,
+
+        try {
+
+          orders.add(
+
+            OrderModel.fromMap(
+
+              Map<dynamic, dynamic>.from(
+                value,
+              ),
+
+              key,
             ),
-            key,
-          ),
-        );
+          );
+
+        } catch (_) {}
       });
+
+      // ===============================================
+      // SORT NEWEST
+      // ===============================================
 
       orders.sort(
         (a, b) =>
@@ -333,9 +413,12 @@ class DatabaseService {
       getUserOrders(
     String userId,
   ) {
+
     return getOrders().map(
+
       (orders) => orders
           .where(
+
             (order) =>
                 order.userId ==
                 userId,
@@ -350,15 +433,22 @@ class DatabaseService {
 
   Future<void>
       updateOrderStatus({
+
     required String orderId,
+
     required String status,
+
   }) async {
+
     try {
+
       await _database
           .child('orders')
           .child(orderId)
           .update({
-        'status': status,
+
+        'status':
+            status,
 
         'updatedAt':
             DateTime.now()
@@ -369,7 +459,9 @@ class DatabaseService {
           .child('notifications')
           .push()
           .set({
-        'title': 'Order Updated',
+
+        'title':
+            'Order Updated',
 
         'message':
             'Order status changed to $status',
@@ -378,7 +470,9 @@ class DatabaseService {
             DateTime.now()
                 .toIso8601String(),
       });
+
     } catch (e) {
+
       throw Exception(
         e.toString(),
       );
@@ -392,12 +486,16 @@ class DatabaseService {
   Future<void> validateOrder(
     String orderId,
   ) async {
+
     try {
+
       await _database
           .child('orders')
           .child(orderId)
           .update({
-        'isValidated': true,
+
+        'isValidated':
+            true,
 
         'status':
             'Processing Delivery',
@@ -406,7 +504,9 @@ class DatabaseService {
             DateTime.now()
                 .toIso8601String(),
       });
+
     } catch (e) {
+
       throw Exception(
         e.toString(),
       );
@@ -414,24 +514,30 @@ class DatabaseService {
   }
 
   // =====================================================
-  // SALES REPORT
+  // REPORTS
   // =====================================================
 
   Stream<List<OrderModel>>
       getDailyOrders(
     DateTime date,
   ) {
+
     return getOrders().map(
+
       (orders) => orders.where(
+
         (order) {
+
           return order
                       .createdAt
                       .year ==
                   date.year &&
+
               order
                       .createdAt
                       .month ==
                   date.month &&
+
               order
                       .createdAt
                       .day ==
@@ -445,13 +551,18 @@ class DatabaseService {
       getMonthlyOrders(
     DateTime date,
   ) {
+
     return getOrders().map(
+
       (orders) => orders.where(
+
         (order) {
+
           return order
                       .createdAt
                       .year ==
                   date.year &&
+
               order
                       .createdAt
                       .month ==
@@ -465,9 +576,13 @@ class DatabaseService {
       getYearlyOrders(
     DateTime date,
   ) {
+
     return getOrders().map(
+
       (orders) => orders.where(
+
         (order) {
+
           return order
                   .createdAt
                   .year ==
@@ -478,16 +593,20 @@ class DatabaseService {
   }
 
   // =====================================================
-  // CALCULATE REVENUE
+  // REVENUE
   // =====================================================
 
   double calculateRevenue(
     List<OrderModel> orders,
   ) {
+
     double total = 0;
 
-    for (var order in orders) {
-      total += order.totalPrice;
+    for (final order
+        in orders) {
+
+      total +=
+          order.totalPrice;
     }
 
     return total;
@@ -500,6 +619,7 @@ class DatabaseService {
   int calculateTotalOrders(
     List<OrderModel> orders,
   ) {
+
     return orders.length;
   }
 
@@ -507,34 +627,42 @@ class DatabaseService {
   // NOTIFICATIONS
   // =====================================================
 
-  Stream<
-      List<Map<dynamic, dynamic>>>
+  Stream<List<Map<dynamic, dynamic>>>
       getNotifications() {
+
     return _database
         .child('notifications')
         .onValue
         .map((event) {
+
       final data =
           event.snapshot.value;
 
       if (data == null) {
+
         return [];
       }
 
       final map =
           Map<dynamic, dynamic>.from(
-        data as dynamic,
+        data as Map,
       );
 
-      List<Map<dynamic, dynamic>>
+      final List<Map<dynamic, dynamic>>
           notifications = [];
 
       map.forEach((key, value) {
-        notifications.add(
-          Map<dynamic, dynamic>.from(
-            value,
-          ),
-        );
+
+        try {
+
+          notifications.add(
+
+            Map<dynamic, dynamic>.from(
+              value,
+            ),
+          );
+
+        } catch (_) {}
       });
 
       return notifications;
@@ -547,6 +675,7 @@ class DatabaseService {
 
   Stream<int>
       getTotalProducts() {
+
     return getProducts().map(
       (products) =>
           products.length,
@@ -555,12 +684,14 @@ class DatabaseService {
 
   Stream<int>
       getLowStockProducts() {
+
     return getProducts().map(
+
       (products) => products
           .where(
+
             (product) =>
-                product.stock <=
-                5,
+                product.stock <= 5,
           )
           .length,
     );
@@ -568,7 +699,9 @@ class DatabaseService {
 
   Stream<double>
       getTotalRevenue() {
+
     return getOrders().map(
+
       (orders) =>
           calculateRevenue(
         orders,
@@ -578,6 +711,7 @@ class DatabaseService {
 
   Stream<int>
       getTotalOrders() {
+
     return getOrders().map(
       (orders) =>
           orders.length,

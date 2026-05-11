@@ -1,70 +1,118 @@
 // lib/models/order_model.dart
 
 class OrderItemModel {
+
   final String productId;
   final String productName;
   final String productImage;
+
   final double productPrice;
+
   final int quantity;
+
   final double subtotal;
 
   OrderItemModel({
+
     required this.productId,
+
     required this.productName,
+
     required this.productImage,
+
     required this.productPrice,
+
     required this.quantity,
+
     required this.subtotal,
   });
+
+  // =====================================================
+  // FROM MAP
+  // =====================================================
 
   factory OrderItemModel.fromMap(
     Map<dynamic, dynamic> map,
   ) {
+
     return OrderItemModel(
-      productId: map['productId'] ?? '',
 
-      productName: map['productName'] ?? '',
+      productId:
+          map['productId'] ?? '',
 
-      productImage: map['productImage'] ?? '',
+      productName:
+          map['productName'] ?? '',
 
-      productPrice: (map['productPrice'] ?? 0).toDouble(),
+      productImage:
+          map['productImage'] ?? '',
 
-      quantity: map['quantity'] ?? 0,
+      productPrice:
+          (map['productPrice'] ?? 0)
+              .toDouble(),
 
-      subtotal: (map['subtotal'] ?? 0).toDouble(),
+      quantity:
+          map['quantity'] ?? 0,
+
+      subtotal:
+          (map['subtotal'] ?? 0)
+              .toDouble(),
     );
   }
 
+  // =====================================================
+  // TO MAP
+  // =====================================================
+
   Map<String, dynamic> toMap() {
+
     return {
-      'productId': productId,
 
-      'productName': productName,
+      'productId':
+          productId,
 
-      'productImage': productImage,
+      'productName':
+          productName,
 
-      'productPrice': productPrice,
+      'productImage':
+          productImage,
 
-      'quantity': quantity,
+      'productPrice':
+          productPrice,
 
-      'subtotal': subtotal,
+      'quantity':
+          quantity,
+
+      'subtotal':
+          subtotal,
     };
   }
 }
 
+// =======================================================
+// ORDER MODEL
+// =======================================================
+
 class OrderModel {
+
   final String orderId;
+
   final String userId;
+
   final String customerName;
+
   final String customerPhone;
+
   final String address;
 
-  final List<OrderItemModel> items;
+  final List<OrderItemModel>
+      items;
 
   final double totalPrice;
+
   final int totalItems;
 
   final String paymentMethod;
+
   final String paymentProof;
 
   final String status;
@@ -72,158 +120,319 @@ class OrderModel {
   final bool isValidated;
 
   final DateTime createdAt;
+
   final DateTime updatedAt;
 
   OrderModel({
+
     required this.orderId,
+
     required this.userId,
+
     required this.customerName,
+
     required this.customerPhone,
+
     required this.address,
+
     required this.items,
+
     required this.totalPrice,
+
     required this.totalItems,
+
     required this.paymentMethod,
+
     required this.paymentProof,
+
     required this.status,
+
     required this.isValidated,
+
     required this.createdAt,
+
     required this.updatedAt,
   });
 
+  // =====================================================
+  // FROM MAP
+  // =====================================================
+
   factory OrderModel.fromMap(
+
     Map<dynamic, dynamic> map,
+
     String orderId,
+
   ) {
-    List<OrderItemModel> parsedItems = [];
+
+    List<OrderItemModel>
+        parsedItems = [];
+
+    // ===================================================
+    // SAFE ITEMS PARSE
+    // ===================================================
 
     if (map['items'] != null) {
-      final itemsMap = map['items'] as List;
 
-      parsedItems = itemsMap
-          .map(
-            (item) => OrderItemModel.fromMap(item),
-          )
-          .toList();
+      final rawItems =
+          map['items'];
+
+      // ===============================================
+      // IF LIST
+      // ===============================================
+
+      if (rawItems is List) {
+
+        parsedItems = rawItems
+
+            .where(
+              (item) => item != null,
+            )
+
+            .map(
+              (item) {
+
+                return OrderItemModel
+                    .fromMap(
+                  Map<dynamic, dynamic>
+                      .from(item),
+                );
+              },
+            )
+
+            .toList();
+      }
+
+      // ===============================================
+      // IF MAP
+      // ===============================================
+
+      else if (rawItems is Map) {
+
+        parsedItems = rawItems.values
+
+            .map(
+              (item) {
+
+                return OrderItemModel
+                    .fromMap(
+                  Map<dynamic, dynamic>
+                      .from(item),
+                );
+              },
+            )
+
+            .toList();
+      }
     }
 
     return OrderModel(
-      orderId: orderId,
 
-      userId: map['userId'] ?? '',
+      orderId:
+          orderId,
 
-      customerName: map['customerName'] ?? '',
+      userId:
+          map['userId'] ?? '',
 
-      customerPhone: map['customerPhone'] ?? '',
+      customerName:
+          map['customerName'] ?? '',
 
-      address: map['address'] ?? '',
+      customerPhone:
+          map['customerPhone'] ?? '',
 
-      items: parsedItems,
+      address:
+          map['address'] ?? '',
 
-      totalPrice: (map['totalPrice'] ?? 0).toDouble(),
+      items:
+          parsedItems,
 
-      totalItems: map['totalItems'] ?? 0,
+      totalPrice:
+          (map['totalPrice'] ?? 0)
+              .toDouble(),
 
-      paymentMethod: map['paymentMethod'] ?? 'Cash',
+      totalItems:
+          map['totalItems'] ?? 0,
 
-      paymentProof: map['paymentProof'] ?? '',
+      paymentMethod:
+          map['paymentMethod'] ??
+              'Cash',
 
-      status: map['status'] ?? 'Waiting Admin Validation',
+      paymentProof:
+          map['paymentProof'] ?? '',
 
-      isValidated: map['isValidated'] ?? false,
+      status:
+          map['status'] ??
+              'Waiting Admin Validation',
 
-      createdAt: DateTime.tryParse(
-            map['createdAt'] ?? '',
-          ) ??
-          DateTime.now(),
+      isValidated:
+          map['isValidated'] ??
+              false,
 
-      updatedAt: DateTime.tryParse(
-            map['updatedAt'] ?? '',
-          ) ??
-          DateTime.now(),
+      createdAt:
+          DateTime.tryParse(
+                map['createdAt']
+                        ?.toString() ??
+                    '',
+              ) ??
+              DateTime.now(),
+
+      updatedAt:
+          DateTime.tryParse(
+                map['updatedAt']
+                        ?.toString() ??
+                    '',
+              ) ??
+              DateTime.now(),
     );
   }
 
+  // =====================================================
+  // TO MAP
+  // =====================================================
+
   Map<String, dynamic> toMap() {
+
     return {
-      'orderId': orderId,
 
-      'userId': userId,
+      'orderId':
+          orderId,
 
-      'customerName': customerName,
+      'userId':
+          userId,
 
-      'customerPhone': customerPhone,
+      'customerName':
+          customerName,
 
-      'address': address,
+      'customerPhone':
+          customerPhone,
 
-      'items': items
-          .map(
-            (e) => e.toMap(),
-          )
-          .toList(),
+      'address':
+          address,
 
-      'totalPrice': totalPrice,
+      'items':
+          items
+              .map(
+                (e) => e.toMap(),
+              )
+              .toList(),
 
-      'totalItems': totalItems,
+      'totalPrice':
+          totalPrice,
 
-      'paymentMethod': paymentMethod,
+      'totalItems':
+          totalItems,
 
-      'paymentProof': paymentProof,
+      'paymentMethod':
+          paymentMethod,
 
-      'status': status,
+      'paymentProof':
+          paymentProof,
 
-      'isValidated': isValidated,
+      'status':
+          status,
 
-      'createdAt': createdAt.toIso8601String(),
+      'isValidated':
+          isValidated,
 
-      'updatedAt': updatedAt.toIso8601String(),
+      'createdAt':
+          createdAt
+              .toIso8601String(),
+
+      'updatedAt':
+          updatedAt
+              .toIso8601String(),
     };
   }
 
+  // =====================================================
+  // COPY WITH
+  // =====================================================
+
   OrderModel copyWith({
+
     String? orderId,
+
     String? userId,
+
     String? customerName,
+
     String? customerPhone,
+
     String? address,
+
     List<OrderItemModel>? items,
+
     double? totalPrice,
+
     int? totalItems,
+
     String? paymentMethod,
+
     String? paymentProof,
+
     String? status,
+
     bool? isValidated,
+
     DateTime? createdAt,
+
     DateTime? updatedAt,
+
   }) {
+
     return OrderModel(
-      orderId: orderId ?? this.orderId,
 
-      userId: userId ?? this.userId,
+      orderId:
+          orderId ?? this.orderId,
 
-      customerName: customerName ?? this.customerName,
+      userId:
+          userId ?? this.userId,
 
-      customerPhone: customerPhone ?? this.customerPhone,
+      customerName:
+          customerName ??
+              this.customerName,
 
-      address: address ?? this.address,
+      customerPhone:
+          customerPhone ??
+              this.customerPhone,
 
-      items: items ?? this.items,
+      address:
+          address ?? this.address,
 
-      totalPrice: totalPrice ?? this.totalPrice,
+      items:
+          items ?? this.items,
 
-      totalItems: totalItems ?? this.totalItems,
+      totalPrice:
+          totalPrice ??
+              this.totalPrice,
 
-      paymentMethod: paymentMethod ?? this.paymentMethod,
+      totalItems:
+          totalItems ??
+              this.totalItems,
 
-      paymentProof: paymentProof ?? this.paymentProof,
+      paymentMethod:
+          paymentMethod ??
+              this.paymentMethod,
 
-      status: status ?? this.status,
+      paymentProof:
+          paymentProof ??
+              this.paymentProof,
 
-      isValidated: isValidated ?? this.isValidated,
+      status:
+          status ?? this.status,
 
-      createdAt: createdAt ?? this.createdAt,
+      isValidated:
+          isValidated ??
+              this.isValidated,
 
-      updatedAt: updatedAt ?? this.updatedAt,
+      createdAt:
+          createdAt ??
+              this.createdAt,
+
+      updatedAt:
+          updatedAt ??
+              this.updatedAt,
     );
   }
 }

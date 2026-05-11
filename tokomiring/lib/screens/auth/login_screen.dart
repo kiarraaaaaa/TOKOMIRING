@@ -3,6 +3,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../core/constants/app_colors.dart';
+
 import '../../providers/auth_provider.dart';
 
 import '../admin/admin_dashboard_screen.dart';
@@ -10,18 +12,25 @@ import '../user/user_home_screen.dart';
 
 import 'signup_screen.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class LoginScreen
+    extends StatefulWidget {
+
+  const LoginScreen({
+    super.key,
+  });
 
   @override
-  State<LoginScreen> createState() =>
-      _LoginScreenState();
+  State<LoginScreen>
+      createState() =>
+          _LoginScreenState();
 }
 
 class _LoginScreenState
     extends State<LoginScreen> {
+
   final GlobalKey<FormState>
-      _formKey = GlobalKey<FormState>();
+      _formKey =
+      GlobalKey<FormState>();
 
   final TextEditingController
       emailController =
@@ -31,11 +40,18 @@ class _LoginScreenState
       passwordController =
       TextEditingController();
 
+  bool obscurePassword =
+      true;
+
   // =====================================================
   // LOGIN
   // =====================================================
 
   Future<void> login() async {
+
+    FocusScope.of(context)
+        .unfocus();
+
     if (!_formKey.currentState!
         .validate()) {
       return;
@@ -49,8 +65,10 @@ class _LoginScreenState
 
     final success =
         await authProvider.login(
+
       email:
-          emailController.text.trim(),
+          emailController.text
+              .trim(),
 
       password:
           passwordController.text
@@ -59,35 +77,82 @@ class _LoginScreenState
 
     if (!mounted) return;
 
+    // ===================================================
+    // SUCCESS
+    // ===================================================
+
     if (success) {
-      // =============================================
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(
+
+        const SnackBar(
+          content: Text(
+            'Login success',
+          ),
+        ),
+      );
+
+      // ===============================================
       // ADMIN
-      // =============================================
+      // ===============================================
 
       if (authProvider.role ==
           'admin') {
-        Navigator.pushReplacement(
+
+        Navigator.pushAndRemoveUntil(
           context,
+
           MaterialPageRoute(
             builder: (_) =>
                 const AdminDashboardScreen(),
           ),
+
+          (route) => false,
         );
       }
 
-      // =============================================
+      // ===============================================
       // USER
-      // =============================================
+      // ===============================================
 
       else {
-        Navigator.pushReplacement(
+
+        Navigator.pushAndRemoveUntil(
           context,
+
           MaterialPageRoute(
             builder: (_) =>
                 const UserHomeScreen(),
           ),
+
+          (route) => false,
         );
       }
+    }
+
+    // ===================================================
+    // FAILED
+    // ===================================================
+
+    else {
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(
+
+        SnackBar(
+          backgroundColor:
+              Colors.red,
+
+          content: Text(
+            authProvider
+                    .errorMessage ??
+                'Login failed',
+          ),
+        ),
+      );
     }
   }
 
@@ -95,19 +160,26 @@ class _LoginScreenState
   // RESET PASSWORD
   // =====================================================
 
-  Future<void> resetPassword() async {
-    final emailResetController =
+  Future<void> resetPassword()
+      async {
+
+    final TextEditingController
+        emailResetController =
         TextEditingController();
 
     await showDialog(
+
       context: context,
+
       builder: (_) {
+
         return AlertDialog(
+
           shape:
               RoundedRectangleBorder(
             borderRadius:
                 BorderRadius.circular(
-              20,
+              24,
             ),
           ),
 
@@ -118,9 +190,11 @@ class _LoginScreenState
           content: Column(
             mainAxisSize:
                 MainAxisSize.min,
+
             children: [
+
               const Text(
-                'Enter your email address to receive a password reset link.',
+                'Enter your email to receive reset link.',
               ),
 
               const SizedBox(
@@ -133,9 +207,12 @@ class _LoginScreenState
 
                 decoration:
                     const InputDecoration(
-                  labelText: 'Email',
 
-                  prefixIcon: Icon(
+                  labelText:
+                      'Email',
+
+                  prefixIcon:
+                      Icon(
                     Icons.email,
                   ),
                 ),
@@ -144,23 +221,30 @@ class _LoginScreenState
           ),
 
           actions: [
+
             TextButton(
+
               onPressed: () {
+
                 Navigator.pop(
                   context,
                 );
               },
+
               child: const Text(
                 'Cancel',
               ),
             ),
 
             ElevatedButton(
+
               onPressed: () async {
+
                 if (emailResetController
                     .text
                     .trim()
                     .isEmpty) {
+
                   return;
                 }
 
@@ -174,6 +258,7 @@ class _LoginScreenState
                 final success =
                     await authProvider
                         .resetPassword(
+
                   emailResetController
                       .text
                       .trim(),
@@ -185,55 +270,31 @@ class _LoginScreenState
                   context,
                 );
 
-                showDialog(
-                  context: context,
-                  builder: (_) {
-                    return AlertDialog(
-                      shape:
-                          RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius.circular(
-                          20,
-                        ),
-                      ),
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(
 
-                      title: Icon(
+                  SnackBar(
+
+                    backgroundColor:
                         success
-                            ? Icons
-                                .check_circle
-                            : Icons.error,
-                        color: success
                             ? Colors.green
                             : Colors.red,
-                        size: 70,
-                      ),
 
-                      content: Text(
-                        success
-                            ? 'Password reset email has been sent.'
-                            : authProvider
-                                    .errorMessage ??
-                                'Failed to send reset email.',
-                        textAlign:
-                            TextAlign.center,
-                      ),
+                    content: Text(
 
-                      actions: [
-                        ElevatedButton(
-                          onPressed: () {
-                            Navigator.pop(
-                              context,
-                            );
-                          },
-                          child: const Text(
-                            'OK',
-                          ),
-                        ),
-                      ],
-                    );
-                  },
+                      success
+
+                          ? 'Reset link sent'
+
+                          : authProvider
+                                  .errorMessage ??
+                              'Failed',
+                    ),
+                  ),
                 );
               },
+
               child: const Text(
                 'Send',
               ),
@@ -242,43 +303,69 @@ class _LoginScreenState
         );
       },
     );
+
+    emailResetController
+        .dispose();
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(
+    BuildContext context,
+  ) {
+
     final authProvider =
         Provider.of<AuthProvider>(
       context,
     );
 
     return Scaffold(
+
       body: Container(
+
         width: double.infinity,
 
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
+        decoration:
+            const BoxDecoration(
+
+          gradient:
+              LinearGradient(
+
             colors: [
+
               Color(0xff0F172A),
+
               Color(0xff1E293B),
             ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+
+            begin:
+                Alignment.topLeft,
+
+            end:
+                Alignment.bottomRight,
           ),
         ),
 
         child: Center(
-          child: SingleChildScrollView(
+
+          child:
+              SingleChildScrollView(
+
             padding:
-                const EdgeInsets.all(20),
+                const EdgeInsets.all(
+              20,
+            ),
 
             child: SizedBox(
+
               width: 430,
 
               child: Card(
+
                 elevation: 10,
 
                 shape:
                     RoundedRectangleBorder(
+
                   borderRadius:
                       BorderRadius.circular(
                     30,
@@ -286,25 +373,30 @@ class _LoginScreenState
                 ),
 
                 child: Padding(
+
                   padding:
                       const EdgeInsets.all(
                     30,
                   ),
 
                   child: Form(
+
                     key: _formKey,
 
                     child: Column(
+
                       mainAxisSize:
                           MainAxisSize.min,
 
                       children: [
-                        // =====================================
+
+                        // =============================
                         // LOGO
-                        // =====================================
+                        // =============================
 
                         Image.asset(
                           'assets/images/tokomiring.png',
+
                           height: 120,
                         ),
 
@@ -312,17 +404,20 @@ class _LoginScreenState
                           height: 20,
                         ),
 
-                        // =====================================
+                        // =============================
                         // TITLE
-                        // =====================================
+                        // =============================
 
                         const Text(
+
                           'Welcome Back',
+
                           style: TextStyle(
+
                             fontSize: 34,
+
                             fontWeight:
-                                FontWeight
-                                    .bold,
+                                FontWeight.bold,
                           ),
                         ),
 
@@ -331,7 +426,9 @@ class _LoginScreenState
                         ),
 
                         const Text(
+
                           'Login to continue',
+
                           style: TextStyle(
                             color:
                                 Colors.grey,
@@ -342,16 +439,22 @@ class _LoginScreenState
                           height: 35,
                         ),
 
-                        // =====================================
+                        // =============================
                         // EMAIL
-                        // =====================================
+                        // =============================
 
                         TextFormField(
+
                           controller:
                               emailController,
 
+                          keyboardType:
+                              TextInputType
+                                  .emailAddress,
+
                           decoration:
                               const InputDecoration(
+
                             labelText:
                                 'Email',
 
@@ -361,14 +464,15 @@ class _LoginScreenState
                             ),
                           ),
 
-                          validator: (
-                            value,
-                          ) {
+                          validator:
+                              (value) {
+
                             if (value ==
                                     null ||
                                 value
                                     .trim()
                                     .isEmpty) {
+
                               return 'Email is required';
                             }
 
@@ -380,36 +484,63 @@ class _LoginScreenState
                           height: 20,
                         ),
 
-                        // =====================================
+                        // =============================
                         // PASSWORD
-                        // =====================================
+                        // =============================
 
                         TextFormField(
+
                           controller:
                               passwordController,
 
                           obscureText:
-                              true,
+                              obscurePassword,
 
                           decoration:
-                              const InputDecoration(
+                              InputDecoration(
+
                             labelText:
                                 'Password',
 
                             prefixIcon:
-                                Icon(
+                                const Icon(
                               Icons.lock,
+                            ),
+
+                            suffixIcon:
+                                IconButton(
+
+                              onPressed: () {
+
+                                setState(() {
+
+                                  obscurePassword =
+                                      !obscurePassword;
+                                });
+                              },
+
+                              icon: Icon(
+
+                                obscurePassword
+
+                                    ? Icons
+                                        .visibility_off
+
+                                    : Icons
+                                        .visibility,
+                              ),
                             ),
                           ),
 
-                          validator: (
-                            value,
-                          ) {
+                          validator:
+                              (value) {
+
                             if (value ==
                                     null ||
                                 value
                                     .trim()
                                     .isEmpty) {
+
                               return 'Password is required';
                             }
 
@@ -417,16 +548,18 @@ class _LoginScreenState
                           },
                         ),
 
-                        // =====================================
+                        // =============================
                         // FORGOT PASSWORD
-                        // =====================================
+                        // =============================
 
                         Align(
+
                           alignment:
                               Alignment
                                   .centerRight,
 
                           child: TextButton(
+
                             onPressed:
                                 resetPassword,
 
@@ -437,92 +570,54 @@ class _LoginScreenState
                         ),
 
                         const SizedBox(
-                          height: 10,
+                          height: 20,
                         ),
 
-                        // =====================================
-                        // ERROR
-                        // =====================================
-
-                        if (authProvider
-                                .errorMessage !=
-                            null)
-                          Container(
-                            width:
-                                double.infinity,
-
-                            padding:
-                                const EdgeInsets
-                                    .all(
-                              14,
-                            ),
-
-                            margin:
-                                const EdgeInsets
-                                    .only(
-                              bottom: 20,
-                            ),
-
-                            decoration:
-                                BoxDecoration(
-                              color: Colors
-                                  .red
-                                  .shade100,
-
-                              borderRadius:
-                                  BorderRadius.circular(
-                                14,
-                              ),
-                            ),
-
-                            child: Text(
-                              authProvider
-                                  .errorMessage!,
-
-                              style: TextStyle(
-                                color: Colors
-                                    .red
-                                    .shade800,
-                                fontWeight:
-                                    FontWeight
-                                        .bold,
-                              ),
-                            ),
-                          ),
-
-                        // =====================================
+                        // =============================
                         // LOGIN BUTTON
-                        // =====================================
+                        // =============================
 
                         SizedBox(
+
                           width:
                               double.infinity,
 
                           height: 58,
 
                           child: ElevatedButton(
+
                             onPressed:
                                 authProvider
                                         .isLoading
+
                                     ? null
+
                                     : login,
 
-                            child: authProvider
-                                    .isLoading
-                                ? const SizedBox(
-                                    width: 24,
-                                    height: 24,
-                                    child:
-                                        CircularProgressIndicator(
-                                      color:
-                                          Colors.white,
-                                      strokeWidth:
-                                          2,
-                                    ),
-                                  )
-                                : const Text(
-                                    'Login',
-                                  ),
+                            child:
+                                authProvider
+                                        .isLoading
+
+                                    ? const SizedBox(
+
+                                        width: 24,
+
+                                        height: 24,
+
+                                        child:
+                                            CircularProgressIndicator(
+
+                                          color:
+                                              Colors.white,
+
+                                          strokeWidth:
+                                              2,
+                                        ),
+                                      )
+
+                                    : const Text(
+                                        'Login',
+                                      ),
                           ),
                         ),
 
@@ -530,15 +625,20 @@ class _LoginScreenState
                           height: 20,
                         ),
 
-                        // =====================================
-                        // CREATE ACCOUNT
-                        // =====================================
+                        // =============================
+                        // SIGNUP
+                        // =============================
 
                         TextButton(
+
                           onPressed: () {
+
                             Navigator.pushReplacement(
+
                               context,
+
                               MaterialPageRoute(
+
                                 builder:
                                     (_) =>
                                         const SignupScreen(),
@@ -564,6 +664,7 @@ class _LoginScreenState
 
   @override
   void dispose() {
+
     emailController.dispose();
 
     passwordController.dispose();

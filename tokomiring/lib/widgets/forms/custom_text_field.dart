@@ -2,8 +2,13 @@
 
 import 'package:flutter/material.dart';
 
-class CustomTextField extends StatelessWidget {
-  final TextEditingController controller;
+import '../../core/constants/app_colors.dart';
+
+class CustomTextField
+    extends StatefulWidget {
+
+  final TextEditingController
+      controller;
 
   final String hintText;
 
@@ -11,47 +16,350 @@ class CustomTextField extends StatelessWidget {
 
   final IconData? prefixIcon;
 
+  final IconData? suffixIcon;
+
   final bool obscureText;
 
   final TextInputType keyboardType;
 
-  final String? Function(String?)? validator;
+  final String? Function(
+    String?,
+  )? validator;
 
   final int maxLines;
 
+  final bool enabled;
+
+  final bool readOnly;
+
+  final VoidCallback? onTap;
+
+  final void Function(String)?
+      onChanged;
+
+  final TextInputAction
+      textInputAction;
+
+  final FocusNode? focusNode;
+
+  final EdgeInsetsGeometry?
+      contentPadding;
+
+  // =====================================================
+  // CONSTRUCTOR
+  // =====================================================
+
   const CustomTextField({
+
     super.key,
+
     required this.controller,
+
     required this.hintText,
+
     this.labelText,
+
     this.prefixIcon,
-    this.obscureText = false,
-    this.keyboardType = TextInputType.text,
+
+    this.suffixIcon,
+
+    this.obscureText =
+        false,
+
+    this.keyboardType =
+        TextInputType.text,
+
     this.validator,
-    this.maxLines = 1,
+
+    this.maxLines =
+        1,
+
+    this.enabled =
+        true,
+
+    this.readOnly =
+        false,
+
+    this.onTap,
+
+    this.onChanged,
+
+    this.textInputAction =
+        TextInputAction.next,
+
+    this.focusNode,
+
+    this.contentPadding,
   });
 
   @override
-  Widget build(BuildContext context) {
+  State<CustomTextField>
+      createState() =>
+          _CustomTextFieldState();
+}
+
+class _CustomTextFieldState
+    extends State<
+        CustomTextField> {
+
+  late bool isObscure;
+
+  // =====================================================
+  // INIT
+  // =====================================================
+
+  @override
+  void initState() {
+
+    super.initState();
+
+    isObscure =
+        widget.obscureText;
+  }
+
+  // =====================================================
+  // BUILD
+  // =====================================================
+
+  @override
+  Widget build(
+    BuildContext context,
+  ) {
+
     return TextFormField(
-      controller: controller,
 
-      obscureText: obscureText,
+      controller:
+          widget.controller,
 
-      keyboardType: keyboardType,
+      obscureText:
+          isObscure,
 
-      validator: validator,
+      keyboardType:
+          widget.keyboardType,
 
-      maxLines: maxLines,
+      validator:
+          widget.validator,
 
-      decoration: InputDecoration(
-        hintText: hintText,
+      maxLines:
+          widget.obscureText
+              ? 1
+              : widget.maxLines,
 
-        labelText: labelText,
+      enabled:
+          widget.enabled,
 
-        prefixIcon: prefixIcon != null
-            ? Icon(prefixIcon)
-            : null,
+      readOnly:
+          widget.readOnly,
+
+      onTap:
+          widget.onTap,
+
+      onChanged:
+          widget.onChanged,
+
+      textInputAction:
+          widget.textInputAction,
+
+      focusNode:
+          widget.focusNode,
+
+      style:
+          const TextStyle(
+
+        fontSize: 15,
+      ),
+
+      decoration:
+          InputDecoration(
+
+        hintText:
+            widget.hintText,
+
+        labelText:
+            widget.labelText,
+
+        filled: true,
+
+        fillColor:
+            widget.enabled
+
+                ? Colors.white
+
+                : Colors.grey
+                    .shade100,
+
+        contentPadding:
+            widget.contentPadding ??
+
+                const EdgeInsets.symmetric(
+
+              horizontal: 20,
+
+              vertical: 18,
+            ),
+
+        // ===============================================
+        // PREFIX
+        // ===============================================
+
+        prefixIcon:
+            widget.prefixIcon !=
+                    null
+
+                ? Icon(
+
+                    widget.prefixIcon,
+
+                    color:
+                        AppColors
+                            .primary,
+                  )
+
+                : null,
+
+        // ===============================================
+        // SUFFIX
+        // ===============================================
+
+        suffixIcon:
+            widget.obscureText
+
+                ? IconButton(
+
+                    onPressed: () {
+
+                      setState(() {
+
+                        isObscure =
+                            !isObscure;
+                      });
+                    },
+
+                    icon: Icon(
+
+                      isObscure
+
+                          ? Icons
+                              .visibility_off_rounded
+
+                          : Icons
+                              .visibility_rounded,
+
+                      color:
+                          Colors.grey
+                              .shade600,
+                    ),
+                  )
+
+                : widget.suffixIcon !=
+                        null
+
+                    ? Icon(
+
+                        widget
+                            .suffixIcon,
+
+                        color:
+                            Colors.grey
+                                .shade600,
+                      )
+
+                    : null,
+
+        // ===============================================
+        // BORDER
+        // ===============================================
+
+        border:
+            OutlineInputBorder(
+
+          borderRadius:
+              BorderRadius.circular(
+            20,
+          ),
+
+          borderSide:
+              BorderSide.none,
+        ),
+
+        enabledBorder:
+            OutlineInputBorder(
+
+          borderRadius:
+              BorderRadius.circular(
+            20,
+          ),
+
+          borderSide:
+              BorderSide(
+
+            color:
+                Colors.grey
+                    .shade200,
+          ),
+        ),
+
+        focusedBorder:
+            OutlineInputBorder(
+
+          borderRadius:
+              BorderRadius.circular(
+            20,
+          ),
+
+          borderSide:
+              const BorderSide(
+
+            color:
+                AppColors.primary,
+
+            width: 2,
+          ),
+        ),
+
+        errorBorder:
+            OutlineInputBorder(
+
+          borderRadius:
+              BorderRadius.circular(
+            20,
+          ),
+
+          borderSide:
+              const BorderSide(
+
+            color:
+                AppColors.danger,
+          ),
+        ),
+
+        focusedErrorBorder:
+            OutlineInputBorder(
+
+          borderRadius:
+              BorderRadius.circular(
+            20,
+          ),
+
+          borderSide:
+              const BorderSide(
+
+            color:
+                AppColors.danger,
+
+            width: 2,
+          ),
+        ),
+
+        errorStyle:
+            const TextStyle(
+
+          color:
+              AppColors.danger,
+
+          fontWeight:
+              FontWeight.w500,
+        ),
       ),
     );
   }

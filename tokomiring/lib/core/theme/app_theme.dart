@@ -1,101 +1,207 @@
-﻿// lib/core/theme/app_theme.dart
+// lib/core/theme/app_theme.dart
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../constants/app_colors.dart';
+
 class AppTheme {
+
   static ThemeData lightTheme =
       ThemeData(
+
     useMaterial3: true,
 
-    brightness: Brightness.light,
+    brightness:
+        Brightness.light,
+
+    // ===================================================
+    // SCAFFOLD
+    // ===================================================
 
     scaffoldBackgroundColor:
-        const Color(0xffF8FAFC),
+        AppColors.background,
 
     primaryColor:
-        const Color(0xff2563EB),
+        AppColors.primary,
 
-    colorScheme: ColorScheme.fromSeed(
+    colorScheme:
+        ColorScheme.fromSeed(
       seedColor:
-          const Color(0xff2563EB),
+          AppColors.primary,
+
+      primary:
+          AppColors.primary,
+
+      secondary:
+          AppColors.secondary,
     ),
 
-    textTheme:
-        GoogleFonts.poppinsTextTheme(),
+    // ===================================================
+    // TEXT THEME
+    // ===================================================
 
-    appBarTheme: const AppBarTheme(
-      backgroundColor: Colors.white,
+    textTheme:
+        GoogleFonts.poppinsTextTheme(
+      const TextTheme(
+
+        bodyLarge: TextStyle(
+          color:
+              AppColors.textPrimary,
+        ),
+
+        bodyMedium: TextStyle(
+          color:
+              AppColors.textPrimary,
+        ),
+
+        titleLarge: TextStyle(
+          color:
+              AppColors.textPrimary,
+
+          fontWeight:
+              FontWeight.bold,
+        ),
+      ),
+    ),
+
+    // ===================================================
+    // APP BAR
+    // ===================================================
+
+    appBarTheme:
+        const AppBarTheme(
+
+      backgroundColor:
+          AppColors.white,
+
+      foregroundColor:
+          AppColors.dark,
 
       elevation: 0,
 
       centerTitle: true,
 
-      iconTheme: IconThemeData(
-        color: Colors.black,
+      scrolledUnderElevation:
+          0,
+
+      iconTheme:
+          IconThemeData(
+        color:
+            AppColors.dark,
       ),
 
-      titleTextStyle: TextStyle(
-        color: Colors.black,
+      titleTextStyle:
+          TextStyle(
+        color:
+            AppColors.dark,
+
         fontSize: 20,
-        fontWeight: FontWeight.bold,
+
+        fontWeight:
+            FontWeight.bold,
       ),
     ),
+
+    // ===================================================
+    // ELEVATED BUTTON
+    // ===================================================
 
     elevatedButtonTheme:
         ElevatedButtonThemeData(
-      style: ElevatedButton.styleFrom(
-        backgroundColor:
-            const Color(0xff2563EB),
 
-        foregroundColor: Colors.white,
+      style:
+          ElevatedButton.styleFrom(
+
+        backgroundColor:
+            AppColors.primary,
+
+        foregroundColor:
+            AppColors.white,
+
+        disabledBackgroundColor:
+            AppColors.disabled,
 
         minimumSize:
-            const Size(double.infinity, 55),
-
-        elevation: 4,
-
-        shape: RoundedRectangleBorder(
-          borderRadius:
-              BorderRadius.circular(18),
+            const Size(
+          double.infinity,
+          55,
         ),
 
-        textStyle: const TextStyle(
+        elevation: 0,
+
+        shape:
+            RoundedRectangleBorder(
+          borderRadius:
+              BorderRadius.circular(
+            18,
+          ),
+        ),
+
+        textStyle:
+            const TextStyle(
           fontSize: 16,
+
           fontWeight:
               FontWeight.bold,
         ),
       ),
     ),
+
+    // ===================================================
+    // OUTLINED BUTTON
+    // ===================================================
 
     outlinedButtonTheme:
         OutlinedButtonThemeData(
-      style: OutlinedButton.styleFrom(
+
+      style:
+          OutlinedButton.styleFrom(
+
         minimumSize:
-            const Size(double.infinity, 55),
-
-        side: const BorderSide(
-          color: Color(0xff2563EB),
+            const Size(
+          double.infinity,
+          55,
         ),
 
-        shape: RoundedRectangleBorder(
+        foregroundColor:
+            AppColors.primary,
+
+        side:
+            const BorderSide(
+          color:
+              AppColors.primary,
+        ),
+
+        shape:
+            RoundedRectangleBorder(
           borderRadius:
-              BorderRadius.circular(18),
+              BorderRadius.circular(
+            18,
+          ),
         ),
 
-        textStyle: const TextStyle(
+        textStyle:
+            const TextStyle(
           fontSize: 16,
+
           fontWeight:
               FontWeight.bold,
         ),
       ),
     ),
 
+    // ===================================================
+    // INPUT
+    // ===================================================
+
     inputDecorationTheme:
         InputDecorationTheme(
+
       filled: true,
 
-      fillColor: Colors.white,
+      fillColor:
+          AppColors.white,
 
       contentPadding:
           const EdgeInsets.symmetric(
@@ -103,53 +209,108 @@ class AppTheme {
         vertical: 18,
       ),
 
-      border: OutlineInputBorder(
-        borderRadius:
-            BorderRadius.circular(18),
+      hintStyle:
+          const TextStyle(
+        color:
+            AppColors.textSecondary,
+      ),
 
-        borderSide: BorderSide.none,
+      border:
+          OutlineInputBorder(
+        borderRadius:
+            BorderRadius.circular(
+          18,
+        ),
+
+        borderSide:
+            BorderSide.none,
       ),
 
       enabledBorder:
           OutlineInputBorder(
         borderRadius:
-            BorderRadius.circular(18),
+            BorderRadius.circular(
+          18,
+        ),
 
-        borderSide: BorderSide.none,
+        borderSide:
+            BorderSide.none,
       ),
 
       focusedBorder:
           OutlineInputBorder(
         borderRadius:
-            BorderRadius.circular(18),
+            BorderRadius.circular(
+          18,
+        ),
 
-        borderSide: const BorderSide(
-          color: Color(0xff2563EB),
+        borderSide:
+            const BorderSide(
+          color:
+              AppColors.primary,
+
           width: 2,
         ),
       ),
     ),
 
-cardTheme: CardThemeData(
-  color: Colors.white,
+    // ===================================================
+    // CARD
+    // ===================================================
 
-  elevation: 5,
+    cardTheme:
+        CardThemeData(
 
-  shadowColor: Colors.black12,
+      color:
+          AppColors.card,
 
-  shape: RoundedRectangleBorder(
-    borderRadius:
-        BorderRadius.circular(24),
-  ),
-),
+      elevation: 3,
 
-    snackBarTheme:
-        const SnackBarThemeData(
-      behavior:
-          SnackBarBehavior.floating,
+      shadowColor:
+          Colors.black12,
+
+      shape:
+          RoundedRectangleBorder(
+        borderRadius:
+            BorderRadius.circular(
+          24,
+        ),
+      ),
     ),
 
+    // ===================================================
+    // SNACKBAR
+    // ===================================================
+
+    snackBarTheme:
+        SnackBarThemeData(
+
+      backgroundColor:
+          AppColors.dark,
+
+      contentTextStyle:
+          const TextStyle(
+        color:
+            AppColors.white,
+      ),
+
+      behavior:
+          SnackBarBehavior.floating,
+
+      shape:
+          RoundedRectangleBorder(
+        borderRadius:
+            BorderRadius.circular(
+          14,
+        ),
+      ),
+    ),
+
+    // ===================================================
+    // DIVIDER
+    // ===================================================
+
     dividerColor:
-        Colors.grey.shade200,
+        AppColors.border,
   );
 }
