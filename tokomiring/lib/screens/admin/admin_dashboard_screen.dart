@@ -1,5 +1,9 @@
+// =====================================================
 // lib/screens/admin/admin_dashboard_screen.dart
+// FULL FIX NO DOUBLE PRODUCT FINAL
+// =====================================================
 
+import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
@@ -8,15 +12,12 @@ import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../core/utils/app_format.dart';
-
 import '../../models/product_model.dart';
-
 import '../../providers/product_provider.dart';
-
-import '../../services/storage_service.dart';
 
 class AdminDashboardScreen
     extends StatefulWidget {
+
   const AdminDashboardScreen({
     super.key,
   });
@@ -29,85 +30,151 @@ class AdminDashboardScreen
 
 class _AdminDashboardScreenState
     extends State<AdminDashboardScreen> {
-  final StorageService _storageService =
-      StorageService();
+
+  final TextEditingController
+      searchController =
+      TextEditingController();
 
   // =====================================================
-  // INIT
+  // FIX DOUBLE INITIALIZE
   // =====================================================
+
+  bool _alreadyInitialized =
+      false;
 
   @override
   void initState() {
+
     super.initState();
 
-    Future.microtask(() {
-      Provider.of<ProductProvider>(
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) {
+
+      if (_alreadyInitialized) {
+        return;
+      }
+
+      _alreadyInitialized = true;
+
+      final provider =
+          Provider.of<ProductProvider>(
         context,
         listen: false,
-      ).initializeProducts();
+      );
+
+      provider.initializeProducts();
     });
   }
 
   // =====================================================
-  // ADD PRODUCT
+  // ADD / EDIT PRODUCT
   // =====================================================
 
-  Future<void> showAddProductDialog() async {
+  Future<void> showProductDialog({
+    ProductModel? product,
+  }) async {
+
+    final provider =
+        Provider.of<ProductProvider>(
+      context,
+      listen: false,
+    );
+
     final nameController =
-        TextEditingController();
+        TextEditingController(
+      text: product?.name ?? '',
+    );
 
     final descriptionController =
-        TextEditingController();
+        TextEditingController(
+      text:
+          product?.description ??
+              '',
+    );
 
     final priceController =
-        TextEditingController();
+        TextEditingController(
+      text:
+          product?.price
+              .toString() ??
+          '',
+    );
 
     final stockController =
-        TextEditingController();
+        TextEditingController(
+      text:
+          product?.stock
+              .toString() ??
+          '',
+    );
 
     String selectedCategory =
-        'Food';
+        product?.category ??
+            'Food';
 
-    Uint8List? imageBytes;
-
-    String? imageName;
+    String imageBase64 =
+        product?.imageBase64 ?? '';
 
     await showDialog(
       context: context,
+
       builder: (_) {
+
         return StatefulBuilder(
           builder: (
             context,
             setStateDialog,
           ) {
-            return AlertDialog(
+
+            return Dialog(
               shape:
                   RoundedRectangleBorder(
                 borderRadius:
                     BorderRadius.circular(
-                  24,
+                  25,
                 ),
               ),
 
-              title: const Text(
-                'Add Product',
-              ),
+              child: Container(
+                width: 650,
 
-              content: SizedBox(
-                width: 500,
+                padding:
+                    const EdgeInsets.all(
+                  30,
+                ),
 
-                child: SingleChildScrollView(
+                child:
+                    SingleChildScrollView(
                   child: Column(
                     mainAxisSize:
                         MainAxisSize.min,
 
                     children: [
-                      // =====================
-                      // IMAGE PICKER
-                      // =====================
+
+                      Text(
+                        product == null
+                            ? 'Add Product'
+                            : 'Edit Product',
+
+                        style:
+                            const TextStyle(
+                          fontSize: 28,
+                          fontWeight:
+                              FontWeight.bold,
+                        ),
+                      ),
+
+                      const SizedBox(
+                        height: 30,
+                      ),
+
+                      // =====================================
+                      // IMAGE
+                      // =====================================
 
                       GestureDetector(
                         onTap: () async {
+
                           final result =
                               await FilePicker
                                   .platform
@@ -121,61 +188,64 @@ class _AdminDashboardScreenState
 
                           if (result !=
                               null) {
-                            imageBytes =
+
+                            Uint8List?
+                                imageBytes =
                                 result
                                     .files
                                     .first
                                     .bytes;
 
-                            imageName =
-                                result
-                                    .files
-                                    .first
-                                    .name;
+                            if (imageBytes !=
+                                null) {
 
-                            setStateDialog(
-                              () {},
-                            );
+                              imageBase64 =
+                                  base64Encode(
+                                imageBytes,
+                              );
+
+                              setStateDialog(
+                                () {},
+                              );
+                            }
                           }
                         },
 
                         child: Container(
-                          height: 180,
-
                           width:
                               double.infinity,
 
+                          height: 220,
+
                           decoration:
                               BoxDecoration(
-                            color: Colors
-                                .grey
-                                .shade200,
+                            color:
+                                Colors.grey
+                                    .shade200,
 
                             borderRadius:
                                 BorderRadius.circular(
-                              20,
+                              25,
                             ),
                           ),
 
                           child:
-                              imageBytes ==
-                                      null
-                                  ? const Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment
-                                              .center,
+                              imageBase64
+                                      .isEmpty
 
-                                      children: [
+                                  ? Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+
+                                      children: const [
+
                                         Icon(
-                                          Icons
-                                              .image,
-                                          size:
-                                              60,
+                                          Icons.image,
+                                          size: 70,
                                         ),
 
                                         SizedBox(
-                                          height:
-                                              10,
+                                          height: 15,
                                         ),
 
                                         Text(
@@ -183,25 +253,28 @@ class _AdminDashboardScreenState
                                         ),
                                       ],
                                     )
+
                                   : ClipRRect(
                                       borderRadius:
                                           BorderRadius.circular(
-                                        20,
+                                        25,
                                       ),
 
                                       child:
                                           Image.memory(
-                                        imageBytes!,
+                                        base64Decode(
+                                          imageBase64,
+                                        ),
 
-                                        fit: BoxFit
-                                            .cover,
+                                        fit:
+                                            BoxFit.cover,
                                       ),
                                     ),
                         ),
                       ),
 
                       const SizedBox(
-                        height: 20,
+                        height: 25,
                       ),
 
                       TextField(
@@ -216,14 +289,14 @@ class _AdminDashboardScreenState
                       ),
 
                       const SizedBox(
-                        height: 15,
+                        height: 20,
                       ),
 
                       TextField(
                         controller:
                             descriptionController,
 
-                        maxLines: 3,
+                        maxLines: 4,
 
                         decoration:
                             const InputDecoration(
@@ -233,7 +306,7 @@ class _AdminDashboardScreenState
                       ),
 
                       const SizedBox(
-                        height: 15,
+                        height: 20,
                       ),
 
                       DropdownButtonFormField<
@@ -241,14 +314,13 @@ class _AdminDashboardScreenState
                         value:
                             selectedCategory,
 
-                        items: [
-                          'Food',
-                          'Drinks',
-                          'Snacks',
-                          'Electronics',
-                          'Household',
-                          'Others',
-                        ]
+                        items: provider
+                            .categories
+                            .where(
+                              (e) =>
+                                  e !=
+                                  'All',
+                            )
                             .map(
                               (e) =>
                                   DropdownMenuItem(
@@ -266,8 +338,13 @@ class _AdminDashboardScreenState
                         onChanged: (
                           value,
                         ) {
-                          selectedCategory =
-                              value!;
+
+                          if (value !=
+                              null) {
+
+                            selectedCategory =
+                                value;
+                          }
                         },
 
                         decoration:
@@ -278,7 +355,7 @@ class _AdminDashboardScreenState
                       ),
 
                       const SizedBox(
-                        height: 15,
+                        height: 20,
                       ),
 
                       TextField(
@@ -286,8 +363,7 @@ class _AdminDashboardScreenState
                             priceController,
 
                         keyboardType:
-                            TextInputType
-                                .number,
+                            TextInputType.number,
 
                         decoration:
                             const InputDecoration(
@@ -297,7 +373,7 @@ class _AdminDashboardScreenState
                       ),
 
                       const SizedBox(
-                        height: 15,
+                        height: 20,
                       ),
 
                       TextField(
@@ -305,8 +381,7 @@ class _AdminDashboardScreenState
                             stockController,
 
                         keyboardType:
-                            TextInputType
-                                .number,
+                            TextInputType.number,
 
                         decoration:
                             const InputDecoration(
@@ -314,139 +389,234 @@ class _AdminDashboardScreenState
                               'Stock',
                         ),
                       ),
+
+                      const SizedBox(
+                        height: 30,
+                      ),
+
+                      Row(
+                        children: [
+
+                          Expanded(
+                            child:
+                                OutlinedButton(
+                              onPressed:
+                                  () {
+
+                                Navigator.pop(
+                                  context,
+                                );
+                              },
+
+                              child:
+                                  const Text(
+                                'Cancel',
+                              ),
+                            ),
+                          ),
+
+                          const SizedBox(
+                            width: 15,
+                          ),
+
+                          Expanded(
+                            child:
+                                ElevatedButton(
+                              onPressed:
+                                  () async {
+
+                                if (nameController
+                                        .text
+                                        .trim()
+                                        .isEmpty ||
+                                    descriptionController
+                                        .text
+                                        .trim()
+                                        .isEmpty ||
+                                    priceController
+                                        .text
+                                        .trim()
+                                        .isEmpty ||
+                                    stockController
+                                        .text
+                                        .trim()
+                                        .isEmpty ||
+                                    imageBase64
+                                        .isEmpty) {
+
+                                  ScaffoldMessenger.of(
+                                    context,
+                                  ).showSnackBar(
+                                    const SnackBar(
+                                      content:
+                                          Text(
+                                        'Please complete all fields',
+                                      ),
+                                    ),
+                                  );
+
+                                  return;
+                                }
+
+                                // =================================
+                                // FIX NO DOUBLE PRODUCT
+                                // =================================
+
+                                final productId =
+                                    product?.id ??
+                                        const Uuid()
+                                            .v4();
+
+                                final newProduct =
+                                    ProductModel(
+
+                                  id:
+                                      productId,
+
+                                  name:
+                                      nameController
+                                          .text
+                                          .trim(),
+
+                                  description:
+                                      descriptionController
+                                          .text
+                                          .trim(),
+
+                                  category:
+                                      selectedCategory,
+
+                                  imageBase64:
+                                      imageBase64,
+
+                                  price:
+                                      double.tryParse(
+                                            priceController
+                                                .text,
+                                          ) ??
+                                          0,
+
+                                  stock:
+                                      int.tryParse(
+                                            stockController
+                                                .text,
+                                          ) ??
+                                          0,
+
+                                  isAvailable:
+                                      true,
+
+                                  isPopular:
+                                      false,
+
+                                  sold:
+                                      product?.sold ??
+                                          0,
+
+                                  createdAt:
+                                      product?.createdAt ??
+                                          DateTime.now(),
+                                );
+
+                                bool success;
+
+                                // =============================
+                                // ADD PRODUCT
+                                // =============================
+
+                                if (product ==
+                                    null) {
+
+                                  // =========================
+                                  // CEK DUPLIKAT NAMA
+                                  // =========================
+
+                                  bool alreadyExists =
+                                      provider.products.any(
+                                    (item) =>
+                                        item.name
+                                            .toLowerCase() ==
+                                        newProduct.name
+                                            .toLowerCase(),
+                                  );
+
+                                  if (alreadyExists) {
+
+                                    if (!mounted) {
+                                      return;
+                                    }
+
+                                    ScaffoldMessenger.of(
+                                      context,
+                                    ).showSnackBar(
+                                      const SnackBar(
+                                        content:
+                                            Text(
+                                          'Product already exists',
+                                        ),
+                                      ),
+                                    );
+
+                                    return;
+                                  }
+
+                                  success =
+                                      await provider
+                                          .addProduct(
+                                    newProduct,
+                                  );
+                                }
+
+                                // =============================
+                                // UPDATE PRODUCT
+                                // =============================
+
+                                else {
+
+                                  success =
+                                      await provider
+                                          .updateProduct(
+                                    newProduct,
+                                  );
+                                }
+
+                                if (!mounted) {
+                                  return;
+                                }
+
+                                Navigator.pop(
+                                  context,
+                                );
+
+                                ScaffoldMessenger.of(
+                                  context,
+                                ).showSnackBar(
+                                  SnackBar(
+                                    content:
+                                        Text(
+                                      success
+                                          ? 'Product saved'
+                                          : 'Failed',
+                                    ),
+                                  ),
+                                );
+                              },
+
+                              child:
+                                  Text(
+                                product ==
+                                        null
+                                    ? 'Add Product'
+                                    : 'Save',
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ],
                   ),
                 ),
               ),
-
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(
-                      context,
-                    );
-                  },
-
-                  child: const Text(
-                    'Cancel',
-                  ),
-                ),
-
-                ElevatedButton(
-                  onPressed: () async {
-                    if (nameController
-                            .text
-                            .isEmpty ||
-                        priceController
-                            .text
-                            .isEmpty ||
-                        stockController
-                            .text
-                            .isEmpty ||
-                        imageBytes ==
-                            null) {
-                      return;
-                    }
-
-                    final provider =
-                        Provider.of<
-                            ProductProvider>(
-                      context,
-                      listen: false,
-                    );
-
-                    // =====================
-                    // UPLOAD IMAGE
-                    // =====================
-
-                    final imageUrl =
-                        await _storageService
-                            .uploadWebImage(
-                      imageBytes:
-                          imageBytes!,
-
-                      fileName:
-                          imageName ??
-                              DateTime.now()
-                                  .millisecondsSinceEpoch
-                                  .toString(),
-                    );
-
-                    // =====================
-                    // CREATE PRODUCT
-                    // =====================
-
-                    final product =
-                        ProductModel(
-                      id:
-                          const Uuid()
-                              .v4(),
-
-                      name:
-                          nameController
-                              .text,
-
-                      description:
-                          descriptionController
-                              .text,
-
-                      category:
-                          selectedCategory,
-
-                      imageUrl:
-                          imageUrl,
-
-                      price: double.parse(
-                        priceController
-                            .text,
-                      ),
-
-                      stock: int.parse(
-                        stockController
-                            .text,
-                      ),
-
-                      isAvailable:
-                          true,
-
-                      isPopular:
-                          false,
-
-                      sold: 0,
-
-                      createdAt:
-                          DateTime.now(),
-                    );
-
-                    await provider
-                        .addProduct(
-                      product,
-                    );
-
-                    if (!mounted) {
-                      return;
-                    }
-
-                    Navigator.pop(
-                      context,
-                    );
-
-                    ScaffoldMessenger.of(
-                      context,
-                    ).showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                          'Product added successfully',
-                        ),
-                      ),
-                    );
-                  },
-
-                  child: const Text(
-                    'Add Product',
-                  ),
-                ),
-              ],
             );
           },
         );
@@ -455,63 +625,102 @@ class _AdminDashboardScreenState
   }
 
   // =====================================================
-  // UPDATE STOCK
+  // DELETE PRODUCT
   // =====================================================
 
-  Future<void> showStockDialog(
+  Future<void> deleteProduct(
     ProductModel product,
   ) async {
-    final controller =
-        TextEditingController(
-      text: product.stock.toString(),
+
+    final provider =
+        Provider.of<ProductProvider>(
+      context,
+      listen: false,
     );
+
+    await provider.deleteProduct(
+      product.id,
+    );
+  }
+
+  // =====================================================
+  // ADD STOCK
+  // =====================================================
+
+  Future<void> addStock(
+    ProductModel product,
+  ) async {
+
+    final stockController =
+        TextEditingController();
 
     await showDialog(
       context: context,
+
       builder: (_) {
+
         return AlertDialog(
-          title: const Text(
-            'Update Stock',
+          title:
+              const Text(
+            'Add Stock',
           ),
 
-          content: TextField(
-            controller: controller,
+          content:
+              TextField(
+            controller:
+                stockController,
 
             keyboardType:
                 TextInputType.number,
 
             decoration:
                 const InputDecoration(
-              labelText: 'Stock',
+              labelText:
+                  'Input Stock',
             ),
           ),
 
           actions: [
+
             TextButton(
-              onPressed: () {
+              onPressed:
+                  () {
+
                 Navigator.pop(
                   context,
                 );
               },
 
-              child: const Text(
+              child:
+                  const Text(
                 'Cancel',
               ),
             ),
 
             ElevatedButton(
-              onPressed: () async {
+              onPressed:
+                  () async {
+
+                int addValue =
+                    int.tryParse(
+                          stockController
+                              .text,
+                        ) ??
+                        0;
+
+                final updatedProduct =
+                    product.copyWith(
+                  stock:
+                      product.stock +
+                          addValue,
+                );
+
                 await Provider.of<
                     ProductProvider>(
                   context,
                   listen: false,
-                ).updateStock(
-                  productId:
-                      product.id,
-
-                  stock: int.parse(
-                    controller.text,
-                  ),
+                ).updateProduct(
+                  updatedProduct,
                 );
 
                 if (!mounted) {
@@ -523,7 +732,8 @@ class _AdminDashboardScreenState
                 );
               },
 
-              child: const Text(
+              child:
+                  const Text(
                 'Save',
               ),
             ),
@@ -533,12 +743,11 @@ class _AdminDashboardScreenState
     );
   }
 
-  // =====================================================
-  // BUILD
-  // =====================================================
-
   @override
-  Widget build(BuildContext context) {
+  Widget build(
+    BuildContext context,
+  ) {
+
     final provider =
         Provider.of<ProductProvider>(
       context,
@@ -546,19 +755,14 @@ class _AdminDashboardScreenState
 
     return Scaffold(
       backgroundColor:
-          const Color(0xffF1F5F9),
-
-      // =========================================
-      // FLOATING BUTTON
-      // =========================================
+          const Color(0xffF8FAFC),
 
       floatingActionButton:
           FloatingActionButton.extended(
-        backgroundColor:
-            Colors.blue,
 
-        onPressed: () async {
-          await showAddProductDialog();
+        onPressed: () {
+
+          showProductDialog();
         },
 
         icon: const Icon(
@@ -570,65 +774,32 @@ class _AdminDashboardScreenState
         ),
       ),
 
-      // =========================================
-      // APPBAR
-      // =========================================
-
       appBar: AppBar(
-        elevation: 0,
-
-        backgroundColor:
-            Colors.white,
-
-        foregroundColor:
-            Colors.black,
-
         title: const Text(
-          'Admin Product Dashboard',
-          style: TextStyle(
-            fontWeight:
-                FontWeight.bold,
-          ),
+          'Admin Dashboard',
         ),
-
-        actions: [
-          IconButton(
-            onPressed: () {
-              provider
-                  .initializeProducts();
-            },
-
-            icon: const Icon(
-              Icons.refresh,
-            ),
-          ),
-        ],
       ),
-
-      // =========================================
-      // BODY
-      // =========================================
 
       body: Padding(
         padding:
-            const EdgeInsets.all(20),
+            const EdgeInsets.all(
+          20,
+        ),
 
         child: Column(
           children: [
-            // =================================
-            // DASHBOARD CARDS
-            // =================================
 
             Row(
               children: [
+
                 dashboardCard(
                   title:
                       'Total Products',
 
-                  value: provider
-                      .products
-                      .length
-                      .toString(),
+                  value:
+                      provider.products
+                          .length
+                          .toString(),
 
                   icon:
                       Icons.inventory_2,
@@ -642,10 +813,11 @@ class _AdminDashboardScreenState
                   title:
                       'Low Stock',
 
-                  value: provider
-                      .lowStockProducts
-                      .length
-                      .toString(),
+                  value:
+                      provider
+                          .lowStockProducts
+                          .length
+                          .toString(),
 
                   icon:
                       Icons.warning,
@@ -659,10 +831,16 @@ class _AdminDashboardScreenState
                   title:
                       'Categories',
 
-                  value: provider
-                      .categories
-                      .length
-                      .toString(),
+                  value:
+                      provider
+                          .categories
+                          .where(
+                            (e) =>
+                                e !=
+                                'All',
+                          )
+                          .length
+                          .toString(),
 
                   icon:
                       Icons.category,
@@ -671,145 +849,246 @@ class _AdminDashboardScreenState
             ),
 
             const SizedBox(
-              height: 25,
+              height: 20,
             ),
 
-            // =================================
-            // PRODUCT LIST
-            // =================================
+            TextField(
+              controller:
+                  searchController,
+
+              onChanged:
+                  provider
+                      .searchProducts,
+
+              decoration:
+                  InputDecoration(
+                hintText:
+                    'Search products...',
+
+                prefixIcon:
+                    const Icon(
+                  Icons.search,
+                ),
+
+                filled: true,
+
+                fillColor:
+                    Colors.white,
+
+                border:
+                    OutlineInputBorder(
+                  borderRadius:
+                      BorderRadius.circular(
+                    18,
+                  ),
+
+                  borderSide:
+                      BorderSide.none,
+                ),
+              ),
+            ),
+
+            const SizedBox(
+              height: 20,
+            ),
 
             Expanded(
-              child: provider
-                      .isLoading
-                  ? const Center(
-                      child:
-                          CircularProgressIndicator(),
-                    )
-                  : provider.products.isEmpty
+              child:
+                  provider.products
+                          .isEmpty
+
                       ? const Center(
-                          child: Text(
+                          child:
+                              Text(
                             'No products available',
                           ),
                         )
-                      : ListView.builder(
+
+                      : GridView.builder(
+
                           itemCount:
                               provider
                                   .products
                                   .length,
+
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount:
+                                4,
+
+                            crossAxisSpacing:
+                                20,
+
+                            mainAxisSpacing:
+                                20,
+
+                            childAspectRatio:
+                                0.78,
+                          ),
 
                           itemBuilder:
                               (
                                 context,
                                 index,
                               ) {
+
                             final product =
                                 provider
                                         .products[
                                     index];
 
                             return Container(
-                              margin:
-                                  const EdgeInsets
-                                      .only(
-                                bottom:
-                                    15,
-                              ),
-
-                              padding:
-                                  const EdgeInsets
-                                      .all(
-                                15,
-                              ),
-
                               decoration:
                                   BoxDecoration(
-                                color: Colors
-                                    .white,
+                                color:
+                                    Colors.white,
 
                                 borderRadius:
                                     BorderRadius.circular(
-                                  20,
+                                  24,
                                 ),
+
+                                boxShadow: [
+
+                                  BoxShadow(
+                                    color:
+                                        Colors.black.withOpacity(
+                                      0.05,
+                                    ),
+
+                                    blurRadius:
+                                        10,
+                                  ),
+                                ],
                               ),
 
-                              child: Row(
+                              child: Column(
+                                crossAxisAlignment:
+                                    CrossAxisAlignment.start,
+
                                 children: [
-                                  // ===================
-                                  // IMAGE
-                                  // ===================
-
-                                  ClipRRect(
-                                    borderRadius:
-                                        BorderRadius.circular(
-                                      15,
-                                    ),
-
-                                    child:
-                                        Image.network(
-                                      product
-                                          .imageUrl,
-
-                                      width:
-                                          90,
-
-                                      height:
-                                          90,
-
-                                      fit: BoxFit
-                                          .cover,
-
-                                      errorBuilder:
-                                          (
-                                        context,
-                                        error,
-                                        stackTrace,
-                                      ) {
-                                        return Container(
-                                          width:
-                                              90,
-
-                                          height:
-                                              90,
-
-                                          color: Colors
-                                              .grey
-                                              .shade300,
-
-                                          child:
-                                              const Icon(
-                                            Icons
-                                                .image,
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                  ),
-
-                                  const SizedBox(
-                                    width:
-                                        20,
-                                  ),
-
-                                  // ===================
-                                  // INFO
-                                  // ===================
 
                                   Expanded(
                                     child:
+                                        Stack(
+                                      children: [
+
+                                        ClipRRect(
+                                          borderRadius:
+                                              const BorderRadius.vertical(
+                                            top:
+                                                Radius.circular(
+                                              24,
+                                            ),
+                                          ),
+
+                                          child:
+                                              product.imageBase64.isEmpty
+
+                                                  ? Container(
+                                                      width:
+                                                          double.infinity,
+
+                                                      color:
+                                                          Colors.grey.shade300,
+
+                                                      child:
+                                                          const Center(
+                                                        child:
+                                                            Icon(
+                                                          Icons.image,
+                                                          size:
+                                                              60,
+                                                        ),
+                                                      ),
+                                                    )
+
+                                                  : Image.memory(
+                                                      base64Decode(
+                                                        product.imageBase64,
+                                                      ),
+
+                                                      width:
+                                                          double.infinity,
+
+                                                      fit:
+                                                          BoxFit.cover,
+                                                    ),
+                                        ),
+
+                                        Positioned(
+                                          top: 10,
+                                          left: 10,
+
+                                          child:
+                                              Container(
+                                            padding:
+                                                const EdgeInsets.symmetric(
+                                              horizontal:
+                                                  10,
+                                              vertical:
+                                                  5,
+                                            ),
+
+                                            decoration:
+                                                BoxDecoration(
+                                              color:
+                                                  Colors.black.withOpacity(
+                                                0.7,
+                                              ),
+
+                                              borderRadius:
+                                                  BorderRadius.circular(
+                                                20,
+                                              ),
+                                            ),
+
+                                            child:
+                                                Text(
+                                              product.category,
+
+                                              style:
+                                                  const TextStyle(
+                                                color:
+                                                    Colors.white,
+
+                                                fontSize:
+                                                    11,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+
+                                  Padding(
+                                    padding:
+                                        const EdgeInsets.all(
+                                      12,
+                                    ),
+
+                                    child:
                                         Column(
                                       crossAxisAlignment:
-                                          CrossAxisAlignment
-                                              .start,
+                                          CrossAxisAlignment.start,
 
                                       children: [
+
                                         Text(
                                           product
                                               .name,
 
+                                          maxLines:
+                                              1,
+
+                                          overflow:
+                                              TextOverflow.ellipsis,
+
                                           style:
                                               const TextStyle(
                                             fontSize:
-                                                20,
+                                                16,
 
                                             fontWeight:
                                                 FontWeight.bold,
@@ -818,12 +1097,22 @@ class _AdminDashboardScreenState
 
                                         const SizedBox(
                                           height:
-                                              5,
+                                              6,
                                         ),
 
                                         Text(
-                                          product
-                                              .category,
+                                          AppFormat.currency(
+                                            product.price,
+                                          ),
+
+                                          style:
+                                              const TextStyle(
+                                            fontWeight:
+                                                FontWeight.bold,
+
+                                            color:
+                                                Colors.green,
+                                          ),
                                         ),
 
                                         const SizedBox(
@@ -832,117 +1121,133 @@ class _AdminDashboardScreenState
                                         ),
 
                                         Text(
-                                          AppFormat.currency(
-                                            product
-                                                .price,
-                                          ),
+                                          'Stock: ${product.stock}',
+                                        ),
 
-                                          style:
-                                              const TextStyle(
-                                            fontWeight:
-                                                FontWeight.bold,
-                                          ),
+                                        const SizedBox(
+                                          height:
+                                              12,
+                                        ),
+
+                                        Row(
+                                          children: [
+
+                                            Expanded(
+                                              child:
+                                                  SizedBox(
+                                                height:
+                                                    36,
+
+                                                child:
+                                                    ElevatedButton(
+                                                  onPressed:
+                                                      () {
+
+                                                    showProductDialog(
+                                                      product:
+                                                          product,
+                                                    );
+                                                  },
+
+                                                  child:
+                                                      const Text(
+                                                    'Edit',
+
+                                                    style:
+                                                        TextStyle(
+                                                      fontSize:
+                                                          11,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+
+                                            const SizedBox(
+                                              width:
+                                                  6,
+                                            ),
+
+                                            Expanded(
+                                              child:
+                                                  SizedBox(
+                                                height:
+                                                    36,
+
+                                                child:
+                                                    ElevatedButton(
+                                                  style:
+                                                      ElevatedButton.styleFrom(
+                                                    backgroundColor:
+                                                        Colors.orange,
+                                                  ),
+
+                                                  onPressed:
+                                                      () {
+
+                                                    addStock(
+                                                      product,
+                                                    );
+                                                  },
+
+                                                  child:
+                                                      const Text(
+                                                    'Stock',
+
+                                                    style:
+                                                        TextStyle(
+                                                      fontSize:
+                                                          11,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+
+                                            const SizedBox(
+                                              width:
+                                                  6,
+                                            ),
+
+                                            Expanded(
+                                              child:
+                                                  SizedBox(
+                                                height:
+                                                    36,
+
+                                                child:
+                                                    ElevatedButton(
+                                                  style:
+                                                      ElevatedButton.styleFrom(
+                                                    backgroundColor:
+                                                        Colors.red,
+                                                  ),
+
+                                                  onPressed:
+                                                      () {
+
+                                                    deleteProduct(
+                                                      product,
+                                                    );
+                                                  },
+
+                                                  child:
+                                                      const Text(
+                                                    'Delete',
+
+                                                    style:
+                                                        TextStyle(
+                                                      fontSize:
+                                                          11,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ],
                                     ),
-                                  ),
-
-                                  // ===================
-                                  // STOCK
-                                  // ===================
-
-                                  Column(
-                                    children: [
-                                      const Text(
-                                        'Stock',
-                                      ),
-
-                                      const SizedBox(
-                                        height:
-                                            8,
-                                      ),
-
-                                      Text(
-                                        product
-                                            .stock
-                                            .toString(),
-
-                                        style:
-                                            const TextStyle(
-                                          fontSize:
-                                              24,
-
-                                          fontWeight:
-                                              FontWeight.bold,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-
-                                  const SizedBox(
-                                    width:
-                                        20,
-                                  ),
-
-                                  // ===================
-                                  // ACTIONS
-                                  // ===================
-
-                                  Column(
-                                    children: [
-                                      ElevatedButton.icon(
-                                        onPressed:
-                                            () {
-                                          showStockDialog(
-                                            product,
-                                          );
-                                        },
-
-                                        icon:
-                                            const Icon(
-                                          Icons
-                                              .edit,
-                                        ),
-
-                                        label:
-                                            const Text(
-                                          'Edit Stock',
-                                        ),
-                                      ),
-
-                                      const SizedBox(
-                                        height:
-                                            10,
-                                      ),
-
-                                      ElevatedButton.icon(
-                                        style:
-                                            ElevatedButton.styleFrom(
-                                          backgroundColor:
-                                              Colors.red,
-                                        ),
-
-                                        onPressed:
-                                            () async {
-                                          await provider
-                                              .deleteProduct(
-                                            product
-                                                .id,
-                                          );
-                                        },
-
-                                        icon:
-                                            const Icon(
-                                          Icons
-                                              .delete,
-                                        ),
-
-                                        label:
-                                            const Text(
-                                          'Delete',
-                                        ),
-                                      ),
-                                    ],
                                   ),
                                 ],
                               ),
@@ -956,55 +1261,72 @@ class _AdminDashboardScreenState
     );
   }
 
-  // =====================================================
-  // CARD
-  // =====================================================
-
   Widget dashboardCard({
     required String title,
     required String value,
     required IconData icon,
   }) {
+
     return Expanded(
       child: Container(
         padding:
-            const EdgeInsets.all(20),
+            const EdgeInsets.all(
+          18,
+        ),
 
-        decoration: BoxDecoration(
+        decoration:
+            BoxDecoration(
           color: Colors.white,
 
           borderRadius:
               BorderRadius.circular(
-            25,
+            22,
           ),
+
+          boxShadow: [
+
+            BoxShadow(
+              color:
+                  Colors.black.withOpacity(
+                0.04,
+              ),
+
+              blurRadius: 10,
+            ),
+          ],
         ),
 
         child: Column(
           children: [
+
             Icon(
               icon,
-              size: 45,
+              size: 38,
             ),
 
             const SizedBox(
-              height: 15,
+              height: 12,
             ),
 
             Text(
               value,
 
-              style: const TextStyle(
-                fontSize: 28,
+              style:
+                  const TextStyle(
+                fontSize: 24,
+
                 fontWeight:
                     FontWeight.bold,
               ),
             ),
 
             const SizedBox(
-              height: 8,
+              height: 6,
             ),
 
-            Text(title),
+            Text(
+              title,
+            ),
           ],
         ),
       ),

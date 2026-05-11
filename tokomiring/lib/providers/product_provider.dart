@@ -21,6 +21,8 @@ class ProductProvider extends ChangeNotifier {
 
   bool _isLoading = false;
 
+  bool _initialized = false;
+
   String? _errorMessage;
 
   String _selectedCategory = 'All';
@@ -66,18 +68,87 @@ class ProductProvider extends ChangeNotifier {
   // =====================================================
 
   void initializeProducts() {
+    if (_initialized) {
+      return;
+    }
+
+    _initialized = true;
+
     _setLoading(true);
+
+    _productSubscription?.cancel();
 
     _productSubscription =
         _databaseService
             .getProducts()
-            .listen((data) {
-      _products = data;
+            .listen(
+      (data) {
+        _products = data;
 
-      _applyFilters();
+        _applyFilters();
+
+        _setLoading(false);
+      },
+
+      onError: (error) {
+        _errorMessage =
+            error.toString();
+
+        _setLoading(false);
+      },
+    );
+  }
+
+  // =====================================================
+  // REFRESH PRODUCTS
+  // =====================================================
+
+  Future<void> refreshProducts() async {
+    try {
+      _setLoading(true);
+
+      final completer =
+          Completer<void>();
+
+      _productSubscription?.cancel();
+
+      _productSubscription =
+          _databaseService
+              .getProducts()
+              .listen(
+        (data) {
+          _products = data;
+
+          _applyFilters();
+
+          _setLoading(false);
+
+          if (!completer.isCompleted) {
+            completer.complete();
+          }
+        },
+
+        onError: (error) {
+          _errorMessage =
+              error.toString();
+
+          _setLoading(false);
+
+          if (!completer.isCompleted) {
+            completer.completeError(
+              error,
+            );
+          }
+        },
+      );
+
+      await completer.future;
+    } catch (e) {
+      _errorMessage =
+          e.toString();
 
       _setLoading(false);
-    });
+    }
   }
 
   // =====================================================
@@ -88,19 +159,22 @@ class ProductProvider extends ChangeNotifier {
     List<ProductModel> tempProducts =
         List.from(_products);
 
-    // Category Filter
+    // CATEGORY FILTER
+
     if (_selectedCategory != 'All') {
       tempProducts = tempProducts
           .where(
             (product) =>
                 product.category
                     .toLowerCase() ==
-                _selectedCategory.toLowerCase(),
+                _selectedCategory
+                    .toLowerCase(),
           )
           .toList();
     }
 
-    // Search Filter
+    // SEARCH FILTER
+
     if (_searchQuery.isNotEmpty) {
       tempProducts = tempProducts
           .where(
@@ -108,24 +182,27 @@ class ProductProvider extends ChangeNotifier {
                 product.name
                     .toLowerCase()
                     .contains(
-                      _searchQuery.toLowerCase(),
+                      _searchQuery
+                          .toLowerCase(),
                     ) ||
                 product.description
                     .toLowerCase()
                     .contains(
-                      _searchQuery.toLowerCase(),
+                      _searchQuery
+                          .toLowerCase(),
                     ),
           )
           .toList();
     }
 
-    _filteredProducts = tempProducts;
+    _filteredProducts =
+        tempProducts;
 
     notifyListeners();
   }
 
   // =====================================================
-  // SEARCH PRODUCTS
+  // SEARCH
   // =====================================================
 
   void searchProducts(
@@ -137,7 +214,7 @@ class ProductProvider extends ChangeNotifier {
   }
 
   // =====================================================
-  // FILTER CATEGORY
+  // SELECT CATEGORY
   // =====================================================
 
   void selectCategory(
@@ -149,7 +226,7 @@ class ProductProvider extends ChangeNotifier {
   }
 
   // =====================================================
-  // CLEAR FILTER
+  // CLEAR FILTERS
   // =====================================================
 
   void clearFilters() {
@@ -169,7 +246,9 @@ class ProductProvider extends ChangeNotifier {
   ) {
     try {
       return _products.firstWhere(
-        (product) => product.id == productId,
+        (product) =>
+            product.id ==
+            productId,
       );
     } catch (e) {
       return null;
@@ -180,10 +259,12 @@ class ProductProvider extends ChangeNotifier {
   // POPULAR PRODUCTS
   // =====================================================
 
-  List<ProductModel> get popularProducts {
+  List<ProductModel>
+      get popularProducts {
     return _products
         .where(
-          (product) => product.isPopular,
+          (product) =>
+              product.isPopular,
         )
         .toList();
   }
@@ -192,7 +273,8 @@ class ProductProvider extends ChangeNotifier {
   // AVAILABLE PRODUCTS
   // =====================================================
 
-  List<ProductModel> get availableProducts {
+  List<ProductModel>
+      get availableProducts {
     return _products
         .where(
           (product) =>
@@ -203,13 +285,15 @@ class ProductProvider extends ChangeNotifier {
   }
 
   // =====================================================
-  // LOW STOCK PRODUCTS
+  // LOW STOCK
   // =====================================================
 
-  List<ProductModel> get lowStockProducts {
+  List<ProductModel>
+      get lowStockProducts {
     return _products
         .where(
-          (product) => product.stock <= 5,
+          (product) =>
+              product.stock <= 5,
         )
         .toList();
   }
@@ -224,13 +308,22 @@ class ProductProvider extends ChangeNotifier {
     try {
       _setLoading(true);
 
-      await _databaseService.addProduct(
-        product,
-      );
+      _errorMessage = null;
+
+      await _databaseService
+          .addProduct(product);
+
+      if (!_products
+          .any((p) => p.id == product.id)) {
+        _products.add(product);
+      }
+
+      _applyFilters();
 
       return true;
     } catch (e) {
-      _errorMessage = e.toString();
+      _errorMessage =
+          e.toString();
 
       notifyListeners();
 
@@ -250,13 +343,29 @@ class ProductProvider extends ChangeNotifier {
     try {
       _setLoading(true);
 
-      await _databaseService.updateProduct(
-        product,
+      _errorMessage = null;
+
+      await _databaseService
+          .updateProduct(product);
+
+      int index =
+          _products.indexWhere(
+        (p) =>
+            p.id ==
+            product.id,
       );
+
+      if (index != -1) {
+        _products[index] =
+            product;
+      }
+
+      _applyFilters();
 
       return true;
     } catch (e) {
-      _errorMessage = e.toString();
+      _errorMessage =
+          e.toString();
 
       notifyListeners();
 
@@ -276,13 +385,25 @@ class ProductProvider extends ChangeNotifier {
     try {
       _setLoading(true);
 
-      await _databaseService.deleteProduct(
+      _errorMessage = null;
+
+      await _databaseService
+          .deleteProduct(
         productId,
       );
 
+      _products.removeWhere(
+        (product) =>
+            product.id ==
+            productId,
+      );
+
+      _applyFilters();
+
       return true;
     } catch (e) {
-      _errorMessage = e.toString();
+      _errorMessage =
+          e.toString();
 
       notifyListeners();
 
@@ -301,14 +422,35 @@ class ProductProvider extends ChangeNotifier {
     required int stock,
   }) async {
     try {
-      await _databaseService.updateStock(
-        productId: productId,
+      await _databaseService
+          .updateStock(
+        productId:
+            productId,
+
         stock: stock,
       );
 
+      int index =
+          _products.indexWhere(
+        (product) =>
+            product.id ==
+            productId,
+      );
+
+      if (index != -1) {
+        _products[index] =
+            _products[index]
+                .copyWith(
+          stock: stock,
+        );
+      }
+
+      _applyFilters();
+
       return true;
     } catch (e) {
-      _errorMessage = e.toString();
+      _errorMessage =
+          e.toString();
 
       notifyListeners();
 

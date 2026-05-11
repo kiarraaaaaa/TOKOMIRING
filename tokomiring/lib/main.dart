@@ -1,10 +1,13 @@
 // lib/main.dart
 
-import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
+
 import 'package:provider/provider.dart';
 
 import 'firebase_options.dart';
+
+import 'core/theme/app_theme.dart';
 
 import 'providers/auth_provider.dart';
 import 'providers/cart_provider.dart';
@@ -12,55 +15,120 @@ import 'providers/product_provider.dart';
 
 import 'routes/app_routes.dart';
 
-import 'core/theme/app_theme.dart';
-
 import 'screens/shared/splash_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  // =====================================================
+  // FIREBASE INIT
+  // =====================================================
+
   await Firebase.initializeApp(
     options:
-        DefaultFirebaseOptions.currentPlatform,
+        DefaultFirebaseOptions
+            .currentPlatform,
   );
 
-  runApp(const TokoMiringApp());
+  runApp(
+    const TokoMiringApp(),
+  );
 }
 
-class TokoMiringApp extends StatelessWidget {
-  const TokoMiringApp({super.key});
+class TokoMiringApp
+    extends StatelessWidget {
+
+  const TokoMiringApp({
+    super.key,
+  });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(
+    BuildContext context,
+  ) {
+
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(
-          create: (_) => AuthProvider()
-            ..initializeAuth(),
-        ),
 
-        ChangeNotifierProvider(
-          create: (_) => CartProvider(),
-        ),
+        // =============================================
+        // AUTH PROVIDER
+        // =============================================
 
         ChangeNotifierProvider(
           create: (_) =>
-              ProductProvider()
-                ..initializeProducts(),
+              AuthProvider()
+                ..initializeAuth(),
+        ),
+
+        // =============================================
+        // CART PROVIDER
+        // =============================================
+
+        ChangeNotifierProvider(
+          create: (_) =>
+              CartProvider(),
+        ),
+
+        // =============================================
+        // PRODUCT PROVIDER
+        // FIX DOUBLE PRODUCT
+        // =============================================
+
+        ChangeNotifierProvider(
+          create: (_) =>
+              ProductProvider(),
         ),
       ],
 
       child: MaterialApp(
-        debugShowCheckedModeBanner: false,
+        debugShowCheckedModeBanner:
+            false,
 
         title: 'Toko Miring',
 
-        theme: AppTheme.lightTheme,
+        theme:
+            AppTheme.lightTheme,
 
-        home: const SplashScreen(),
+        // =============================================
+        // SPLASH SCREEN
+        // =============================================
+
+        home:
+            const SplashScreen(),
+
+        // =============================================
+        // ROUTES
+        // =============================================
 
         onGenerateRoute:
-            AppRoutes.generateRoute,
+            AppRoutes
+                .generateRoute,
+
+        // =============================================
+        // BUILDER
+        // =============================================
+
+        builder: (
+          context,
+          child,
+        ) {
+
+          return MediaQuery(
+            data: MediaQuery.of(
+              context,
+            ).copyWith(
+              textScaler:
+                  const TextScaler
+                      .linear(
+                1.0,
+              ),
+            ),
+
+            child:
+                child ??
+                const SizedBox(),
+          );
+        },
       ),
     );
   }

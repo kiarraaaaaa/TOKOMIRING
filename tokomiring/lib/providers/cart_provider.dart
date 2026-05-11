@@ -6,6 +6,7 @@ import '../models/product_model.dart';
 
 class CartItemModel {
   final ProductModel product;
+
   int quantity;
 
   CartItemModel({
@@ -13,24 +14,33 @@ class CartItemModel {
     required this.quantity,
   });
 
+  // =====================================================
+  // SUBTOTAL
+  // =====================================================
+
   double get subtotal =>
       product.price * quantity;
 }
 
-class CartProvider extends ChangeNotifier {
+class CartProvider
+    extends ChangeNotifier {
+
   // =====================================================
   // CART ITEMS
   // =====================================================
 
-  final List<CartItemModel> _items = [];
+  final List<CartItemModel> _items =
+      [];
 
-  List<CartItemModel> get items => _items;
+  List<CartItemModel> get items =>
+      _items;
 
   // =====================================================
   // TOTAL ITEMS
   // =====================================================
 
   int get totalItems {
+
     int total = 0;
 
     for (var item in _items) {
@@ -45,6 +55,7 @@ class CartProvider extends ChangeNotifier {
   // =====================================================
 
   double get totalPrice {
+
     double total = 0;
 
     for (var item in _items) {
@@ -55,12 +66,14 @@ class CartProvider extends ChangeNotifier {
   }
 
   // =====================================================
-  // CHECK EMPTY
+  // EMPTY CHECK
   // =====================================================
 
-  bool get isEmpty => _items.isEmpty;
+  bool get isEmpty =>
+      _items.isEmpty;
 
-  bool get isNotEmpty => _items.isNotEmpty;
+  bool get isNotEmpty =>
+      _items.isNotEmpty;
 
   // =====================================================
   // ADD TO CART
@@ -69,19 +82,47 @@ class CartProvider extends ChangeNotifier {
   void addToCart(
     ProductModel product,
   ) {
-    final index = _items.indexWhere(
-      (item) => item.product.id == product.id,
+
+    final index =
+        _items.indexWhere(
+      (item) =>
+          item.product.id ==
+          product.id,
     );
 
+    // =============================================
+    // PRODUCT ALREADY EXISTS
+    // =============================================
+
     if (index >= 0) {
-      _items[index].quantity++;
-    } else {
-      _items.add(
-        CartItemModel(
-          product: product,
-          quantity: 1,
-        ),
-      );
+
+      // CHECK STOCK LIMIT
+
+      if (_items[index]
+              .quantity <
+          product.stock) {
+
+        _items[index]
+            .quantity++;
+      }
+
+    }
+
+    // =============================================
+    // NEW PRODUCT
+    // =============================================
+
+    else {
+
+      if (product.stock > 0) {
+
+        _items.add(
+          CartItemModel(
+            product: product,
+            quantity: 1,
+          ),
+        );
+      }
     }
 
     notifyListeners();
@@ -94,8 +135,11 @@ class CartProvider extends ChangeNotifier {
   void removeFromCart(
     String productId,
   ) {
+
     _items.removeWhere(
-      (item) => item.product.id == productId,
+      (item) =>
+          item.product.id ==
+          productId,
     );
 
     notifyListeners();
@@ -108,14 +152,30 @@ class CartProvider extends ChangeNotifier {
   void increaseQuantity(
     String productId,
   ) {
-    final index = _items.indexWhere(
-      (item) => item.product.id == productId,
+
+    final index =
+        _items.indexWhere(
+      (item) =>
+          item.product.id ==
+          productId,
     );
 
     if (index >= 0) {
-      _items[index].quantity++;
 
-      notifyListeners();
+      final item =
+          _items[index];
+
+      // ===========================================
+      // LIMIT STOCK
+      // ===========================================
+
+      if (item.quantity <
+          item.product.stock) {
+
+        item.quantity++;
+
+        notifyListeners();
+      }
     }
   }
 
@@ -126,14 +186,25 @@ class CartProvider extends ChangeNotifier {
   void decreaseQuantity(
     String productId,
   ) {
-    final index = _items.indexWhere(
-      (item) => item.product.id == productId,
+
+    final index =
+        _items.indexWhere(
+      (item) =>
+          item.product.id ==
+          productId,
     );
 
     if (index >= 0) {
-      if (_items[index].quantity > 1) {
-        _items[index].quantity--;
+
+      if (_items[index]
+              .quantity >
+          1) {
+
+        _items[index]
+            .quantity--;
+
       } else {
+
         _items.removeAt(index);
       }
 
@@ -149,12 +220,37 @@ class CartProvider extends ChangeNotifier {
     required String productId,
     required int quantity,
   }) {
-    final index = _items.indexWhere(
-      (item) => item.product.id == productId,
+
+    final index =
+        _items.indexWhere(
+      (item) =>
+          item.product.id ==
+          productId,
     );
 
     if (index >= 0) {
-      _items[index].quantity = quantity;
+
+      final stock =
+          _items[index]
+              .product
+              .stock;
+
+      // ===========================================
+      // LIMIT MIN & MAX
+      // ===========================================
+
+      if (quantity <= 0) {
+
+        _items.removeAt(index);
+
+      } else {
+
+        _items[index]
+            .quantity =
+                quantity > stock
+                    ? stock
+                    : quantity;
+      }
 
       notifyListeners();
     }
@@ -167,8 +263,11 @@ class CartProvider extends ChangeNotifier {
   bool isInCart(
     String productId,
   ) {
+
     return _items.any(
-      (item) => item.product.id == productId,
+      (item) =>
+          item.product.id ==
+          productId,
     );
   }
 
@@ -179,12 +278,18 @@ class CartProvider extends ChangeNotifier {
   int getQuantity(
     String productId,
   ) {
-    final index = _items.indexWhere(
-      (item) => item.product.id == productId,
+
+    final index =
+        _items.indexWhere(
+      (item) =>
+          item.product.id ==
+          productId,
     );
 
     if (index >= 0) {
-      return _items[index].quantity;
+
+      return _items[index]
+          .quantity;
     }
 
     return 0;
@@ -195,30 +300,48 @@ class CartProvider extends ChangeNotifier {
   // =====================================================
 
   void clearCart() {
+
     _items.clear();
 
     notifyListeners();
   }
 
   // =====================================================
-  // GET CART MAP
+  // CART TO MAP
   // =====================================================
 
-  List<Map<String, dynamic>> toMap() {
-    return _items.map((item) {
-      return {
-        'productId': item.product.id,
+  List<Map<String, dynamic>>
+      toMap() {
 
-        'productName': item.product.name,
+    return _items.map(
+      (item) {
 
-        'productImage': item.product.imageUrl,
+        return {
 
-        'productPrice': item.product.price,
+          'productId':
+              item.product.id,
 
-        'quantity': item.quantity,
+          'productName':
+              item.product.name,
 
-        'subtotal': item.subtotal,
-      };
-    }).toList();
+          // =======================================
+          // BASE64 IMAGE
+          // =======================================
+
+          'productImage':
+              item.product
+                  .imageBase64,
+
+          'productPrice':
+              item.product.price,
+
+          'quantity':
+              item.quantity,
+
+          'subtotal':
+              item.subtotal,
+        };
+      },
+    ).toList();
   }
 }

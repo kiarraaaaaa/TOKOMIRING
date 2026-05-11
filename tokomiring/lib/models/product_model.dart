@@ -2,30 +2,58 @@
 
 class ProductModel {
   final String id;
+
   final String name;
+
   final String description;
+
   final String category;
-  final String imageUrl;
+
+  // =====================================================
+  // BASE64 IMAGE
+  // =====================================================
+
+  final String imageBase64;
+
   final double price;
+
   final int stock;
+
   final bool isAvailable;
+
   final bool isPopular;
+
   final int sold;
+
   final DateTime createdAt;
 
   ProductModel({
     required this.id,
+
     required this.name,
+
     required this.description,
+
     required this.category,
-    required this.imageUrl,
+
+    required this.imageBase64,
+
     required this.price,
+
     required this.stock,
+
     required this.isAvailable,
+
     required this.isPopular,
+
     required this.sold,
+
     required this.createdAt,
   });
+
+  // =====================================================
+  // FROM MAP
+  // =====================================================
 
   factory ProductModel.fromMap(
     Map<dynamic, dynamic> map,
@@ -36,19 +64,26 @@ class ProductModel {
 
       name: map['name'] ?? '',
 
-      description: map['description'] ?? '',
+      description:
+          map['description'] ?? '',
 
-      category: map['category'] ?? '',
+      category:
+          map['category'] ?? '',
 
-      imageUrl: map['imageUrl'] ?? '',
+      imageBase64:
+          map['imageBase64'] ?? '',
 
-      price: (map['price'] ?? 0).toDouble(),
+      price:
+          (map['price'] ?? 0)
+              .toDouble(),
 
       stock: map['stock'] ?? 0,
 
-      isAvailable: map['isAvailable'] ?? true,
+      isAvailable:
+          map['isAvailable'] ?? true,
 
-      isPopular: map['isPopular'] ?? false,
+      isPopular:
+          map['isPopular'] ?? false,
 
       sold: map['sold'] ?? 0,
 
@@ -58,6 +93,10 @@ class ProductModel {
           DateTime.now(),
     );
   }
+
+  // =====================================================
+  // TO MAP
+  // =====================================================
 
   Map<String, dynamic> toMap() {
     return {
@@ -69,33 +108,50 @@ class ProductModel {
 
       'category': category,
 
-      'imageUrl': imageUrl,
+      'imageBase64': imageBase64,
 
       'price': price,
 
       'stock': stock,
 
-      'isAvailable': isAvailable,
+      'isAvailable':
+          isAvailable,
 
-      'isPopular': isPopular,
+      'isPopular':
+          isPopular,
 
       'sold': sold,
 
-      'createdAt': createdAt.toIso8601String(),
+      'createdAt':
+          createdAt.toIso8601String(),
     };
   }
 
+  // =====================================================
+  // COPY WITH
+  // =====================================================
+
   ProductModel copyWith({
     String? id,
+
     String? name,
+
     String? description,
+
     String? category,
-    String? imageUrl,
+
+    String? imageBase64,
+
     double? price,
+
     int? stock,
+
     bool? isAvailable,
+
     bool? isPopular,
+
     int? sold,
+
     DateTime? createdAt,
   }) {
     return ProductModel(
@@ -103,23 +159,34 @@ class ProductModel {
 
       name: name ?? this.name,
 
-      description: description ?? this.description,
+      description:
+          description ??
+              this.description,
 
-      category: category ?? this.category,
+      category:
+          category ?? this.category,
 
-      imageUrl: imageUrl ?? this.imageUrl,
+      imageBase64:
+          imageBase64 ??
+              this.imageBase64,
 
       price: price ?? this.price,
 
       stock: stock ?? this.stock,
 
-      isAvailable: isAvailable ?? this.isAvailable,
+      isAvailable:
+          isAvailable ??
+              this.isAvailable,
 
-      isPopular: isPopular ?? this.isPopular,
+      isPopular:
+          isPopular ??
+              this.isPopular,
 
       sold: sold ?? this.sold,
 
-      createdAt: createdAt ?? this.createdAt,
+      createdAt:
+          createdAt ??
+              this.createdAt,
     );
   }
 }
