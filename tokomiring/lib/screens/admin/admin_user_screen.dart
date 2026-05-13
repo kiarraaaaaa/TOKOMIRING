@@ -1,54 +1,48 @@
 // =====================================================
-// FULL FINAL FIX
-// lib/screens/admin/admin_order_screen.dart
+// FIX FINAL - ADMIN USER SCREEN
 // FIX:
-// ✅ initializeOrders VOID ERROR
-// ✅ REALTIME REPORTS
-// ✅ REALTIME SOLD
-// ✅ REALTIME TOP SELLING
-// ✅ REALTIME CHART
-// ✅ OVERFLOW FIX
-// ✅ RESPONSIVE FIX
+// ✅ FREEZE
+// ✅ OVERFLOW
+// ✅ GRID CRASH
+// ✅ SIDEBAR LAG
+// ✅ BUTTON KEGEDEAN
+// ✅ SCROLL BUG
 // =====================================================
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../models/order_model.dart';
+import '../../providers/auth_provider.dart';
+import '../../models/user_model.dart';
 
-import '../../providers/order_provider.dart';
-import '../../providers/product_provider.dart';
-
-class AdminOrderScreen
+class AdminUserScreen
     extends StatefulWidget {
 
-  const AdminOrderScreen({
+  const AdminUserScreen({
     super.key,
   });
 
   @override
-  State<AdminOrderScreen>
+  State<AdminUserScreen>
       createState() =>
-          _AdminOrderScreenState();
+          _AdminUserScreenState();
 }
 
-class _AdminOrderScreenState
-    extends State<AdminOrderScreen> {
+class _AdminUserScreenState
+    extends State<AdminUserScreen> {
 
   String selectedFilter =
-      'All';
+      'All Users';
 
-  final List<String> statuses = [
+  final List<String> filters = [
 
-    'All',
+    'All Users',
 
-    'Waiting Admin Validation',
+    'Active Users',
 
-    'Processing Delivery',
+    'Banned Users',
 
-    'Package On Delivery',
-
-    'Completed',
+    'Admins',
   ];
 
   @override
@@ -59,255 +53,94 @@ class _AdminOrderScreenState
     WidgetsBinding.instance
         .addPostFrameCallback((_) {
 
-      Provider.of<OrderProvider>(
+      final provider =
+          Provider.of<AuthProvider>(
         context,
         listen: false,
-      ).initializeOrders();
+      );
 
-      Provider.of<ProductProvider>(
-        context,
-        listen: false,
-      ).initializeProducts();
+      provider.loadUsers();
     });
   }
 
   // =====================================================
-  // UPDATE STATUS
+  // TOGGLE STATUS
   // =====================================================
 
-  Future<void> updateStatus({
+  Future<void> toggleUserStatus(
+    UserModel user,
+  ) async {
 
-    required OrderModel order,
-  }) async {
+    final provider =
+        Provider.of<AuthProvider>(
+      context,
+      listen: false,
+    );
 
-    String selectedStatus =
-        order.status;
+    final updated =
+        user.copyWith(
+      isActive:
+          !user.isActive,
+    );
 
-    await showDialog(
-
-      context: context,
-
-      builder: (_) {
-
-        return AlertDialog(
-
-          shape:
-              RoundedRectangleBorder(
-
-            borderRadius:
-                BorderRadius.circular(
-              24,
-            ),
-          ),
-
-          title:
-              const Text(
-            'Update Status',
-          ),
-
-          content:
-              StatefulBuilder(
-
-            builder:
-                (
-                  context,
-                  setState,
-                ) {
-
-              return SingleChildScrollView(
-
-                child: Column(
-
-                  mainAxisSize:
-                      MainAxisSize.min,
-
-                  children:
-
-                      statuses
-                          .where(
-                            (
-                              e,
-                            ) {
-
-                              return e !=
-                                  'All';
-                            },
-                          )
-                          .map(
-                            (
-                              status,
-                            ) {
-
-                        return RadioListTile<
-                            String>(
-
-                          value:
-                              status,
-
-                          groupValue:
-                              selectedStatus,
-
-                          title:
-                              Text(
-                            status,
-                          ),
-
-                          onChanged:
-                              (
-                                value,
-                              ) {
-
-                            setState(() {
-
-                              selectedStatus =
-                                  value!;
-                            });
-                          },
-                        );
-                      },
-                          )
-                          .toList(),
-                ),
-              );
-            },
-          ),
-
-          actions: [
-
-            TextButton(
-
-              onPressed:
-                  () {
-
-                Navigator.pop(
-                  context,
-                );
-              },
-
-              child:
-                  const Text(
-                'Cancel',
-              ),
-            ),
-
-            ElevatedButton(
-
-              style:
-                  ElevatedButton.styleFrom(
-
-                backgroundColor:
-                    Colors.blue,
-              ),
-
-              onPressed:
-                  () async {
-
-                final orderProvider =
-                    Provider.of<OrderProvider>(
-
-                  context,
-
-                  listen: false,
-                );
-
-                final productProvider =
-                    Provider.of<ProductProvider>(
-
-                  context,
-
-                  listen: false,
-                );
-
-                // =====================================
-                // UPDATE STATUS
-                // =====================================
-
-                await orderProvider
-                    .updateOrderStatus(
-
-                  orderId:
-                      order.orderId,
-
-                  status:
-                      selectedStatus,
-                );
-
-                // =====================================
-                // COMPLETED = UPDATE SOLD
-                // =====================================
-
-                if (selectedStatus
-                            .toLowerCase() ==
-                        'completed' &&
-
-                    order.status
-                            .toLowerCase() !=
-                        'completed') {
-
-                  for (final item
-                      in order.items) {
-
-                    await productProvider
-                        .increaseSold(
-
-                      productId:
-                          item.productId,
-
-                      quantity:
-                          item.quantity,
-                    );
-                  }
-
-                  await productProvider
-                      .refreshProducts();
-                }
-
-                // =====================================
-                // REFRESH
-                // =====================================
-
-                orderProvider
-                    .initializeOrders();
-
-                if (!mounted) {
-                  return;
-                }
-
-                Navigator.pop(
-                  context,
-                );
-
-                ScaffoldMessenger.of(
-                  context,
-                ).showSnackBar(
-
-                  const SnackBar(
-
-                    content:
-                        Text(
-                      'Order updated successfully',
-                    ),
-                  ),
-                );
-              },
-
-              child:
-                  const Text(
-
-                'Update',
-
-                style:
-                    TextStyle(
-                  color:
-                      Colors.white,
-                ),
-              ),
-            ),
-          ],
-        );
-      },
+    await provider.updateUser(
+      updated,
     );
   }
+
+  // =====================================================
+  // FILTER
+  // =====================================================
+
+  List<UserModel> getFilteredUsers(
+    List<UserModel> users,
+  ) {
+
+    switch (selectedFilter) {
+
+      case 'Active Users':
+
+        return users.where(
+          (
+            e,
+          ) {
+
+            return e.isActive;
+          },
+        ).toList();
+
+      case 'Banned Users':
+
+        return users.where(
+          (
+            e,
+          ) {
+
+            return !e.isActive;
+          },
+        ).toList();
+
+      case 'Admins':
+
+        return users.where(
+          (
+            e,
+          ) {
+
+            return e.role ==
+                'admin';
+          },
+        ).toList();
+
+      default:
+
+        return users;
+    }
+  }
+
+  // =====================================================
+  // BUILD
+  // =====================================================
 
   @override
   Widget build(
@@ -315,32 +148,17 @@ class _AdminOrderScreenState
   ) {
 
     final provider =
-        Provider.of<OrderProvider>(
+        Provider.of<AuthProvider>(
       context,
     );
 
-    final allOrders =
-        provider.orders;
+    final users =
+        provider.users;
 
-    final filteredOrders =
-
-        selectedFilter ==
-                'All'
-
-            ? allOrders
-
-            : allOrders
-                .where(
-                  (
-                    order,
-                  ) {
-
-                return order
-                        .status ==
-                    selectedFilter;
-              },
-                )
-                .toList();
+    final filteredUsers =
+        getFilteredUsers(
+      users,
+    );
 
     final width =
         MediaQuery.of(context)
@@ -386,7 +204,7 @@ class _AdminOrderScreenState
 
             Text(
 
-              'Order Management',
+              'User Management',
 
               style:
                   TextStyle(
@@ -407,7 +225,7 @@ class _AdminOrderScreenState
 
             Text(
 
-              'Monitor and manage customer orders.',
+              'Manage active users and admins.',
 
               style:
                   TextStyle(
@@ -424,9 +242,9 @@ class _AdminOrderScreenState
               height: 30,
             ),
 
-            // =========================================
+            // =====================================
             // ANALYTICS
-            // =========================================
+            // =====================================
 
             GridView.builder(
 
@@ -445,13 +263,13 @@ class _AdminOrderScreenState
                     analyticsCount,
 
                 crossAxisSpacing:
-                    20,
+                    18,
 
                 mainAxisSpacing:
-                    20,
+                    18,
 
                 mainAxisExtent:
-                    190,
+                    180,
               ),
 
               itemBuilder:
@@ -464,45 +282,13 @@ class _AdminOrderScreenState
 
                   {
                     'title':
-                        'Waiting',
+                        'Total Users',
 
                     'value':
-                        allOrders
-                            .where(
-                      (
-                        e,
-                      ) {
-
-                        return e.status ==
-                            'Waiting Admin Validation';
-                      },
-                    ).length,
+                        users.length,
 
                     'icon':
-                        Icons.pending,
-
-                    'color':
-                        Colors.orange,
-                  },
-
-                  {
-                    'title':
-                        'Processing',
-
-                    'value':
-                        allOrders
-                            .where(
-                      (
-                        e,
-                      ) {
-
-                        return e.status ==
-                            'Processing Delivery';
-                      },
-                    ).length,
-
-                    'icon':
-                        Icons.local_shipping,
+                        Icons.people,
 
                     'color':
                         Colors.blue,
@@ -510,40 +296,16 @@ class _AdminOrderScreenState
 
                   {
                     'title':
-                        'Delivery',
+                        'Active Users',
 
                     'value':
-                        allOrders
+                        users
                             .where(
                       (
                         e,
                       ) {
 
-                        return e.status ==
-                            'Package On Delivery';
-                      },
-                    ).length,
-
-                    'icon':
-                        Icons.delivery_dining,
-
-                    'color':
-                        Colors.purple,
-                  },
-
-                  {
-                    'title':
-                        'Completed',
-
-                    'value':
-                        allOrders
-                            .where(
-                      (
-                        e,
-                      ) {
-
-                        return e.status ==
-                            'Completed';
+                        return e.isActive;
                       },
                     ).length,
 
@@ -552,6 +314,51 @@ class _AdminOrderScreenState
 
                     'color':
                         Colors.green,
+                  },
+
+                  {
+                    'title':
+                        'Banned Users',
+
+                    'value':
+                        users
+                            .where(
+                      (
+                        e,
+                      ) {
+
+                        return !e.isActive;
+                      },
+                    ).length,
+
+                    'icon':
+                        Icons.block,
+
+                    'color':
+                        Colors.red,
+                  },
+
+                  {
+                    'title':
+                        'Admins',
+
+                    'value':
+                        users
+                            .where(
+                      (
+                        e,
+                      ) {
+
+                        return e.role ==
+                            'admin';
+                      },
+                    ).length,
+
+                    'icon':
+                        Icons.admin_panel_settings,
+
+                    'color':
+                        Colors.purple,
                   },
                 ];
 
@@ -576,16 +383,16 @@ class _AdminOrderScreenState
             ),
 
             const SizedBox(
-              height: 30,
+              height: 28,
             ),
 
-            // =========================================
+            // =====================================
             // FILTER
-            // =========================================
+            // =====================================
 
             SizedBox(
 
-              height: 56,
+              height: 54,
 
               child:
                   ListView.builder(
@@ -594,7 +401,7 @@ class _AdminOrderScreenState
                     Axis.horizontal,
 
                 itemCount:
-                    statuses.length,
+                    filters.length,
 
                 itemBuilder:
                     (
@@ -602,12 +409,12 @@ class _AdminOrderScreenState
                       index,
                     ) {
 
-                  final status =
-                      statuses[index];
+                  final filter =
+                      filters[index];
 
                   final active =
                       selectedFilter ==
-                          status;
+                          filter;
 
                   return Padding(
 
@@ -621,7 +428,7 @@ class _AdminOrderScreenState
 
                       borderRadius:
                           BorderRadius.circular(
-                        16,
+                        14,
                       ),
 
                       onTap: () {
@@ -629,7 +436,7 @@ class _AdminOrderScreenState
                         setState(() {
 
                           selectedFilter =
-                              status;
+                              filter;
                         });
                       },
 
@@ -639,7 +446,7 @@ class _AdminOrderScreenState
                         duration:
                             const Duration(
                           milliseconds:
-                              250,
+                              220,
                         ),
 
                         padding:
@@ -665,15 +472,16 @@ class _AdminOrderScreenState
 
                           borderRadius:
                               BorderRadius.circular(
-                            16,
+                            14,
                           ),
                         ),
 
-                        child: Center(
+                        child:
+                            Center(
 
                           child: Text(
 
-                            status,
+                            filter,
 
                             style:
                                 TextStyle(
@@ -688,6 +496,8 @@ class _AdminOrderScreenState
 
                               fontWeight:
                                   FontWeight.bold,
+
+                              fontSize: 13,
                             ),
                           ),
                         ),
@@ -702,11 +512,11 @@ class _AdminOrderScreenState
               height: 30,
             ),
 
-            // =========================================
-            // ORDER LIST
-            // =========================================
+            // =====================================
+            // USER LIST
+            // =====================================
 
-            if (filteredOrders
+            if (filteredUsers
                 .isEmpty)
 
               Container(
@@ -727,7 +537,7 @@ class _AdminOrderScreenState
 
                   borderRadius:
                       BorderRadius.circular(
-                    28,
+                    24,
                   ),
                 ),
 
@@ -735,7 +545,7 @@ class _AdminOrderScreenState
                     const Center(
 
                   child: Text(
-                    'No orders found',
+                    'No users found',
                   ),
                 ),
               )
@@ -751,7 +561,7 @@ class _AdminOrderScreenState
                     const NeverScrollableScrollPhysics(),
 
                 itemCount:
-                    filteredOrders.length,
+                    filteredUsers.length,
 
                 itemBuilder:
                     (
@@ -759,9 +569,12 @@ class _AdminOrderScreenState
                       index,
                     ) {
 
-                  return orderCard(
-                    filteredOrders[
-                        index],
+                  final user =
+                      filteredUsers[
+                          index];
+
+                  return userCard(
+                    user,
                   );
                 },
               ),
@@ -776,11 +589,11 @@ class _AdminOrderScreenState
   }
 
   // =====================================================
-  // ORDER CARD
+  // USER CARD
   // =====================================================
 
-  Widget orderCard(
-    OrderModel order,
+  Widget userCard(
+    UserModel user,
   ) {
 
     final width =
@@ -795,258 +608,8 @@ class _AdminOrderScreenState
 
       margin:
           const EdgeInsets.only(
-        bottom: 20,
+        bottom: 18,
       ),
-
-      padding:
-          const EdgeInsets.all(
-        24,
-      ),
-
-      decoration:
-          BoxDecoration(
-
-        color:
-            Colors.white,
-
-        borderRadius:
-            BorderRadius.circular(
-          28,
-        ),
-
-        boxShadow: [
-
-          BoxShadow(
-
-            color:
-                Colors.black
-                    .withOpacity(
-              0.03,
-            ),
-
-            blurRadius: 12,
-
-            offset:
-                const Offset(
-              0,
-              4,
-            ),
-          ),
-        ],
-      ),
-
-      child:
-
-          mobile
-
-              ? Column(
-                  crossAxisAlignment:
-                      CrossAxisAlignment
-                          .start,
-
-                  children: [
-
-                    Text(
-
-                      order.customerName,
-
-                      style:
-                          const TextStyle(
-
-                        fontSize: 20,
-
-                        fontWeight:
-                            FontWeight.bold,
-                      ),
-                    ),
-
-                    const SizedBox(
-                      height: 10,
-                    ),
-
-                    SelectableText(
-                      'Order #${order.orderId}',
-                    ),
-
-                    const SizedBox(
-                      height: 10,
-                    ),
-
-                    Text(
-                      order.status,
-                    ),
-
-                    const SizedBox(
-                      height: 10,
-                    ),
-
-                    Text(
-                      'Rp ${order.totalPrice.toStringAsFixed(0)}',
-                    ),
-
-                    const SizedBox(
-                      height: 20,
-                    ),
-
-                    SizedBox(
-
-                      width:
-                          double.infinity,
-
-                      height:
-                          52,
-
-                      child:
-                          ElevatedButton(
-
-                        style:
-                            ElevatedButton.styleFrom(
-
-                          backgroundColor:
-                              Colors.blue,
-                        ),
-
-                        onPressed:
-                            () {
-
-                          updateStatus(
-                            order:
-                                order,
-                          );
-                        },
-
-                        child:
-                            const Text(
-
-                          'Update Status',
-
-                          style:
-                              TextStyle(
-                            color:
-                                Colors.white,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                )
-
-              : Row(
-                  children: [
-
-                    Expanded(
-                      flex: 3,
-
-                      child:
-                          Column(
-                        crossAxisAlignment:
-                            CrossAxisAlignment
-                                .start,
-
-                        children: [
-
-                          Text(
-
-                            order.customerName,
-
-                            style:
-                                const TextStyle(
-
-                              fontSize: 20,
-
-                              fontWeight:
-                                  FontWeight.bold,
-                            ),
-                          ),
-
-                          const SizedBox(
-                            height: 8,
-                          ),
-
-                          SelectableText(
-                            'Order #${order.orderId}',
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    Expanded(
-                      flex: 2,
-
-                      child:
-                          Text(
-                        order.status,
-                      ),
-                    ),
-
-                    Expanded(
-                      flex: 2,
-
-                      child:
-                          Text(
-                        'Rp ${order.totalPrice.toStringAsFixed(0)}',
-                      ),
-                    ),
-
-                    SizedBox(
-
-                      width: 140,
-
-                      height: 48,
-
-                      child:
-                          ElevatedButton(
-
-                        style:
-                            ElevatedButton.styleFrom(
-
-                          backgroundColor:
-                              Colors.blue,
-                        ),
-
-                        onPressed:
-                            () {
-
-                          updateStatus(
-                            order:
-                                order,
-                          );
-                        },
-
-                        child:
-                            const Text(
-
-                          'Update',
-
-                          style:
-                              TextStyle(
-                            color:
-                                Colors.white,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-    );
-  }
-
-  // =====================================================
-  // ANALYTICS CARD
-  // =====================================================
-
-  Widget analyticsCard(
-
-    String title,
-
-    int value,
-
-    IconData icon,
-
-    Color color,
-  ) {
-
-    return Container(
 
       padding:
           const EdgeInsets.all(
@@ -1061,7 +624,7 @@ class _AdminOrderScreenState
 
         borderRadius:
             BorderRadius.circular(
-          28,
+          24,
         ),
 
         boxShadow: [
@@ -1086,6 +649,419 @@ class _AdminOrderScreenState
       ),
 
       child:
+
+          mobile
+
+              ? Column(
+                  crossAxisAlignment:
+                      CrossAxisAlignment
+                          .start,
+
+                  children: [
+
+                    Row(
+                      children: [
+
+                        CircleAvatar(
+
+                          radius: 28,
+
+                          backgroundColor:
+                              Colors.blue
+                                  .withOpacity(
+                            0.1,
+                          ),
+
+                          child:
+                              const Icon(
+                            Icons.person,
+                            color:
+                                Colors.blue,
+                          ),
+                        ),
+
+                        const SizedBox(
+                          width: 16,
+                        ),
+
+                        Expanded(
+                          child:
+                              Column(
+                            crossAxisAlignment:
+                                CrossAxisAlignment
+                                    .start,
+
+                            children: [
+
+                              Text(
+
+                                user.name,
+
+                                overflow:
+                                    TextOverflow
+                                        .ellipsis,
+
+                                style:
+                                    const TextStyle(
+
+                                  fontSize:
+                                      18,
+
+                                  fontWeight:
+                                      FontWeight.bold,
+                                ),
+                              ),
+
+                              const SizedBox(
+                                height:
+                                    6,
+                              ),
+
+                              Text(
+                                user.email,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(
+                      height: 18,
+                    ),
+
+                    Wrap(
+                      spacing: 10,
+                      runSpacing: 10,
+                      children: [
+
+                        chip(
+                          user.role
+                              .toUpperCase(),
+                          user.role ==
+                                  'admin'
+
+                              ? Colors
+                                  .purple
+
+                              : Colors
+                                  .blue,
+                        ),
+
+                        chip(
+
+                          user.isActive
+
+                              ? 'ACTIVE'
+
+                              : 'BANNED',
+
+                          user.isActive
+
+                              ? Colors
+                                  .green
+
+                              : Colors
+                                  .red,
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(
+                      height: 20,
+                    ),
+
+                    SizedBox(
+
+                      width:
+                          double.infinity,
+
+                      height:
+                          44,
+
+                      child:
+                          ElevatedButton(
+
+                        style:
+                            ElevatedButton.styleFrom(
+
+                          backgroundColor:
+
+                              user.isActive
+
+                                  ? Colors.red
+
+                                  : Colors.green,
+                        ),
+
+                        onPressed:
+                            () {
+
+                          toggleUserStatus(
+                            user,
+                          );
+                        },
+
+                        child:
+                            Text(
+
+                          user.isActive
+
+                              ? 'Ban User'
+
+                              : 'Activate User',
+
+                          style:
+                              const TextStyle(
+                            color:
+                                Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                )
+
+              : Row(
+                  children: [
+
+                    CircleAvatar(
+
+                      radius: 30,
+
+                      backgroundColor:
+                          Colors.blue
+                              .withOpacity(
+                        0.1,
+                      ),
+
+                      child:
+                          const Icon(
+                        Icons.person,
+                        color:
+                            Colors.blue,
+                      ),
+                    ),
+
+                    const SizedBox(
+                      width: 18,
+                    ),
+
+                    Expanded(
+                      flex: 3,
+
+                      child:
+                          Column(
+                        crossAxisAlignment:
+                            CrossAxisAlignment
+                                .start,
+
+                        children: [
+
+                          Text(
+
+                            user.name,
+
+                            overflow:
+                                TextOverflow
+                                    .ellipsis,
+
+                            style:
+                                const TextStyle(
+
+                              fontSize: 18,
+
+                              fontWeight:
+                                  FontWeight.bold,
+                            ),
+                          ),
+
+                          const SizedBox(
+                            height: 6,
+                          ),
+
+                          Text(
+                            user.email,
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    Expanded(
+                      child:
+                          chip(
+                        user.role
+                            .toUpperCase(),
+
+                        user.role ==
+                                'admin'
+
+                            ? Colors
+                                .purple
+
+                            : Colors
+                                .blue,
+                      ),
+                    ),
+
+                    Expanded(
+                      child:
+                          chip(
+
+                        user.isActive
+
+                            ? 'ACTIVE'
+
+                            : 'BANNED',
+
+                        user.isActive
+
+                            ? Colors
+                                .green
+
+                            : Colors
+                                .red,
+                      ),
+                    ),
+
+                    SizedBox(
+
+                      width: 140,
+
+                      height: 42,
+
+                      child:
+                          ElevatedButton(
+
+                        style:
+                            ElevatedButton.styleFrom(
+
+                          backgroundColor:
+
+                              user.isActive
+
+                                  ? Colors.red
+
+                                  : Colors.green,
+                        ),
+
+                        onPressed:
+                            () {
+
+                          toggleUserStatus(
+                            user,
+                          );
+                        },
+
+                        child:
+                            Text(
+
+                          user.isActive
+
+                              ? 'Ban'
+
+                              : 'Activate',
+
+                          style:
+                              const TextStyle(
+                            color:
+                                Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+    );
+  }
+
+  // =====================================================
+  // CHIP
+  // =====================================================
+
+  Widget chip(
+    String text,
+    Color color,
+  ) {
+
+    return Container(
+
+      padding:
+          const EdgeInsets.symmetric(
+
+        horizontal: 14,
+
+        vertical: 8,
+      ),
+
+      decoration:
+          BoxDecoration(
+
+        color:
+            color.withOpacity(
+          0.1,
+        ),
+
+        borderRadius:
+            BorderRadius.circular(
+          12,
+        ),
+      ),
+
+      child:
+          Text(
+
+        text,
+
+        style:
+            TextStyle(
+
+          color: color,
+
+          fontWeight:
+              FontWeight.bold,
+
+          fontSize: 12,
+        ),
+      ),
+    );
+  }
+
+  // =====================================================
+  // ANALYTICS CARD
+  // =====================================================
+
+  Widget analyticsCard(
+
+    String title,
+
+    int value,
+
+    IconData icon,
+
+    Color color,
+  ) {
+
+    return Container(
+
+      padding:
+          const EdgeInsets.all(
+        20,
+      ),
+
+      decoration:
+          BoxDecoration(
+
+        color:
+            Colors.white,
+
+        borderRadius:
+            BorderRadius.circular(
+          24,
+        ),
+      ),
+
+      child:
           Column(
         crossAxisAlignment:
             CrossAxisAlignment
@@ -1095,9 +1071,9 @@ class _AdminOrderScreenState
 
           Container(
 
-            width: 60,
+            width: 56,
 
-            height: 60,
+            height: 56,
 
             decoration:
                 BoxDecoration(
@@ -1109,17 +1085,14 @@ class _AdminOrderScreenState
 
               borderRadius:
                   BorderRadius.circular(
-                18,
+                16,
               ),
             ),
 
             child: Icon(
-
               icon,
-
               color: color,
-
-              size: 30,
+              size: 28,
             ),
           ),
 
@@ -1129,16 +1102,10 @@ class _AdminOrderScreenState
 
             '$value',
 
-            maxLines: 1,
-
-            overflow:
-                TextOverflow
-                    .ellipsis,
-
             style:
                 const TextStyle(
 
-              fontSize: 32,
+              fontSize: 30,
 
               fontWeight:
                   FontWeight.bold,
@@ -1152,8 +1119,6 @@ class _AdminOrderScreenState
           Text(
 
             title,
-
-            maxLines: 1,
 
             overflow:
                 TextOverflow

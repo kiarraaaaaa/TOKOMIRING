@@ -1,4 +1,13 @@
+// =====================================================
+// FULL REVISED VERSION
 // lib/providers/product_provider.dart
+// FIX:
+// ✅ REALTIME TOP SELLING
+// ✅ REALTIME SOLD UPDATE
+// ✅ REALTIME REPORTS
+// ✅ AUTO REFRESH PRODUCTS
+// ✅ CHART LIVE UPDATE
+// =====================================================
 
 import 'dart:async';
 
@@ -7,38 +16,50 @@ import 'package:flutter/material.dart';
 import '../models/product_model.dart';
 import '../services/database_service.dart';
 
-class ProductProvider extends ChangeNotifier {
-  final DatabaseService _databaseService =
+class ProductProvider
+    extends ChangeNotifier {
+
+  final DatabaseService
+      _databaseService =
       DatabaseService();
 
   // =====================================================
   // VARIABLES
   // =====================================================
 
-  List<ProductModel> _products = [];
+  List<ProductModel> _products =
+      [];
 
-  List<ProductModel> _filteredProducts = [];
+  List<ProductModel>
+      _filteredProducts = [];
 
-  bool _isLoading = false;
+  bool _isLoading =
+      false;
 
-  bool _initialized = false;
+  bool _initialized =
+      false;
 
   String? _errorMessage;
 
-  String _selectedCategory = 'All';
+  String _selectedCategory =
+      'All';
 
   String _searchQuery = '';
 
-  StreamSubscription? _productSubscription;
+  StreamSubscription?
+      _productSubscription;
 
   // =====================================================
   // GETTERS
   // =====================================================
 
-  List<ProductModel> get products =>
-      _filteredProducts;
+  List<ProductModel> get products {
 
-  bool get isLoading => _isLoading;
+    return _filteredProducts;
+  }
+
+  bool get isLoading =>
+      _isLoading;
 
   String? get errorMessage =>
       _errorMessage;
@@ -54,20 +75,79 @@ class ProductProvider extends ChangeNotifier {
   // =====================================================
 
   final List<String> categories = [
+
     'All',
+
     'Food',
+
     'Drinks',
+
     'Snacks',
+
     'Electronics',
+
     'Household',
+
     'Others',
   ];
 
   // =====================================================
-  // INIT PRODUCTS
+  // TOP SELLING
+  // =====================================================
+
+  List<ProductModel>
+      get topSellingProducts {
+
+    final copied =
+        List<ProductModel>.from(
+      _products,
+    );
+
+    copied.sort(
+      (
+        a,
+        b,
+      ) {
+
+        return b.sold.compareTo(
+          a.sold,
+        );
+      },
+    );
+
+    return copied;
+  }
+
+  // =====================================================
+  // TOTAL SOLD ITEMS
+  // =====================================================
+
+  int get totalSoldItems {
+
+    int total = 0;
+
+    for (var product
+        in _products) {
+
+      total += product.sold;
+    }
+
+    return total;
+  }
+
+  // =====================================================
+  // TOTAL PRODUCTS
+  // =====================================================
+
+  int get totalProducts =>
+      _products.length;
+
+  // =====================================================
+  // INITIALIZE
   // =====================================================
 
   void initializeProducts() {
+
     if (_initialized) {
       return;
     }
@@ -76,65 +156,92 @@ class ProductProvider extends ChangeNotifier {
 
     _setLoading(true);
 
-    _productSubscription?.cancel();
+    _productSubscription
+        ?.cancel();
+
+    // ===================================================
+    // REALTIME LISTENER
+    // ===================================================
 
     _productSubscription =
         _databaseService
             .getProducts()
             .listen(
+
       (data) {
+
         _products = data;
 
         _applyFilters();
 
         _setLoading(false);
+
+        notifyListeners();
       },
 
       onError: (error) {
+
         _errorMessage =
             error.toString();
 
         _setLoading(false);
+
+        notifyListeners();
       },
     );
   }
 
   // =====================================================
-  // REFRESH PRODUCTS
+  // FORCE REFRESH
   // =====================================================
 
-  Future<void> refreshProducts() async {
+  Future<void>
+      refreshProducts() async {
+
     try {
+
       _setLoading(true);
 
       final completer =
           Completer<void>();
 
-      _productSubscription?.cancel();
+      await _productSubscription
+          ?.cancel();
 
       _productSubscription =
           _databaseService
               .getProducts()
               .listen(
+
         (data) {
+
           _products = data;
 
           _applyFilters();
 
           _setLoading(false);
 
-          if (!completer.isCompleted) {
+          notifyListeners();
+
+          if (!completer
+              .isCompleted) {
+
             completer.complete();
           }
         },
 
         onError: (error) {
+
           _errorMessage =
               error.toString();
 
           _setLoading(false);
 
-          if (!completer.isCompleted) {
+          notifyListeners();
+
+          if (!completer
+              .isCompleted) {
+
             completer.completeError(
               error,
             );
@@ -143,54 +250,88 @@ class ProductProvider extends ChangeNotifier {
       );
 
       await completer.future;
+
     } catch (e) {
+
       _errorMessage =
           e.toString();
 
       _setLoading(false);
+
+      notifyListeners();
     }
   }
 
   // =====================================================
-  // FILTER PRODUCTS
+  // FILTER
   // =====================================================
 
   void _applyFilters() {
-    List<ProductModel> tempProducts =
-        List.from(_products);
 
-    // CATEGORY FILTER
+    List<ProductModel>
+        tempProducts =
+        List.from(
+      _products,
+    );
 
-    if (_selectedCategory != 'All') {
+    // ===================================================
+    // CATEGORY
+    // ===================================================
+
+    if (_selectedCategory !=
+        'All') {
+
       tempProducts = tempProducts
           .where(
-            (product) =>
-                product.category
-                    .toLowerCase() ==
-                _selectedCategory
-                    .toLowerCase(),
+            (
+              product,
+            ) {
+
+              return product
+                      .category
+                      .toLowerCase() ==
+                  _selectedCategory
+                      .toLowerCase();
+            },
           )
           .toList();
     }
 
-    // SEARCH FILTER
+    // ===================================================
+    // SEARCH
+    // ===================================================
 
-    if (_searchQuery.isNotEmpty) {
+    if (_searchQuery
+        .isNotEmpty) {
+
       tempProducts = tempProducts
           .where(
-            (product) =>
-                product.name
-                    .toLowerCase()
-                    .contains(
-                      _searchQuery
-                          .toLowerCase(),
-                    ) ||
-                product.description
-                    .toLowerCase()
-                    .contains(
-                      _searchQuery
-                          .toLowerCase(),
-                    ),
+            (
+              product,
+            ) {
+
+              return product.name
+                      .toLowerCase()
+                      .contains(
+                        _searchQuery
+                            .toLowerCase(),
+                      ) ||
+
+                  product
+                      .description
+                      .toLowerCase()
+                      .contains(
+                        _searchQuery
+                            .toLowerCase(),
+                      ) ||
+
+                  product.category
+                      .toLowerCase()
+                      .contains(
+                        _searchQuery
+                            .toLowerCase(),
+                      );
+            },
           )
           .toList();
     }
@@ -208,19 +349,22 @@ class ProductProvider extends ChangeNotifier {
   void searchProducts(
     String query,
   ) {
+
     _searchQuery = query;
 
     _applyFilters();
   }
 
   // =====================================================
-  // SELECT CATEGORY
+  // CATEGORY
   // =====================================================
 
   void selectCategory(
     String category,
   ) {
-    _selectedCategory = category;
+
+    _selectedCategory =
+        category;
 
     _applyFilters();
   }
@@ -230,7 +374,9 @@ class ProductProvider extends ChangeNotifier {
   // =====================================================
 
   void clearFilters() {
-    _selectedCategory = 'All';
+
+    _selectedCategory =
+        'All';
 
     _searchQuery = '';
 
@@ -238,50 +384,65 @@ class ProductProvider extends ChangeNotifier {
   }
 
   // =====================================================
-  // GET PRODUCT BY ID
+  // PRODUCT BY ID
   // =====================================================
 
   ProductModel? getProductById(
     String productId,
   ) {
+
     try {
+
       return _products.firstWhere(
-        (product) =>
-            product.id ==
-            productId,
+        (
+          product,
+        ) {
+
+          return product.id ==
+              productId;
+        },
       );
-    } catch (e) {
+
+    } catch (_) {
+
       return null;
     }
   }
 
   // =====================================================
-  // POPULAR PRODUCTS
+  // POPULAR
   // =====================================================
 
   List<ProductModel>
       get popularProducts {
-    return _products
-        .where(
-          (product) =>
-              product.isPopular,
-        )
-        .toList();
+
+    return _products.where(
+      (
+        product,
+      ) {
+
+        return product.isPopular;
+      },
+    ).toList();
   }
 
   // =====================================================
-  // AVAILABLE PRODUCTS
+  // AVAILABLE
   // =====================================================
 
   List<ProductModel>
       get availableProducts {
-    return _products
-        .where(
-          (product) =>
-              product.stock > 0 &&
-              product.isAvailable,
-        )
-        .toList();
+
+    return _products.where(
+      (
+        product,
+      ) {
+
+        return product.stock >
+                0 &&
+            product.isAvailable;
+      },
+    ).toList();
   }
 
   // =====================================================
@@ -290,12 +451,16 @@ class ProductProvider extends ChangeNotifier {
 
   List<ProductModel>
       get lowStockProducts {
-    return _products
-        .where(
-          (product) =>
-              product.stock <= 5,
-        )
-        .toList();
+
+    return _products.where(
+      (
+        product,
+      ) {
+
+        return product.stock <=
+            5;
+      },
+    ).toList();
   }
 
   // =====================================================
@@ -305,30 +470,53 @@ class ProductProvider extends ChangeNotifier {
   Future<bool> addProduct(
     ProductModel product,
   ) async {
+
     try {
+
       _setLoading(true);
 
       _errorMessage = null;
 
       await _databaseService
-          .addProduct(product);
+          .addProduct(
+        product,
+      );
 
-      if (!_products
-          .any((p) => p.id == product.id)) {
-        _products.add(product);
+      final exist =
+          _products.any(
+        (
+          p,
+        ) {
+
+          return p.id ==
+              product.id;
+        },
+      );
+
+      if (!exist) {
+
+        _products.add(
+          product,
+        );
       }
 
       _applyFilters();
 
+      notifyListeners();
+
       return true;
+
     } catch (e) {
+
       _errorMessage =
           e.toString();
 
       notifyListeners();
 
       return false;
+
     } finally {
+
       _setLoading(false);
     }
   }
@@ -340,49 +528,66 @@ class ProductProvider extends ChangeNotifier {
   Future<bool> updateProduct(
     ProductModel product,
   ) async {
+
     try {
+
       _setLoading(true);
 
       _errorMessage = null;
 
       await _databaseService
-          .updateProduct(product);
+          .updateProduct(
+        product,
+      );
 
-      int index =
+      final index =
           _products.indexWhere(
-        (p) =>
-            p.id ==
-            product.id,
+        (
+          p,
+        ) {
+
+          return p.id ==
+              product.id;
+        },
       );
 
       if (index != -1) {
+
         _products[index] =
             product;
       }
 
       _applyFilters();
 
+      notifyListeners();
+
       return true;
+
     } catch (e) {
+
       _errorMessage =
           e.toString();
 
       notifyListeners();
 
       return false;
+
     } finally {
+
       _setLoading(false);
     }
   }
 
   // =====================================================
-  // DELETE PRODUCT
+  // DELETE
   // =====================================================
 
   Future<bool> deleteProduct(
     String productId,
   ) async {
+
     try {
+
       _setLoading(true);
 
       _errorMessage = null;
@@ -393,22 +598,32 @@ class ProductProvider extends ChangeNotifier {
       );
 
       _products.removeWhere(
-        (product) =>
-            product.id ==
-            productId,
+        (
+          product,
+        ) {
+
+          return product.id ==
+              productId;
+        },
       );
 
       _applyFilters();
 
+      notifyListeners();
+
       return true;
+
     } catch (e) {
+
       _errorMessage =
           e.toString();
 
       notifyListeners();
 
       return false;
+
     } finally {
+
       _setLoading(false);
     }
   }
@@ -418,26 +633,37 @@ class ProductProvider extends ChangeNotifier {
   // =====================================================
 
   Future<bool> updateStock({
+
     required String productId,
+
     required int stock,
+
   }) async {
+
     try {
+
       await _databaseService
           .updateStock(
+
         productId:
             productId,
 
         stock: stock,
       );
 
-      int index =
+      final index =
           _products.indexWhere(
-        (product) =>
-            product.id ==
-            productId,
+        (
+          product,
+        ) {
+
+          return product.id ==
+              productId;
+        },
       );
 
       if (index != -1) {
+
         _products[index] =
             _products[index]
                 .copyWith(
@@ -447,8 +673,12 @@ class ProductProvider extends ChangeNotifier {
 
       _applyFilters();
 
+      notifyListeners();
+
       return true;
+
     } catch (e) {
+
       _errorMessage =
           e.toString();
 
@@ -459,12 +689,68 @@ class ProductProvider extends ChangeNotifier {
   }
 
   // =====================================================
-  // PRIVATE HELPERS
+  // UPDATE SOLD
+  // =====================================================
+
+  Future<void> increaseSold({
+
+    required String productId,
+
+    required int quantity,
+
+  }) async {
+
+    try {
+
+      final index =
+          _products.indexWhere(
+        (
+          product,
+        ) {
+
+          return product.id ==
+              productId;
+        },
+      );
+
+      if (index == -1) {
+        return;
+      }
+
+      final current =
+          _products[index];
+
+      final updated =
+          current.copyWith(
+
+        sold:
+            current.sold +
+                quantity,
+      );
+
+      _products[index] =
+          updated;
+
+      await _databaseService
+          .updateProduct(
+        updated,
+      );
+
+      _applyFilters();
+
+      notifyListeners();
+
+    } catch (_) {}
+  }
+
+  // =====================================================
+  // PRIVATE
   // =====================================================
 
   void _setLoading(
     bool value,
   ) {
+
     _isLoading = value;
 
     notifyListeners();
@@ -476,7 +762,9 @@ class ProductProvider extends ChangeNotifier {
 
   @override
   void dispose() {
-    _productSubscription?.cancel();
+
+    _productSubscription
+        ?.cancel();
 
     super.dispose();
   }

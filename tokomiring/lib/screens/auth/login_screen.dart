@@ -1,9 +1,11 @@
+// =====================================================
+// FULL FIXED VERSION
 // lib/screens/auth/login_screen.dart
+// ADMIN DASHBOARD ERROR FIXED
+// =====================================================
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
-import '../../core/constants/app_colors.dart';
 
 import '../../providers/auth_provider.dart';
 
@@ -26,7 +28,8 @@ class LoginScreen
 }
 
 class _LoginScreenState
-    extends State<LoginScreen> {
+    extends State<LoginScreen>
+    with TickerProviderStateMixin {
 
   final GlobalKey<FormState>
       _formKey =
@@ -43,6 +46,69 @@ class _LoginScreenState
   bool obscurePassword =
       true;
 
+  late AnimationController
+      _animationController;
+
+  late Animation<double>
+      _fadeAnimation;
+
+  late Animation<Offset>
+      _slideAnimation;
+
+  @override
+  void initState() {
+
+    super.initState();
+
+    _animationController =
+        AnimationController(
+
+      vsync: this,
+
+      duration:
+          const Duration(
+        milliseconds: 700,
+      ),
+    );
+
+    _fadeAnimation =
+        CurvedAnimation(
+
+      parent:
+          _animationController,
+
+      curve:
+          Curves.easeInOut,
+    );
+
+    _slideAnimation =
+        Tween<Offset>(
+
+      begin:
+          const Offset(
+        0,
+        0.08,
+      ),
+
+      end:
+          Offset.zero,
+
+    ).animate(
+
+      CurvedAnimation(
+
+        parent:
+            _animationController,
+
+        curve:
+            Curves.easeOut,
+      ),
+    );
+
+    _animationController
+        .forward();
+  }
+
   // =====================================================
   // LOGIN
   // =====================================================
@@ -54,12 +120,15 @@ class _LoginScreenState
 
     if (!_formKey.currentState!
         .validate()) {
+
       return;
     }
 
     final authProvider =
         Provider.of<AuthProvider>(
+
       context,
+
       listen: false,
     );
 
@@ -75,10 +144,12 @@ class _LoginScreenState
               .trim(),
     );
 
-    if (!mounted) return;
+    if (!mounted) {
+      return;
+    }
 
     // ===================================================
-    // SUCCESS
+    // LOGIN SUCCESS
     // ===================================================
 
     if (success) {
@@ -87,53 +158,92 @@ class _LoginScreenState
         context,
       ).showSnackBar(
 
-        const SnackBar(
-          content: Text(
+        SnackBar(
+
+          backgroundColor:
+              Colors.green,
+
+          behavior:
+              SnackBarBehavior
+                  .floating,
+
+          shape:
+              RoundedRectangleBorder(
+
+            borderRadius:
+                BorderRadius.circular(
+              16,
+            ),
+          ),
+
+          content: const Text(
             'Login success',
           ),
         ),
       );
 
       // ===============================================
-      // ADMIN
+      // ADMIN LOGIN
       // ===============================================
 
       if (authProvider.role ==
           'admin') {
 
-        Navigator.pushAndRemoveUntil(
-          context,
+        Navigator.of(context)
+            .pushAndRemoveUntil(
 
           MaterialPageRoute(
-            builder: (_) =>
-                const AdminDashboardScreen(),
+
+            builder:
+                (
+                  context,
+                ) {
+
+              return AdminDashboardScreen();
+            },
           ),
 
-          (route) => false,
+          (
+            route,
+          ) {
+
+            return false;
+          },
         );
       }
 
       // ===============================================
-      // USER
+      // USER LOGIN
       // ===============================================
 
       else {
 
-        Navigator.pushAndRemoveUntil(
-          context,
+        Navigator.of(context)
+            .pushAndRemoveUntil(
 
           MaterialPageRoute(
-            builder: (_) =>
-                const UserHomeScreen(),
+
+            builder:
+                (
+                  context,
+                ) {
+
+              return const UserHomeScreen();
+            },
           ),
 
-          (route) => false,
+          (
+            route,
+          ) {
+
+            return false;
+          },
         );
       }
     }
 
     // ===================================================
-    // FAILED
+    // LOGIN FAILED
     // ===================================================
 
     else {
@@ -143,10 +253,25 @@ class _LoginScreenState
       ).showSnackBar(
 
         SnackBar(
+
           backgroundColor:
               Colors.red,
 
+          behavior:
+              SnackBarBehavior
+                  .floating,
+
+          shape:
+              RoundedRectangleBorder(
+
+            borderRadius:
+                BorderRadius.circular(
+              16,
+            ),
+          ),
+
           content: Text(
+
             authProvider
                     .errorMessage ??
                 'Login failed',
@@ -177,9 +302,10 @@ class _LoginScreenState
 
           shape:
               RoundedRectangleBorder(
+
             borderRadius:
                 BorderRadius.circular(
-              24,
+              28,
             ),
           ),
 
@@ -187,7 +313,9 @@ class _LoginScreenState
             'Reset Password',
           ),
 
-          content: Column(
+          content:
+              Column(
+
             mainAxisSize:
                 MainAxisSize.min,
 
@@ -202,18 +330,38 @@ class _LoginScreenState
               ),
 
               TextField(
+
                 controller:
                     emailResetController,
 
                 decoration:
-                    const InputDecoration(
+                    InputDecoration(
 
                   labelText:
                       'Email',
 
                   prefixIcon:
-                      Icon(
+                      const Icon(
                     Icons.email,
+                  ),
+
+                  filled: true,
+
+                  fillColor:
+                      const Color(
+                    0xffF8FAFC,
+                  ),
+
+                  border:
+                      OutlineInputBorder(
+
+                    borderRadius:
+                        BorderRadius.circular(
+                      18,
+                    ),
+
+                    borderSide:
+                        BorderSide.none,
                   ),
                 ),
               ),
@@ -238,7 +386,15 @@ class _LoginScreenState
 
             ElevatedButton(
 
-              onPressed: () async {
+              style:
+                  ElevatedButton.styleFrom(
+
+                backgroundColor:
+                    Colors.blue,
+              ),
+
+              onPressed:
+                  () async {
 
                 if (emailResetController
                     .text
@@ -264,7 +420,9 @@ class _LoginScreenState
                       .trim(),
                 );
 
-                if (!mounted) return;
+                if (!mounted) {
+                  return;
+                }
 
                 Navigator.pop(
                   context,
@@ -277,9 +435,18 @@ class _LoginScreenState
                   SnackBar(
 
                     backgroundColor:
+
                         success
-                            ? Colors.green
-                            : Colors.red,
+
+                            ? Colors
+                                .green
+
+                            : Colors
+                                .red,
+
+                    behavior:
+                        SnackBarBehavior
+                            .floating,
 
                     content: Text(
 
@@ -296,7 +463,13 @@ class _LoginScreenState
               },
 
               child: const Text(
+
                 'Send',
+
+                style: TextStyle(
+                  color:
+                      Colors.white,
+                ),
               ),
             ),
           ],
@@ -318,11 +491,18 @@ class _LoginScreenState
       context,
     );
 
+    final width =
+        MediaQuery.of(
+          context,
+        ).size.width;
+
     return Scaffold(
 
       body: Container(
 
         width: double.infinity,
+
+        height: double.infinity,
 
         decoration:
             const BoxDecoration(
@@ -330,327 +510,498 @@ class _LoginScreenState
           gradient:
               LinearGradient(
 
-            colors: [
-
-              Color(0xff0F172A),
-
-              Color(0xff1E293B),
-            ],
-
             begin:
                 Alignment.topLeft,
 
             end:
                 Alignment.bottomRight,
+
+            colors: [
+
+              Color(
+                0xff0F172A,
+              ),
+
+              Color(
+                0xff1E293B,
+              ),
+            ],
           ),
         ),
 
-        child: Center(
+        child: SafeArea(
 
-          child:
-              SingleChildScrollView(
+          child: Center(
 
-            padding:
-                const EdgeInsets.all(
-              20,
-            ),
+            child:
+                SingleChildScrollView(
 
-            child: SizedBox(
+              padding:
+                  const EdgeInsets.all(
+                24,
+              ),
 
-              width: 430,
+              child:
+                  FadeTransition(
 
-              child: Card(
+                opacity:
+                    _fadeAnimation,
 
-                elevation: 10,
+                child:
+                    SlideTransition(
 
-                shape:
-                    RoundedRectangleBorder(
+                  position:
+                      _slideAnimation,
 
-                  borderRadius:
-                      BorderRadius.circular(
-                    30,
-                  ),
-                ),
+                  child:
+                      Container(
 
-                child: Padding(
+                    width:
 
-                  padding:
-                      const EdgeInsets.all(
-                    30,
-                  ),
+                        width < 500
 
-                  child: Form(
+                            ? double.infinity
 
-                    key: _formKey,
+                            : 450,
 
-                    child: Column(
+                    padding:
+                        const EdgeInsets.all(
+                      34,
+                    ),
 
-                      mainAxisSize:
-                          MainAxisSize.min,
+                    decoration:
+                        BoxDecoration(
 
-                      children: [
+                      color:
+                          Colors.white,
 
-                        // =============================
-                        // LOGO
-                        // =============================
+                      borderRadius:
+                          BorderRadius.circular(
+                        34,
+                      ),
 
-                        Image.asset(
-                          'assets/images/tokomiring.png',
+                      boxShadow: [
 
-                          height: 120,
-                        ),
+                        BoxShadow(
 
-                        const SizedBox(
-                          height: 20,
-                        ),
-
-                        // =============================
-                        // TITLE
-                        // =============================
-
-                        const Text(
-
-                          'Welcome Back',
-
-                          style: TextStyle(
-
-                            fontSize: 34,
-
-                            fontWeight:
-                                FontWeight.bold,
-                          ),
-                        ),
-
-                        const SizedBox(
-                          height: 10,
-                        ),
-
-                        const Text(
-
-                          'Login to continue',
-
-                          style: TextStyle(
-                            color:
-                                Colors.grey,
-                          ),
-                        ),
-
-                        const SizedBox(
-                          height: 35,
-                        ),
-
-                        // =============================
-                        // EMAIL
-                        // =============================
-
-                        TextFormField(
-
-                          controller:
-                              emailController,
-
-                          keyboardType:
-                              TextInputType
-                                  .emailAddress,
-
-                          decoration:
-                              const InputDecoration(
-
-                            labelText:
-                                'Email',
-
-                            prefixIcon:
-                                Icon(
-                              Icons.email,
-                            ),
+                          color:
+                              Colors.black
+                                  .withOpacity(
+                            0.08,
                           ),
 
-                          validator:
-                              (value) {
+                          blurRadius:
+                              30,
 
-                            if (value ==
-                                    null ||
-                                value
-                                    .trim()
-                                    .isEmpty) {
-
-                              return 'Email is required';
-                            }
-
-                            return null;
-                          },
-                        ),
-
-                        const SizedBox(
-                          height: 20,
-                        ),
-
-                        // =============================
-                        // PASSWORD
-                        // =============================
-
-                        TextFormField(
-
-                          controller:
-                              passwordController,
-
-                          obscureText:
-                              obscurePassword,
-
-                          decoration:
-                              InputDecoration(
-
-                            labelText:
-                                'Password',
-
-                            prefixIcon:
-                                const Icon(
-                              Icons.lock,
-                            ),
-
-                            suffixIcon:
-                                IconButton(
-
-                              onPressed: () {
-
-                                setState(() {
-
-                                  obscurePassword =
-                                      !obscurePassword;
-                                });
-                              },
-
-                              icon: Icon(
-
-                                obscurePassword
-
-                                    ? Icons
-                                        .visibility_off
-
-                                    : Icons
-                                        .visibility,
-                              ),
-                            ),
-                          ),
-
-                          validator:
-                              (value) {
-
-                            if (value ==
-                                    null ||
-                                value
-                                    .trim()
-                                    .isEmpty) {
-
-                              return 'Password is required';
-                            }
-
-                            return null;
-                          },
-                        ),
-
-                        // =============================
-                        // FORGOT PASSWORD
-                        // =============================
-
-                        Align(
-
-                          alignment:
-                              Alignment
-                                  .centerRight,
-
-                          child: TextButton(
-
-                            onPressed:
-                                resetPassword,
-
-                            child: const Text(
-                              'Forgot Password?',
-                            ),
-                          ),
-                        ),
-
-                        const SizedBox(
-                          height: 20,
-                        ),
-
-                        // =============================
-                        // LOGIN BUTTON
-                        // =============================
-
-                        SizedBox(
-
-                          width:
-                              double.infinity,
-
-                          height: 58,
-
-                          child: ElevatedButton(
-
-                            onPressed:
-                                authProvider
-                                        .isLoading
-
-                                    ? null
-
-                                    : login,
-
-                            child:
-                                authProvider
-                                        .isLoading
-
-                                    ? const SizedBox(
-
-                                        width: 24,
-
-                                        height: 24,
-
-                                        child:
-                                            CircularProgressIndicator(
-
-                                          color:
-                                              Colors.white,
-
-                                          strokeWidth:
-                                              2,
-                                        ),
-                                      )
-
-                                    : const Text(
-                                        'Login',
-                                      ),
-                          ),
-                        ),
-
-                        const SizedBox(
-                          height: 20,
-                        ),
-
-                        // =============================
-                        // SIGNUP
-                        // =============================
-
-                        TextButton(
-
-                          onPressed: () {
-
-                            Navigator.pushReplacement(
-
-                              context,
-
-                              MaterialPageRoute(
-
-                                builder:
-                                    (_) =>
-                                        const SignupScreen(),
-                              ),
-                            );
-                          },
-
-                          child: const Text(
-                            'Create Account',
+                          offset:
+                              const Offset(
+                            0,
+                            15,
                           ),
                         ),
                       ],
+                    ),
+
+                    child: Form(
+
+                      key: _formKey,
+
+                      child: Column(
+                        mainAxisSize:
+                            MainAxisSize.min,
+
+                        children: [
+
+                          Container(
+
+                            width: 120,
+
+                            height: 120,
+
+                            decoration:
+                                BoxDecoration(
+
+                              borderRadius:
+                                  BorderRadius.circular(
+                                30,
+                              ),
+
+                              gradient:
+                                  LinearGradient(
+
+                                colors: [
+
+                                  Colors.blue
+                                      .withOpacity(
+                                    0.1,
+                                  ),
+
+                                  Colors.purple
+                                      .withOpacity(
+                                    0.1,
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                            child:
+                                Padding(
+
+                              padding:
+                                  const EdgeInsets.all(
+                                18,
+                              ),
+
+                              child:
+                                  Image.asset(
+                                'assets/images/tokomiring.png',
+                              ),
+                            ),
+                          ),
+
+                          const SizedBox(
+                            height: 28,
+                          ),
+
+                          const Text(
+
+                            'Welcome Back',
+
+                            textAlign:
+                                TextAlign
+                                    .center,
+
+                            style:
+                                TextStyle(
+
+                              fontSize: 34,
+
+                              fontWeight:
+                                  FontWeight.bold,
+                            ),
+                          ),
+
+                          const SizedBox(
+                            height: 10,
+                          ),
+
+                          Text(
+
+                            'Login to continue your journey.',
+
+                            textAlign:
+                                TextAlign
+                                    .center,
+
+                            style:
+                                TextStyle(
+
+                              color:
+                                  Colors.grey
+                                      .shade600,
+
+                              fontSize: 15,
+                            ),
+                          ),
+
+                          const SizedBox(
+                            height: 36,
+                          ),
+
+                          TextFormField(
+
+                            controller:
+                                emailController,
+
+                            keyboardType:
+                                TextInputType
+                                    .emailAddress,
+
+                            decoration:
+                                InputDecoration(
+
+                              labelText:
+                                  'Email',
+
+                              prefixIcon:
+                                  const Icon(
+                                Icons.email,
+                              ),
+
+                              filled: true,
+
+                              fillColor:
+                                  const Color(
+                                0xffF8FAFC,
+                              ),
+
+                              border:
+                                  OutlineInputBorder(
+
+                                borderRadius:
+                                    BorderRadius.circular(
+                                  18,
+                                ),
+
+                                borderSide:
+                                    BorderSide.none,
+                              ),
+                            ),
+
+                            validator:
+                                (
+                                  value,
+                                ) {
+
+                              if (value ==
+                                      null ||
+                                  value
+                                      .trim()
+                                      .isEmpty) {
+
+                                return 'Email is required';
+                              }
+
+                              return null;
+                            },
+                          ),
+
+                          const SizedBox(
+                            height: 22,
+                          ),
+
+                          TextFormField(
+
+                            controller:
+                                passwordController,
+
+                            obscureText:
+                                obscurePassword,
+
+                            decoration:
+                                InputDecoration(
+
+                              labelText:
+                                  'Password',
+
+                              prefixIcon:
+                                  const Icon(
+                                Icons.lock,
+                              ),
+
+                              suffixIcon:
+                                  IconButton(
+
+                                onPressed:
+                                    () {
+
+                                  setState(() {
+
+                                    obscurePassword =
+                                        !obscurePassword;
+                                  });
+                                },
+
+                                icon: Icon(
+
+                                  obscurePassword
+
+                                      ? Icons
+                                          .visibility_off
+
+                                      : Icons
+                                          .visibility,
+                                ),
+                              ),
+
+                              filled: true,
+
+                              fillColor:
+                                  const Color(
+                                0xffF8FAFC,
+                              ),
+
+                              border:
+                                  OutlineInputBorder(
+
+                                borderRadius:
+                                    BorderRadius.circular(
+                                  18,
+                                ),
+
+                                borderSide:
+                                    BorderSide.none,
+                              ),
+                            ),
+
+                            validator:
+                                (
+                                  value,
+                                ) {
+
+                              if (value ==
+                                      null ||
+                                  value
+                                      .trim()
+                                      .isEmpty) {
+
+                                return 'Password is required';
+                              }
+
+                              return null;
+                            },
+                          ),
+
+                          Align(
+
+                            alignment:
+                                Alignment
+                                    .centerRight,
+
+                            child: TextButton(
+
+                              onPressed:
+                                  resetPassword,
+
+                              child: const Text(
+                                'Forgot Password?',
+                              ),
+                            ),
+                          ),
+
+                          const SizedBox(
+                            height: 20,
+                          ),
+
+                          SizedBox(
+
+                            width:
+                                double.infinity,
+
+                            height: 58,
+
+                            child:
+                                ElevatedButton(
+
+                              style:
+                                  ElevatedButton.styleFrom(
+
+                                backgroundColor:
+                                    Colors.blue,
+
+                                shape:
+                                    RoundedRectangleBorder(
+
+                                  borderRadius:
+                                      BorderRadius.circular(
+                                    18,
+                                  ),
+                                ),
+                              ),
+
+                              onPressed:
+
+                                  authProvider
+                                          .isLoading
+
+                                      ? null
+
+                                      : login,
+
+                              child:
+
+                                  authProvider
+                                          .isLoading
+
+                                      ? const SizedBox(
+
+                                          width:
+                                              24,
+
+                                          height:
+                                              24,
+
+                                          child:
+                                              CircularProgressIndicator(
+
+                                            color:
+                                                Colors.white,
+
+                                            strokeWidth:
+                                                2,
+                                          ),
+                                        )
+
+                                      : const Text(
+
+                                          'Login',
+
+                                          style:
+                                              TextStyle(
+
+                                            color:
+                                                Colors.white,
+
+                                            fontSize:
+                                                16,
+
+                                            fontWeight:
+                                                FontWeight.bold,
+                                          ),
+                                        ),
+                            ),
+                          ),
+
+                          const SizedBox(
+                            height: 20,
+                          ),
+
+                          Row(
+                            mainAxisAlignment:
+                                MainAxisAlignment
+                                    .center,
+
+                            children: [
+
+                              Text(
+
+                                'Don’t have an account?',
+
+                                style:
+                                    TextStyle(
+
+                                  color:
+                                      Colors.grey
+                                          .shade600,
+                                ),
+                              ),
+
+                              TextButton(
+
+                                onPressed:
+                                    () {
+
+                                  Navigator.pushReplacement(
+
+                                    context,
+
+                                    MaterialPageRoute(
+
+                                      builder:
+                                          (_) =>
+                                              const SignupScreen(),
+                                    ),
+                                  );
+                                },
+
+                                child: const Text(
+                                  'Create Account',
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -664,6 +1015,9 @@ class _LoginScreenState
 
   @override
   void dispose() {
+
+    _animationController
+        .dispose();
 
     emailController.dispose();
 

@@ -83,7 +83,7 @@ class _SplashScreenState
           MaterialPageRoute(
 
             builder: (_) =>
-                const AdminDashboardScreen(),
+                 AdminDashboardScreen(),
           ),
         );
       }

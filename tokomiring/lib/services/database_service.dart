@@ -1,5 +1,3 @@
-// lib/services/database_service.dart
-
 import 'package:firebase_database/firebase_database.dart';
 import 'package:uuid/uuid.dart';
 
@@ -33,14 +31,9 @@ class DatabaseService {
               .child('products')
               .child(product.id);
 
-      // ===============================================
-      // CHECK EXIST
-      // ===============================================
-
       final snapshot =
           await productRef.get();
 
-      // PRODUCT ALREADY EXISTS
       if (snapshot.exists) {
 
         throw Exception(
@@ -48,7 +41,6 @@ class DatabaseService {
         );
       }
 
-      // SAVE PRODUCT
       await productRef.set(
         product.toMap(),
       );
@@ -147,6 +139,60 @@ class DatabaseService {
   }
 
   // =====================================================
+  // INCREASE SOLD
+  // =====================================================
+
+  Future<void> increaseProductSold({
+
+    required String productId,
+
+    required int quantity,
+
+  }) async {
+
+    try {
+
+      final snapshot =
+          await _database
+              .child('products')
+              .child(productId)
+              .get();
+
+      if (!snapshot.exists ||
+          snapshot.value == null) {
+
+        return;
+      }
+
+      final data =
+          Map<dynamic, dynamic>.from(
+        snapshot.value as Map,
+      );
+
+      final currentSold =
+          data['sold'] ?? 0;
+
+      final updatedSold =
+          currentSold + quantity;
+
+      await _database
+          .child('products')
+          .child(productId)
+          .update({
+
+        'sold':
+            updatedSold,
+      });
+
+    } catch (e) {
+
+      throw Exception(
+        e.toString(),
+      );
+    }
+  }
+
+  // =====================================================
   // GET PRODUCTS
   // =====================================================
 
@@ -209,7 +255,7 @@ class DatabaseService {
   }
 
   // =====================================================
-  // GET PRODUCTS CATEGORY
+  // CATEGORY
   // =====================================================
 
   Stream<List<ProductModel>>
@@ -295,7 +341,6 @@ class DatabaseService {
             currentStock -
                 item.quantity;
 
-        // PREVENT NEGATIVE
         if (updatedStock < 0) {
 
           updatedStock = 0;
@@ -442,6 +487,30 @@ class DatabaseService {
 
     try {
 
+      final orderSnapshot =
+          await _database
+              .child('orders')
+              .child(orderId)
+              .get();
+
+      if (!orderSnapshot.exists ||
+          orderSnapshot.value ==
+              null) {
+
+        throw Exception(
+          'Order not found',
+        );
+      }
+
+      final orderData =
+          Map<dynamic, dynamic>.from(
+        orderSnapshot.value as Map,
+      );
+
+      final oldStatus =
+          orderData['status'] ??
+              '';
+
       await _database
           .child('orders')
           .child(orderId)
@@ -454,6 +523,49 @@ class DatabaseService {
             DateTime.now()
                 .toIso8601String(),
       });
+
+      // ===============================================
+      // COMPLETED = UPDATE SOLD
+      // ===============================================
+
+      if (status
+                  .toLowerCase() ==
+              'completed' &&
+          oldStatus
+                  .toLowerCase() !=
+              'completed') {
+
+        final items =
+            orderData['items'];
+
+        if (items is List) {
+
+          for (final item
+              in items) {
+
+            final itemMap =
+                Map<dynamic,
+                    dynamic>.from(
+              item,
+            );
+
+            await increaseProductSold(
+
+              productId:
+                  itemMap['productId']
+                      .toString(),
+
+              quantity:
+                  itemMap['quantity']
+                      as int,
+            );
+          }
+        }
+      }
+
+      // ===============================================
+      // NOTIFICATION
+      // ===============================================
 
       await _database
           .child('notifications')
@@ -605,8 +717,13 @@ class DatabaseService {
     for (final order
         in orders) {
 
-      total +=
-          order.totalPrice;
+      if (order.status
+              .toLowerCase() ==
+          'completed') {
+
+        total +=
+            order.totalPrice;
+      }
     }
 
     return total;

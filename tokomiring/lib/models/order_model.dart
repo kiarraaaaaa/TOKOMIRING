@@ -1,8 +1,9 @@
-// lib/models/order_model.dart
-
 class OrderItemModel {
+
   final String productId;
+
   final String productName;
+
   final String productImage;
 
   final double productPrice;
@@ -12,11 +13,17 @@ class OrderItemModel {
   final double subtotal;
 
   OrderItemModel({
+
     required this.productId,
+
     required this.productName,
+
     required this.productImage,
+
     required this.productPrice,
+
     required this.quantity,
+
     required this.subtotal,
   });
 
@@ -27,26 +34,38 @@ class OrderItemModel {
   factory OrderItemModel.fromMap(
     Map<dynamic, dynamic> map,
   ) {
+
     return OrderItemModel(
+
       productId:
-          map['productId'] ?? '',
+          map['productId']
+                  ?.toString() ??
+              '',
 
       productName:
-          map['productName'] ?? '',
+          map['productName']
+                  ?.toString() ??
+              '',
 
       productImage:
-          map['productImage'] ?? '',
+          map['productImage']
+                  ?.toString() ??
+              '',
 
       productPrice:
-          (map['productPrice'] ?? 0)
-              .toDouble(),
+          _safeDouble(
+        map['productPrice'],
+      ),
 
       quantity:
-          map['quantity'] ?? 0,
+          _safeInt(
+        map['quantity'],
+      ),
 
       subtotal:
-          (map['subtotal'] ?? 0)
-              .toDouble(),
+          _safeDouble(
+        map['subtotal'],
+      ),
     );
   }
 
@@ -55,7 +74,9 @@ class OrderItemModel {
   // =====================================================
 
   Map<String, dynamic> toMap() {
+
     return {
+
       'productId':
           productId,
 
@@ -74,6 +95,54 @@ class OrderItemModel {
       'subtotal':
           subtotal,
     };
+  }
+
+  // =====================================================
+  // COPY WITH
+  // =====================================================
+
+  OrderItemModel copyWith({
+
+    String? productId,
+
+    String? productName,
+
+    String? productImage,
+
+    double? productPrice,
+
+    int? quantity,
+
+    double? subtotal,
+
+  }) {
+
+    return OrderItemModel(
+
+      productId:
+          productId ??
+              this.productId,
+
+      productName:
+          productName ??
+              this.productName,
+
+      productImage:
+          productImage ??
+              this.productImage,
+
+      productPrice:
+          productPrice ??
+              this.productPrice,
+
+      quantity:
+          quantity ??
+              this.quantity,
+
+      subtotal:
+          subtotal ??
+              this.subtotal,
+    );
   }
 }
 
@@ -113,19 +182,33 @@ class OrderModel {
   final DateTime updatedAt;
 
   OrderModel({
+
     required this.orderId,
+
     required this.userId,
+
     required this.customerName,
+
     required this.customerPhone,
+
     required this.address,
+
     required this.items,
+
     required this.totalPrice,
+
     required this.totalItems,
+
     required this.paymentMethod,
+
     required this.paymentProof,
+
     required this.status,
+
     required this.isValidated,
+
     required this.createdAt,
+
     required this.updatedAt,
   });
 
@@ -134,7 +217,9 @@ class OrderModel {
   // =====================================================
 
   factory OrderModel.fromMap(
+
     Map<dynamic, dynamic> map,
+
     String orderId,
   ) {
 
@@ -145,95 +230,147 @@ class OrderModel {
     // SAFE PARSE ITEMS
     // ===================================================
 
-    if (map['items'] != null) {
+    final rawItems =
+        map['items'];
 
-      final rawItems =
-          map['items'];
+    if (rawItems != null) {
 
-      // ===============================================
-      // IF LIST
-      // ===============================================
+      try {
 
-      if (rawItems is List) {
+        // ===============================================
+        // LIST
+        // ===============================================
 
-        parsedItems = rawItems
+        if (rawItems is List) {
 
-            .where(
-              (item) => item != null,
-            )
+          parsedItems =
+              rawItems
 
-            .map(
-              (item) {
+                  .where(
+                    (
+                      item,
+                    ) {
 
-                return OrderItemModel
-                    .fromMap(
-                  Map<dynamic, dynamic>
-                      .from(item),
-                );
-              },
-            )
+                      return item !=
+                          null;
+                    },
+                  )
 
-            .toList();
-      }
+                  .map(
+                    (
+                      item,
+                    ) {
 
-      // ===============================================
-      // IF MAP
-      // ===============================================
+                      return OrderItemModel
+                          .fromMap(
 
-      else if (rawItems is Map) {
+                        Map<dynamic,
+                            dynamic>.from(
+                          item,
+                        ),
+                      );
+                    },
+                  )
 
-        parsedItems = rawItems.values
+                  .toList();
+        }
 
-            .map(
-              (item) {
+        // ===============================================
+        // MAP
+        // ===============================================
 
-                return OrderItemModel
-                    .fromMap(
-                  Map<dynamic, dynamic>
-                      .from(item),
-                );
-              },
-            )
+        else if (rawItems
+            is Map) {
 
-            .toList();
+          parsedItems =
+              rawItems.values
+
+                  .where(
+                    (
+                      item,
+                    ) {
+
+                      return item !=
+                          null;
+                    },
+                  )
+
+                  .map(
+                    (
+                      item,
+                    ) {
+
+                      return OrderItemModel
+                          .fromMap(
+
+                        Map<dynamic,
+                            dynamic>.from(
+                          item,
+                        ),
+                      );
+                    },
+                  )
+
+                  .toList();
+        }
+
+      } catch (_) {
+
+        parsedItems = [];
       }
     }
 
     return OrderModel(
+
       orderId:
           orderId,
 
       userId:
-          map['userId'] ?? '',
+          map['userId']
+                  ?.toString() ??
+              '',
 
       customerName:
-          map['customerName'] ?? '',
+          map['customerName']
+                  ?.toString() ??
+              '',
 
       customerPhone:
-          map['customerPhone'] ?? '',
+          map['customerPhone']
+                  ?.toString() ??
+              '',
 
       address:
-          map['address'] ?? '',
+          map['address']
+                  ?.toString() ??
+              '',
 
       items:
           parsedItems,
 
       totalPrice:
-          (map['totalPrice'] ?? 0)
-              .toDouble(),
+          _safeDouble(
+        map['totalPrice'],
+      ),
 
       totalItems:
-          map['totalItems'] ?? 0,
+          _safeInt(
+        map['totalItems'],
+      ),
 
       paymentMethod:
-          map['paymentMethod'] ??
+          map['paymentMethod']
+                  ?.toString() ??
               'Cash',
 
       paymentProof:
-          map['paymentProof'] ?? '',
+          map['paymentProof']
+                  ?.toString() ??
+              '',
 
       status:
-          map['status'] ??
+          map['status']
+                  ?.toString() ??
               'Waiting Admin Validation',
 
       isValidated:
@@ -241,20 +378,14 @@ class OrderModel {
               false,
 
       createdAt:
-          DateTime.tryParse(
-                map['createdAt']
-                        ?.toString() ??
-                    '',
-              ) ??
-              DateTime.now(),
+          _safeDate(
+        map['createdAt'],
+      ),
 
       updatedAt:
-          DateTime.tryParse(
-                map['updatedAt']
-                        ?.toString() ??
-                    '',
-              ) ??
-              DateTime.now(),
+          _safeDate(
+        map['updatedAt'],
+      ),
     );
   }
 
@@ -263,7 +394,9 @@ class OrderModel {
   // =====================================================
 
   Map<String, dynamic> toMap() {
+
     return {
+
       'orderId':
           orderId,
 
@@ -282,7 +415,12 @@ class OrderModel {
       'items':
           items
               .map(
-                (e) => e.toMap(),
+                (
+                  e,
+                ) {
+
+                  return e.toMap();
+                },
               )
               .toList(),
 
@@ -319,28 +457,45 @@ class OrderModel {
   // =====================================================
 
   OrderModel copyWith({
+
     String? orderId,
+
     String? userId,
+
     String? customerName,
+
     String? customerPhone,
+
     String? address,
+
     List<OrderItemModel>? items,
+
     double? totalPrice,
+
     int? totalItems,
+
     String? paymentMethod,
+
     String? paymentProof,
+
     String? status,
+
     bool? isValidated,
+
     DateTime? createdAt,
+
     DateTime? updatedAt,
   }) {
 
     return OrderModel(
+
       orderId:
-          orderId ?? this.orderId,
+          orderId ??
+              this.orderId,
 
       userId:
-          userId ?? this.userId,
+          userId ??
+              this.userId,
 
       customerName:
           customerName ??
@@ -351,10 +506,12 @@ class OrderModel {
               this.customerPhone,
 
       address:
-          address ?? this.address,
+          address ??
+              this.address,
 
       items:
-          items ?? this.items,
+          items ??
+              this.items,
 
       totalPrice:
           totalPrice ??
@@ -373,7 +530,8 @@ class OrderModel {
               this.paymentProof,
 
       status:
-          status ?? this.status,
+          status ??
+              this.status,
 
       isValidated:
           isValidated ??
@@ -387,5 +545,79 @@ class OrderModel {
           updatedAt ??
               this.updatedAt,
     );
+  }
+
+  // =====================================================
+  // JSON
+  // =====================================================
+
+  @override
+  String toString() {
+
+    return 'OrderModel(orderId: $orderId, customer: $customerName, total: $totalPrice)';
+  }
+}
+
+// =======================================================
+// SAFE PARSERS
+// =======================================================
+
+double _safeDouble(
+  dynamic value,
+) {
+
+  if (value == null) {
+    return 0;
+  }
+
+  if (value is double) {
+    return value;
+  }
+
+  if (value is int) {
+    return value.toDouble();
+  }
+
+  return double.tryParse(
+        value.toString(),
+      ) ??
+      0;
+}
+
+int _safeInt(
+  dynamic value,
+) {
+
+  if (value == null) {
+    return 0;
+  }
+
+  if (value is int) {
+    return value;
+  }
+
+  return int.tryParse(
+        value.toString(),
+      ) ??
+      0;
+}
+
+DateTime _safeDate(
+  dynamic value,
+) {
+
+  if (value == null) {
+    return DateTime.now();
+  }
+
+  try {
+
+    return DateTime.parse(
+      value.toString(),
+    );
+
+  } catch (_) {
+
+    return DateTime.now();
   }
 }

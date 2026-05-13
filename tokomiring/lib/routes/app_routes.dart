@@ -1,16 +1,42 @@
+// =====================================================
+// FULL FIXED VERSION
 // lib/routes/app_routes.dart
+// =====================================================
 
 import 'package:flutter/material.dart';
+
+// =====================================================
+// AUTH
+// =====================================================
 
 import '../screens/auth/welcome_screen.dart';
 import '../screens/auth/login_screen.dart';
 import '../screens/auth/signup_screen.dart';
 
+// =====================================================
+// USER
+// =====================================================
+
 import '../screens/user/user_home_screen.dart';
 import '../screens/user/cart_screen.dart';
 import '../screens/user/checkout_screen.dart';
+import '../screens/user/user_order_screen.dart';
+import '../screens/user/user_profile_screen.dart';
+
+// =====================================================
+// ADMIN
+// =====================================================
 
 import '../screens/admin/admin_dashboard_screen.dart';
+import '../screens/admin/admin_product_screen.dart';
+import '../screens/admin/admin_order_screen.dart';
+import '../screens/admin/admin_sales_report_screen.dart';
+import '../screens/admin/admin_user_screen.dart';
+import '../screens/admin/admin_notification_screen.dart';
+
+// =====================================================
+// SHARED
+// =====================================================
 
 import '../screens/shared/not_found_screen.dart';
 import '../screens/shared/maintenance_screen.dart';
@@ -18,7 +44,7 @@ import '../screens/shared/maintenance_screen.dart';
 class AppRoutes {
 
   // =====================================================
-  // ROUTE NAMES
+  // AUTH
   // =====================================================
 
   static const String welcome =
@@ -30,6 +56,10 @@ class AppRoutes {
   static const String signup =
       '/signup';
 
+  // =====================================================
+  // USER
+  // =====================================================
+
   static const String userHome =
       '/user-home';
 
@@ -39,8 +69,38 @@ class AppRoutes {
   static const String checkout =
       '/checkout';
 
+  static const String userOrders =
+      '/user-orders';
+
+  static const String userProfile =
+      '/user-profile';
+
+  // =====================================================
+  // ADMIN
+  // =====================================================
+
   static const String adminDashboard =
       '/admin-dashboard';
+
+  static const String adminProducts =
+      '/admin-products';
+
+  static const String adminOrders =
+      '/admin-orders';
+
+  static const String adminReports =
+      '/admin-reports';
+
+  static const String adminUsers =
+      '/admin-users';
+
+  static const String
+      adminNotifications =
+          '/admin-notifications';
+
+  // =====================================================
+  // SHARED
+  // =====================================================
 
   static const String maintenance =
       '/maintenance';
@@ -49,7 +109,8 @@ class AppRoutes {
   // ROUTE GENERATOR
   // =====================================================
 
-  static Route<dynamic> generateRoute(
+  static Route<dynamic>
+      generateRoute(
     RouteSettings settings,
   ) {
 
@@ -60,18 +121,21 @@ class AppRoutes {
       // =================================================
 
       case welcome:
+
         return MaterialPageRoute(
           builder: (_) =>
               const WelcomeScreen(),
         );
 
       case login:
+
         return MaterialPageRoute(
           builder: (_) =>
               const LoginScreen(),
         );
 
       case signup:
+
         return MaterialPageRoute(
           builder: (_) =>
               const SignupScreen(),
@@ -82,29 +146,38 @@ class AppRoutes {
       // =================================================
 
       case userHome:
+
         return MaterialPageRoute(
           builder: (_) =>
               const UserHomeScreen(),
         );
 
-      // =================================================
-      // CART
-      // =================================================
-
       case cart:
+
         return MaterialPageRoute(
           builder: (_) =>
               const CartScreen(),
         );
 
-      // =================================================
-      // CHECKOUT
-      // =================================================
-
       case checkout:
+
         return MaterialPageRoute(
           builder: (_) =>
               const CheckoutScreen(),
+        );
+
+      case userOrders:
+
+        return MaterialPageRoute(
+          builder: (_) =>
+              const UserOrderScreen(),
+        );
+
+      case userProfile:
+
+        return MaterialPageRoute(
+          builder: (_) =>
+              const UserProfileScreen(),
         );
 
       // =================================================
@@ -112,16 +185,53 @@ class AppRoutes {
       // =================================================
 
       case adminDashboard:
+
         return MaterialPageRoute(
           builder: (_) =>
-              const AdminDashboardScreen(),
+               AdminDashboardScreen(),
+        );
+
+      case adminProducts:
+
+        return MaterialPageRoute(
+          builder: (_) =>
+              const AdminProductScreen(),
+        );
+
+      case adminOrders:
+
+        return MaterialPageRoute(
+          builder: (_) =>
+              const AdminOrderScreen(),
+        );
+
+      case adminReports:
+
+        return MaterialPageRoute(
+          builder: (_) =>
+              const AdminSalesReportScreen(),
+        );
+
+      case adminUsers:
+
+        return MaterialPageRoute(
+          builder: (_) =>
+              const AdminUserScreen(),
+        );
+
+      case adminNotifications:
+
+        return MaterialPageRoute(
+          builder: (_) =>
+              const AdminNotificationScreen(),
         );
 
       // =================================================
-      // MAINTENANCE
+      // SHARED
       // =================================================
 
       case maintenance:
+
         return MaterialPageRoute(
           builder: (_) =>
               const MaintenanceScreen(),
@@ -132,6 +242,7 @@ class AppRoutes {
       // =================================================
 
       default:
+
         return MaterialPageRoute(
           builder: (_) =>
               const NotFoundScreen(),
@@ -144,12 +255,16 @@ class AppRoutes {
   // =====================================================
 
   static Future<dynamic> push(
+
     BuildContext context,
+
     String routeName,
   ) {
 
     return Navigator.pushNamed(
+
       context,
+
       routeName,
     );
   }
@@ -158,14 +273,19 @@ class AppRoutes {
   // PUSH REPLACE
   // =====================================================
 
-  static Future<dynamic> pushReplace(
+  static Future<dynamic>
+      pushReplace(
+
     BuildContext context,
+
     String routeName,
   ) {
 
     return Navigator
         .pushReplacementNamed(
+
       context,
+
       routeName,
     );
   }
@@ -174,15 +294,21 @@ class AppRoutes {
   // PUSH REMOVE
   // =====================================================
 
-  static Future<dynamic> pushAndRemove(
+  static Future<dynamic>
+      pushAndRemove(
+
     BuildContext context,
+
     String routeName,
   ) {
 
     return Navigator
         .pushNamedAndRemoveUntil(
+
       context,
+
       routeName,
+
       (route) => false,
     );
   }

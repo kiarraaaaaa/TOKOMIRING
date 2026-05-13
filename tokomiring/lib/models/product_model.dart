@@ -1,5 +1,3 @@
-// lib/models/product_model.dart
-
 class ProductModel {
 
   final String id;
@@ -9,10 +7,6 @@ class ProductModel {
   final String description;
 
   final String category;
-
-  // =====================================================
-  // BASE64 IMAGE
-  // =====================================================
 
   final String imageBase64;
 
@@ -58,7 +52,9 @@ class ProductModel {
   // =====================================================
 
   factory ProductModel.fromMap(
+
     Map<dynamic, dynamic> map,
+
     String id,
   ) {
 
@@ -68,40 +64,52 @@ class ProductModel {
           id,
 
       name:
-          map['name'] ?? '',
+          map['name']
+                  ?.toString() ??
+              '',
 
       description:
-          map['description'] ?? '',
+          map['description']
+                  ?.toString() ??
+              '',
 
       category:
-          map['category'] ?? '',
+          map['category']
+                  ?.toString() ??
+              'Others',
 
       imageBase64:
-          map['imageBase64'] ?? '',
+          map['imageBase64']
+                  ?.toString() ??
+              '',
 
       price:
-          (map['price'] ?? 0)
-              .toDouble(),
+          _safeDouble(
+        map['price'],
+      ),
 
       stock:
-          map['stock'] ?? 0,
+          _safeInt(
+        map['stock'],
+      ),
 
       isAvailable:
-          map['isAvailable'] ?? true,
+          map['isAvailable'] ??
+              true,
 
       isPopular:
-          map['isPopular'] ?? false,
+          map['isPopular'] ??
+              false,
 
       sold:
-          map['sold'] ?? 0,
+          _safeInt(
+        map['sold'],
+      ),
 
       createdAt:
-          DateTime.tryParse(
-                map['createdAt']
-                        ?.toString() ??
-                    '',
-              ) ??
-              DateTime.now(),
+          _safeDate(
+        map['createdAt'],
+      ),
     );
   }
 
@@ -153,11 +161,15 @@ class ProductModel {
   // CHECK STOCK
   // =====================================================
 
-  bool get inStock =>
-      stock > 0;
+  bool get inStock {
 
-  bool get lowStock =>
-      stock <= 5;
+    return stock > 0;
+  }
+
+  bool get lowStock {
+
+    return stock <= 5;
+  }
 
   // =====================================================
   // FORMAT PRICE
@@ -239,5 +251,80 @@ class ProductModel {
           createdAt ??
               this.createdAt,
     );
+  }
+
+  // =====================================================
+  // JSON DEBUG
+  // =====================================================
+
+  @override
+  String toString() {
+
+    return 'ProductModel(id: $id, name: $name, sold: $sold)';
+  }
+}
+
+// =======================================================
+// SAFE PARSERS
+// =======================================================
+
+double _safeDouble(
+  dynamic value,
+) {
+
+  if (value == null) {
+    return 0;
+  }
+
+  if (value is double) {
+    return value;
+  }
+
+  if (value is int) {
+    return value.toDouble();
+  }
+
+  return double.tryParse(
+        value.toString(),
+      ) ??
+      0;
+}
+
+int _safeInt(
+  dynamic value,
+) {
+
+  if (value == null) {
+    return 0;
+  }
+
+  if (value is int) {
+    return value;
+  }
+
+  return int.tryParse(
+        value.toString(),
+      ) ??
+      0;
+}
+
+DateTime _safeDate(
+  dynamic value,
+) {
+
+  if (value == null) {
+
+    return DateTime.now();
+  }
+
+  try {
+
+    return DateTime.parse(
+      value.toString(),
+    );
+
+  } catch (_) {
+
+    return DateTime.now();
   }
 }

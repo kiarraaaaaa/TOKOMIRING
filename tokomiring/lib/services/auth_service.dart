@@ -1,3 +1,6 @@
+
+
+
 // lib/services/auth_service.dart
 
 import 'package:firebase_auth/firebase_auth.dart';
@@ -47,10 +50,6 @@ class AuthService {
 
     try {
 
-      // ===============================================
-      // CREATE AUTH
-      // ===============================================
-
       final credential =
           await _auth
               .createUserWithEmailAndPassword(
@@ -74,17 +73,9 @@ class AuthService {
         );
       }
 
-      // ===============================================
-      // UPDATE DISPLAY NAME
-      // ===============================================
-
       await user.updateDisplayName(
         name.trim(),
       );
-
-      // ===============================================
-      // USER MODEL
-      // ===============================================
 
       final userModel =
           UserModel(
@@ -123,10 +114,6 @@ class AuthService {
         createdAt:
             DateTime.now(),
       );
-
-      // ===============================================
-      // SAVE DATABASE
-      // ===============================================
 
       await _database
           .child('users')
@@ -195,10 +182,6 @@ class AuthService {
               .child(user.uid)
               .get();
 
-      // ===============================================
-      // USER NOT EXISTS
-      // ===============================================
-
       if (!snapshot.exists ||
           snapshot.value == null) {
 
@@ -263,6 +246,111 @@ class AuthService {
         data,
         uid,
       );
+
+    } catch (e) {
+
+      throw Exception(
+        e.toString(),
+      );
+    }
+  }
+
+  // =====================================================
+  // GET ALL USERS
+  // =====================================================
+
+  Future<List<UserModel>>
+      getAllUsers()
+      async {
+
+    try {
+
+      final snapshot =
+          await _database
+              .child('users')
+              .get();
+
+      if (!snapshot.exists ||
+          snapshot.value == null) {
+
+        return [];
+      }
+
+      final data =
+          Map<dynamic, dynamic>.from(
+        snapshot.value as Map,
+      );
+
+      List<UserModel> users =
+          [];
+
+      data.forEach((
+        key,
+        value,
+      ) {
+
+        users.add(
+
+          UserModel.fromMap(
+
+            Map<dynamic, dynamic>.from(
+              value,
+            ),
+
+            key,
+          ),
+        );
+      });
+
+      return users;
+
+    } catch (e) {
+
+      throw Exception(
+        e.toString(),
+      );
+    }
+  }
+
+  // =====================================================
+  // UPDATE USER
+  // =====================================================
+
+  Future<void> updateUser(
+    UserModel user,
+  ) async {
+
+    try {
+
+      await _database
+          .child('users')
+          .child(user.uid)
+          .update({
+
+        'name':
+            user.name,
+
+        'username':
+            user.username,
+
+        'email':
+            user.email,
+
+        'role':
+            user.role,
+
+        'photoUrl':
+            user.photoUrl,
+
+        'phone':
+            user.phone,
+
+        'address':
+            user.address,
+
+        'isActive':
+            user.isActive,
+      });
 
     } catch (e) {
 
@@ -387,18 +475,10 @@ class AuthService {
 
     try {
 
-      // ===============================================
-      // DELETE DATABASE
-      // ===============================================
-
       await _database
           .child('users')
           .child(uid)
           .remove();
-
-      // ===============================================
-      // DELETE AUTH
-      // ===============================================
 
       final user =
           _auth.currentUser;
@@ -481,10 +561,6 @@ class AuthService {
         adminEmail,
       );
 
-      // ===============================================
-      // ADMIN NOT EXISTS
-      // ===============================================
-
       if (methods.isEmpty) {
 
         await register(
@@ -509,3 +585,4 @@ class AuthService {
     } catch (_) {}
   }
 }
+

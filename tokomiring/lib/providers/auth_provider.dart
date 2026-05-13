@@ -1,10 +1,12 @@
+// =====================================================
 // lib/providers/auth_provider.dart
+// FULL FIXED VERSION
+// =====================================================
 
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import '../models/user_model.dart';
-
 import '../services/auth_service.dart';
 
 class AuthProvider
@@ -20,6 +22,8 @@ class AuthProvider
 
   UserModel? _userModel;
 
+  List<UserModel> _users = [];
+
   bool _isLoading = false;
 
   bool _isLoggedIn = false;
@@ -32,6 +36,9 @@ class AuthProvider
 
   UserModel? get user =>
       _userModel;
+
+  List<UserModel> get users =>
+      _users;
 
   bool get isLoading =>
       _isLoading;
@@ -70,10 +77,6 @@ class AuthProvider
               .instance
               .currentUser;
 
-      // ===============================================
-      // USER EXISTS
-      // ===============================================
-
       if (currentUser != null) {
 
         final userData =
@@ -91,10 +94,6 @@ class AuthProvider
               true;
         }
       }
-
-      // ===============================================
-      // USER NOT FOUND
-      // ===============================================
 
       else {
 
@@ -117,6 +116,74 @@ class AuthProvider
     } finally {
 
       _setLoading(false);
+    }
+  }
+
+  // =====================================================
+  // LOAD USERS
+  // =====================================================
+
+  Future<void> loadUsers()
+      async {
+
+    try {
+
+      _setLoading(true);
+
+      final result =
+          await _authService
+              .getAllUsers();
+
+      _users = result;
+
+      notifyListeners();
+
+    } catch (e) {
+
+      debugPrint(
+        e.toString(),
+      );
+
+    } finally {
+
+      _setLoading(false);
+    }
+  }
+
+  // =====================================================
+  // UPDATE USER
+  // =====================================================
+
+  Future<void> updateUser(
+    UserModel user,
+  ) async {
+
+    try {
+
+      await _authService
+          .updateUser(
+        user,
+      );
+
+      final index =
+          _users.indexWhere(
+        (u) =>
+            u.uid == user.uid,
+      );
+
+      if (index != -1) {
+
+        _users[index] =
+            user;
+      }
+
+      notifyListeners();
+
+    } catch (e) {
+
+      debugPrint(
+        e.toString(),
+      );
     }
   }
 

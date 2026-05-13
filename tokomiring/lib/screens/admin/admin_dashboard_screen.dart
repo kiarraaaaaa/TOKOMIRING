@@ -1,24 +1,27 @@
 // =====================================================
+// FULL FIXED VERSION
 // lib/screens/admin/admin_dashboard_screen.dart
-// FULL FIX NO DOUBLE PRODUCT FINAL
+// NO CONST ERROR
 // =====================================================
 
-import 'dart:convert';
-import 'dart:typed_data';
-
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:uuid/uuid.dart';
 
-import '../../core/utils/app_format.dart';
-import '../../models/product_model.dart';
-import '../../providers/product_provider.dart';
+import '../../widgets/admin/admin_sidebar.dart';
+
+import 'admin_product_screen.dart';
+import 'admin_order_screen.dart';
+import 'admin_sales_report_screen.dart';
+import 'admin_user_screen.dart';
+import 'admin_notification_screen.dart';
 
 class AdminDashboardScreen
     extends StatefulWidget {
 
-  const AdminDashboardScreen({
+  // ===================================================
+  // FIXED
+  // ===================================================
+
+  AdminDashboardScreen({
     super.key,
   });
 
@@ -29,717 +32,552 @@ class AdminDashboardScreen
 }
 
 class _AdminDashboardScreenState
-    extends State<AdminDashboardScreen> {
+    extends State<AdminDashboardScreen>
+    with TickerProviderStateMixin {
 
-  final TextEditingController
-      searchController =
-      TextEditingController();
+  int selectedIndex = 0;
 
-  // =====================================================
-  // FIX DOUBLE INITIALIZE
-  // =====================================================
+  late AnimationController
+      _animationController;
 
-  bool _alreadyInitialized =
-      false;
+  late Animation<double>
+      _fadeAnimation;
 
   @override
   void initState() {
 
     super.initState();
 
-    WidgetsBinding.instance
-        .addPostFrameCallback((_) {
+    _animationController =
+        AnimationController(
 
-      if (_alreadyInitialized) {
-        return;
-      }
+      vsync: this,
 
-      _alreadyInitialized = true;
+      duration:
+          const Duration(
+        milliseconds: 400,
+      ),
+    );
 
-      final provider =
-          Provider.of<ProductProvider>(
-        context,
-        listen: false,
-      );
+    _fadeAnimation =
+        CurvedAnimation(
 
-      provider.initializeProducts();
-    });
+      parent:
+          _animationController,
+
+      curve:
+          Curves.easeInOut,
+    );
+
+    _animationController
+        .forward();
+  }
+
+  @override
+  void dispose() {
+
+    _animationController
+        .dispose();
+
+    super.dispose();
   }
 
   // =====================================================
-  // ADD / EDIT PRODUCT
+  // SCREENS
   // =====================================================
 
-  Future<void> showProductDialog({
-    ProductModel? product,
-  }) async {
+  Widget currentScreen() {
 
-    final provider =
-        Provider.of<ProductProvider>(
-      context,
-      listen: false,
-    );
+    switch (selectedIndex) {
 
-    final nameController =
-        TextEditingController(
-      text: product?.name ?? '',
-    );
+      // ===============================================
+      // DASHBOARD
+      // ===============================================
 
-    final descriptionController =
-        TextEditingController(
-      text:
-          product?.description ??
-              '',
-    );
+      case 0:
 
-    final priceController =
-        TextEditingController(
-      text:
-          product?.price
-              .toString() ??
-          '',
-    );
+        return dashboardHome();
 
-    final stockController =
-        TextEditingController(
-      text:
-          product?.stock
-              .toString() ??
-          '',
-    );
+      // ===============================================
+      // PRODUCTS
+      // ===============================================
 
-    String selectedCategory =
-        product?.category ??
-            'Food';
+      case 1:
 
-    String imageBase64 =
-        product?.imageBase64 ?? '';
+        return AdminProductScreen();
 
-    await showDialog(
-      context: context,
+      // ===============================================
+      // ORDERS
+      // ===============================================
 
-      builder: (_) {
+      case 2:
 
-        return StatefulBuilder(
-          builder: (
-            context,
-            setStateDialog,
-          ) {
+        return AdminOrderScreen();
 
-            return Dialog(
-              shape:
-                  RoundedRectangleBorder(
-                borderRadius:
-                    BorderRadius.circular(
-                  25,
-                ),
-              ),
+      // ===============================================
+      // REPORTS
+      // ===============================================
 
-              child: Container(
-                width: 650,
+      case 3:
 
-                padding:
-                    const EdgeInsets.all(
-                  30,
-                ),
+        return AdminSalesReportScreen();
 
-                child:
-                    SingleChildScrollView(
+      // ===============================================
+      // USERS
+      // ===============================================
+
+      case 4:
+
+        return AdminUserScreen();
+
+      // ===============================================
+      // NOTIFICATIONS
+      // ===============================================
+
+      case 5:
+
+        return AdminNotificationScreen();
+
+      default:
+
+        return dashboardHome();
+    }
+  }
+
+  // =====================================================
+  // DASHBOARD HOME
+  // =====================================================
+
+  Widget dashboardHome() {
+
+    return FadeTransition(
+
+      opacity:
+          _fadeAnimation,
+
+      child:
+          SingleChildScrollView(
+
+        padding:
+            const EdgeInsets.all(
+          30,
+        ),
+
+        child: Column(
+          crossAxisAlignment:
+              CrossAxisAlignment
+                  .start,
+
+          children: [
+
+            // =========================================
+            // HEADER
+            // =========================================
+
+            Row(
+              children: [
+
+                Expanded(
                   child: Column(
-                    mainAxisSize:
-                        MainAxisSize.min,
+                    crossAxisAlignment:
+                        CrossAxisAlignment
+                            .start,
 
                     children: [
 
                       Text(
-                        product == null
-                            ? 'Add Product'
-                            : 'Edit Product',
+
+                        'Admin Dashboard',
 
                         style:
-                            const TextStyle(
-                          fontSize: 28,
+                            TextStyle(
+
+                          fontSize:
+                              MediaQuery.of(
+                                            context,
+                                          ).size.width <
+                                          700
+
+                                  ? 28
+
+                                  : 38,
+
                           fontWeight:
                               FontWeight.bold,
                         ),
                       ),
 
                       const SizedBox(
-                        height: 30,
+                        height: 10,
                       ),
 
-                      // =====================================
-                      // IMAGE
-                      // =====================================
+                      Text(
 
-                      GestureDetector(
-                        onTap: () async {
+                        'Manage products, orders, reports, users and notifications.',
 
-                          final result =
-                              await FilePicker
-                                  .platform
-                                  .pickFiles(
-                            type:
-                                FileType.image,
+                        style:
+                            TextStyle(
 
-                            withData:
-                                true,
-                          );
+                          color:
+                              Colors.grey
+                                  .shade600,
 
-                          if (result !=
-                              null) {
-
-                            Uint8List?
-                                imageBytes =
-                                result
-                                    .files
-                                    .first
-                                    .bytes;
-
-                            if (imageBytes !=
-                                null) {
-
-                              imageBase64 =
-                                  base64Encode(
-                                imageBytes,
-                              );
-
-                              setStateDialog(
-                                () {},
-                              );
-                            }
-                          }
-                        },
-
-                        child: Container(
-                          width:
-                              double.infinity,
-
-                          height: 220,
-
-                          decoration:
-                              BoxDecoration(
-                            color:
-                                Colors.grey
-                                    .shade200,
-
-                            borderRadius:
-                                BorderRadius.circular(
-                              25,
-                            ),
-                          ),
-
-                          child:
-                              imageBase64
-                                      .isEmpty
-
-                                  ? Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-
-                                      children: const [
-
-                                        Icon(
-                                          Icons.image,
-                                          size: 70,
-                                        ),
-
-                                        SizedBox(
-                                          height: 15,
-                                        ),
-
-                                        Text(
-                                          'Upload Product Image',
-                                        ),
-                                      ],
-                                    )
-
-                                  : ClipRRect(
-                                      borderRadius:
-                                          BorderRadius.circular(
-                                        25,
-                                      ),
-
-                                      child:
-                                          Image.memory(
-                                        base64Decode(
-                                          imageBase64,
-                                        ),
-
-                                        fit:
-                                            BoxFit.cover,
-                                      ),
-                                    ),
+                          fontSize: 15,
                         ),
-                      ),
-
-                      const SizedBox(
-                        height: 25,
-                      ),
-
-                      TextField(
-                        controller:
-                            nameController,
-
-                        decoration:
-                            const InputDecoration(
-                          labelText:
-                              'Product Name',
-                        ),
-                      ),
-
-                      const SizedBox(
-                        height: 20,
-                      ),
-
-                      TextField(
-                        controller:
-                            descriptionController,
-
-                        maxLines: 4,
-
-                        decoration:
-                            const InputDecoration(
-                          labelText:
-                              'Description',
-                        ),
-                      ),
-
-                      const SizedBox(
-                        height: 20,
-                      ),
-
-                      DropdownButtonFormField<
-                          String>(
-                        value:
-                            selectedCategory,
-
-                        items: provider
-                            .categories
-                            .where(
-                              (e) =>
-                                  e !=
-                                  'All',
-                            )
-                            .map(
-                              (e) =>
-                                  DropdownMenuItem(
-                                value:
-                                    e,
-
-                                child:
-                                    Text(
-                                  e,
-                                ),
-                              ),
-                            )
-                            .toList(),
-
-                        onChanged: (
-                          value,
-                        ) {
-
-                          if (value !=
-                              null) {
-
-                            selectedCategory =
-                                value;
-                          }
-                        },
-
-                        decoration:
-                            const InputDecoration(
-                          labelText:
-                              'Category',
-                        ),
-                      ),
-
-                      const SizedBox(
-                        height: 20,
-                      ),
-
-                      TextField(
-                        controller:
-                            priceController,
-
-                        keyboardType:
-                            TextInputType.number,
-
-                        decoration:
-                            const InputDecoration(
-                          labelText:
-                              'Price',
-                        ),
-                      ),
-
-                      const SizedBox(
-                        height: 20,
-                      ),
-
-                      TextField(
-                        controller:
-                            stockController,
-
-                        keyboardType:
-                            TextInputType.number,
-
-                        decoration:
-                            const InputDecoration(
-                          labelText:
-                              'Stock',
-                        ),
-                      ),
-
-                      const SizedBox(
-                        height: 30,
-                      ),
-
-                      Row(
-                        children: [
-
-                          Expanded(
-                            child:
-                                OutlinedButton(
-                              onPressed:
-                                  () {
-
-                                Navigator.pop(
-                                  context,
-                                );
-                              },
-
-                              child:
-                                  const Text(
-                                'Cancel',
-                              ),
-                            ),
-                          ),
-
-                          const SizedBox(
-                            width: 15,
-                          ),
-
-                          Expanded(
-                            child:
-                                ElevatedButton(
-                              onPressed:
-                                  () async {
-
-                                if (nameController
-                                        .text
-                                        .trim()
-                                        .isEmpty ||
-                                    descriptionController
-                                        .text
-                                        .trim()
-                                        .isEmpty ||
-                                    priceController
-                                        .text
-                                        .trim()
-                                        .isEmpty ||
-                                    stockController
-                                        .text
-                                        .trim()
-                                        .isEmpty ||
-                                    imageBase64
-                                        .isEmpty) {
-
-                                  ScaffoldMessenger.of(
-                                    context,
-                                  ).showSnackBar(
-                                    const SnackBar(
-                                      content:
-                                          Text(
-                                        'Please complete all fields',
-                                      ),
-                                    ),
-                                  );
-
-                                  return;
-                                }
-
-                                // =================================
-                                // FIX NO DOUBLE PRODUCT
-                                // =================================
-
-                                final productId =
-                                    product?.id ??
-                                        const Uuid()
-                                            .v4();
-
-                                final newProduct =
-                                    ProductModel(
-
-                                  id:
-                                      productId,
-
-                                  name:
-                                      nameController
-                                          .text
-                                          .trim(),
-
-                                  description:
-                                      descriptionController
-                                          .text
-                                          .trim(),
-
-                                  category:
-                                      selectedCategory,
-
-                                  imageBase64:
-                                      imageBase64,
-
-                                  price:
-                                      double.tryParse(
-                                            priceController
-                                                .text,
-                                          ) ??
-                                          0,
-
-                                  stock:
-                                      int.tryParse(
-                                            stockController
-                                                .text,
-                                          ) ??
-                                          0,
-
-                                  isAvailable:
-                                      true,
-
-                                  isPopular:
-                                      false,
-
-                                  sold:
-                                      product?.sold ??
-                                          0,
-
-                                  createdAt:
-                                      product?.createdAt ??
-                                          DateTime.now(),
-                                );
-
-                                bool success;
-
-                                // =============================
-                                // ADD PRODUCT
-                                // =============================
-
-                                if (product ==
-                                    null) {
-
-                                  // =========================
-                                  // CEK DUPLIKAT NAMA
-                                  // =========================
-
-                                  bool alreadyExists =
-                                      provider.products.any(
-                                    (item) =>
-                                        item.name
-                                            .toLowerCase() ==
-                                        newProduct.name
-                                            .toLowerCase(),
-                                  );
-
-                                  if (alreadyExists) {
-
-                                    if (!mounted) {
-                                      return;
-                                    }
-
-                                    ScaffoldMessenger.of(
-                                      context,
-                                    ).showSnackBar(
-                                      const SnackBar(
-                                        content:
-                                            Text(
-                                          'Product already exists',
-                                        ),
-                                      ),
-                                    );
-
-                                    return;
-                                  }
-
-                                  success =
-                                      await provider
-                                          .addProduct(
-                                    newProduct,
-                                  );
-                                }
-
-                                // =============================
-                                // UPDATE PRODUCT
-                                // =============================
-
-                                else {
-
-                                  success =
-                                      await provider
-                                          .updateProduct(
-                                    newProduct,
-                                  );
-                                }
-
-                                if (!mounted) {
-                                  return;
-                                }
-
-                                Navigator.pop(
-                                  context,
-                                );
-
-                                ScaffoldMessenger.of(
-                                  context,
-                                ).showSnackBar(
-                                  SnackBar(
-                                    content:
-                                        Text(
-                                      success
-                                          ? 'Product saved'
-                                          : 'Failed',
-                                    ),
-                                  ),
-                                );
-                              },
-
-                              child:
-                                  Text(
-                                product ==
-                                        null
-                                    ? 'Add Product'
-                                    : 'Save',
-                              ),
-                            ),
-                          ),
-                        ],
                       ),
                     ],
                   ),
                 ),
+
+                Container(
+
+                  padding:
+                      const EdgeInsets.all(
+                    18,
+                  ),
+
+                  decoration:
+                      BoxDecoration(
+
+                    color:
+                        Colors.white,
+
+                    borderRadius:
+                        BorderRadius.circular(
+                      24,
+                    ),
+                  ),
+
+                  child: const Icon(
+
+                    Icons
+                        .admin_panel_settings,
+
+                    size: 40,
+
+                    color:
+                        Colors.blue,
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(
+              height: 35,
+            ),
+
+            // =========================================
+            // QUICK MENU
+            // =========================================
+
+            GridView(
+
+              shrinkWrap: true,
+
+              physics:
+                  const NeverScrollableScrollPhysics(),
+
+              gridDelegate:
+                  SliverGridDelegateWithFixedCrossAxisCount(
+
+                crossAxisCount:
+
+                    MediaQuery.of(
+                                  context,
+                                ).size.width <
+                                700
+
+                        ? 1
+
+                        : MediaQuery.of(
+                                      context,
+                                    ).size.width <
+                                    1200
+
+                            ? 2
+
+                            : 3,
+
+                crossAxisSpacing:
+                    20,
+
+                mainAxisSpacing:
+                    20,
+
+                childAspectRatio:
+                    1.6,
               ),
-            );
-          },
-        );
-      },
+
+              children: [
+
+                dashboardCard(
+
+                  title:
+                      'Products',
+
+                  subtitle:
+                      'Manage product inventory',
+
+                  icon:
+                      Icons.inventory_2,
+
+                  color:
+                      Colors.blue,
+
+                  onTap: () {
+
+                    setState(() {
+
+                      selectedIndex =
+                          1;
+                    });
+                  },
+                ),
+
+                dashboardCard(
+
+                  title:
+                      'Orders',
+
+                  subtitle:
+                      'Monitor customer orders',
+
+                  icon:
+                      Icons.shopping_bag,
+
+                  color:
+                      Colors.orange,
+
+                  onTap: () {
+
+                    setState(() {
+
+                      selectedIndex =
+                          2;
+                    });
+                  },
+                ),
+
+                dashboardCard(
+
+                  title:
+                      'Reports',
+
+                  subtitle:
+                      'Sales analytics & revenue',
+
+                  icon:
+                      Icons.bar_chart,
+
+                  color:
+                      Colors.green,
+
+                  onTap: () {
+
+                    setState(() {
+
+                      selectedIndex =
+                          3;
+                    });
+                  },
+                ),
+
+                dashboardCard(
+
+                  title:
+                      'Users',
+
+                  subtitle:
+                      'User management system',
+
+                  icon:
+                      Icons.people,
+
+                  color:
+                      Colors.purple,
+
+                  onTap: () {
+
+                    setState(() {
+
+                      selectedIndex =
+                          4;
+                    });
+                  },
+                ),
+
+                dashboardCard(
+
+                  title:
+                      'Notifications',
+
+                  subtitle:
+                      'System activity & logs',
+
+                  icon:
+                      Icons.notifications,
+
+                  color:
+                      Colors.red,
+
+                  onTap: () {
+
+                    setState(() {
+
+                      selectedIndex =
+                          5;
+                    });
+                  },
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
     );
   }
 
   // =====================================================
-  // DELETE PRODUCT
+  // CARD
   // =====================================================
 
-  Future<void> deleteProduct(
-    ProductModel product,
-  ) async {
+  Widget dashboardCard({
 
-    final provider =
-        Provider.of<ProductProvider>(
-      context,
-      listen: false,
-    );
+    required String title,
 
-    await provider.deleteProduct(
-      product.id,
-    );
-  }
+    required String subtitle,
 
-  // =====================================================
-  // ADD STOCK
-  // =====================================================
+    required IconData icon,
 
-  Future<void> addStock(
-    ProductModel product,
-  ) async {
+    required Color color,
 
-    final stockController =
-        TextEditingController();
+    required VoidCallback onTap,
+  }) {
 
-    await showDialog(
-      context: context,
+    return GestureDetector(
 
-      builder: (_) {
+      onTap: onTap,
 
-        return AlertDialog(
-          title:
-              const Text(
-            'Add Stock',
+      child:
+          AnimatedContainer(
+
+        duration:
+            const Duration(
+          milliseconds: 250,
+        ),
+
+        padding:
+            const EdgeInsets.all(
+          24,
+        ),
+
+        decoration:
+            BoxDecoration(
+
+          color:
+              Colors.white,
+
+          borderRadius:
+              BorderRadius.circular(
+            30,
           ),
 
-          content:
-              TextField(
-            controller:
-                stockController,
+          boxShadow: [
 
-            keyboardType:
-                TextInputType.number,
+            BoxShadow(
 
-            decoration:
-                const InputDecoration(
-              labelText:
-                  'Input Stock',
-            ),
-          ),
-
-          actions: [
-
-            TextButton(
-              onPressed:
-                  () {
-
-                Navigator.pop(
-                  context,
-                );
-              },
-
-              child:
-                  const Text(
-                'Cancel',
+              color:
+                  Colors.black
+                      .withOpacity(
+                0.04,
               ),
-            ),
 
-            ElevatedButton(
-              onPressed:
-                  () async {
+              blurRadius:
+                  14,
 
-                int addValue =
-                    int.tryParse(
-                          stockController
-                              .text,
-                        ) ??
-                        0;
-
-                final updatedProduct =
-                    product.copyWith(
-                  stock:
-                      product.stock +
-                          addValue,
-                );
-
-                await Provider.of<
-                    ProductProvider>(
-                  context,
-                  listen: false,
-                ).updateProduct(
-                  updatedProduct,
-                );
-
-                if (!mounted) {
-                  return;
-                }
-
-                Navigator.pop(
-                  context,
-                );
-              },
-
-              child:
-                  const Text(
-                'Save',
+              offset:
+                  const Offset(
+                0,
+                8,
               ),
             ),
           ],
-        );
-      },
+        ),
+
+        child: Column(
+          crossAxisAlignment:
+              CrossAxisAlignment
+                  .start,
+
+          children: [
+
+            Container(
+
+              width: 65,
+
+              height: 65,
+
+              decoration:
+                  BoxDecoration(
+
+                color:
+                    color.withOpacity(
+                  0.12,
+                ),
+
+                borderRadius:
+                    BorderRadius.circular(
+                  22,
+                ),
+              ),
+
+              child: Icon(
+
+                icon,
+
+                color: color,
+
+                size: 34,
+              ),
+            ),
+
+            const Spacer(),
+
+            Text(
+
+              title,
+
+              style:
+                  const TextStyle(
+
+                fontSize: 22,
+
+                fontWeight:
+                    FontWeight.bold,
+              ),
+            ),
+
+            const SizedBox(
+              height: 10,
+            ),
+
+            Text(
+
+              subtitle,
+
+              style:
+                  TextStyle(
+
+                color:
+                    Colors.grey
+                        .shade600,
+
+                fontSize: 14,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -748,587 +586,45 @@ class _AdminDashboardScreenState
     BuildContext context,
   ) {
 
-    final provider =
-        Provider.of<ProductProvider>(
-      context,
-    );
-
     return Scaffold(
+
       backgroundColor:
-          const Color(0xffF8FAFC),
-
-      floatingActionButton:
-          FloatingActionButton.extended(
-
-        onPressed: () {
-
-          showProductDialog();
-        },
-
-        icon: const Icon(
-          Icons.add,
-        ),
-
-        label: const Text(
-          'Add Product',
-        ),
+          const Color(
+        0xffF8FAFC,
       ),
 
-      appBar: AppBar(
-        title: const Text(
-          'Admin Dashboard',
-        ),
-      ),
+      body: Row(
+        children: [
 
-      body: Padding(
-        padding:
-            const EdgeInsets.all(
-          20,
-        ),
+          AdminSidebar(
 
-        child: Column(
-          children: [
+            selectedIndex:
+                selectedIndex,
 
-            Row(
-              children: [
+            onSelected:
+                (
+                  index,
+                ) {
 
-                dashboardCard(
-                  title:
-                      'Total Products',
+              setState(() {
 
-                  value:
-                      provider.products
-                          .length
-                          .toString(),
+                selectedIndex =
+                    index;
+              });
+            },
 
-                  icon:
-                      Icons.inventory_2,
-                ),
+            onLogout: () {
 
-                const SizedBox(
-                  width: 20,
-                ),
-
-                dashboardCard(
-                  title:
-                      'Low Stock',
-
-                  value:
-                      provider
-                          .lowStockProducts
-                          .length
-                          .toString(),
-
-                  icon:
-                      Icons.warning,
-                ),
-
-                const SizedBox(
-                  width: 20,
-                ),
-
-                dashboardCard(
-                  title:
-                      'Categories',
-
-                  value:
-                      provider
-                          .categories
-                          .where(
-                            (e) =>
-                                e !=
-                                'All',
-                          )
-                          .length
-                          .toString(),
-
-                  icon:
-                      Icons.category,
-                ),
-              ],
-            ),
-
-            const SizedBox(
-              height: 20,
-            ),
-
-            TextField(
-              controller:
-                  searchController,
-
-              onChanged:
-                  provider
-                      .searchProducts,
-
-              decoration:
-                  InputDecoration(
-                hintText:
-                    'Search products...',
-
-                prefixIcon:
-                    const Icon(
-                  Icons.search,
-                ),
-
-                filled: true,
-
-                fillColor:
-                    Colors.white,
-
-                border:
-                    OutlineInputBorder(
-                  borderRadius:
-                      BorderRadius.circular(
-                    18,
-                  ),
-
-                  borderSide:
-                      BorderSide.none,
-                ),
-              ),
-            ),
-
-            const SizedBox(
-              height: 20,
-            ),
-
-            Expanded(
-              child:
-                  provider.products
-                          .isEmpty
-
-                      ? const Center(
-                          child:
-                              Text(
-                            'No products available',
-                          ),
-                        )
-
-                      : GridView.builder(
-
-                          itemCount:
-                              provider
-                                  .products
-                                  .length,
-
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount:
-                                4,
-
-                            crossAxisSpacing:
-                                20,
-
-                            mainAxisSpacing:
-                                20,
-
-                            childAspectRatio:
-                                0.78,
-                          ),
-
-                          itemBuilder:
-                              (
-                                context,
-                                index,
-                              ) {
-
-                            final product =
-                                provider
-                                        .products[
-                                    index];
-
-                            return Container(
-                              decoration:
-                                  BoxDecoration(
-                                color:
-                                    Colors.white,
-
-                                borderRadius:
-                                    BorderRadius.circular(
-                                  24,
-                                ),
-
-                                boxShadow: [
-
-                                  BoxShadow(
-                                    color:
-                                        Colors.black.withOpacity(
-                                      0.05,
-                                    ),
-
-                                    blurRadius:
-                                        10,
-                                  ),
-                                ],
-                              ),
-
-                              child: Column(
-                                crossAxisAlignment:
-                                    CrossAxisAlignment.start,
-
-                                children: [
-
-                                  Expanded(
-                                    child:
-                                        Stack(
-                                      children: [
-
-                                        ClipRRect(
-                                          borderRadius:
-                                              const BorderRadius.vertical(
-                                            top:
-                                                Radius.circular(
-                                              24,
-                                            ),
-                                          ),
-
-                                          child:
-                                              product.imageBase64.isEmpty
-
-                                                  ? Container(
-                                                      width:
-                                                          double.infinity,
-
-                                                      color:
-                                                          Colors.grey.shade300,
-
-                                                      child:
-                                                          const Center(
-                                                        child:
-                                                            Icon(
-                                                          Icons.image,
-                                                          size:
-                                                              60,
-                                                        ),
-                                                      ),
-                                                    )
-
-                                                  : Image.memory(
-                                                      base64Decode(
-                                                        product.imageBase64,
-                                                      ),
-
-                                                      width:
-                                                          double.infinity,
-
-                                                      fit:
-                                                          BoxFit.cover,
-                                                    ),
-                                        ),
-
-                                        Positioned(
-                                          top: 10,
-                                          left: 10,
-
-                                          child:
-                                              Container(
-                                            padding:
-                                                const EdgeInsets.symmetric(
-                                              horizontal:
-                                                  10,
-                                              vertical:
-                                                  5,
-                                            ),
-
-                                            decoration:
-                                                BoxDecoration(
-                                              color:
-                                                  Colors.black.withOpacity(
-                                                0.7,
-                                              ),
-
-                                              borderRadius:
-                                                  BorderRadius.circular(
-                                                20,
-                                              ),
-                                            ),
-
-                                            child:
-                                                Text(
-                                              product.category,
-
-                                              style:
-                                                  const TextStyle(
-                                                color:
-                                                    Colors.white,
-
-                                                fontSize:
-                                                    11,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-
-                                  Padding(
-                                    padding:
-                                        const EdgeInsets.all(
-                                      12,
-                                    ),
-
-                                    child:
-                                        Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-
-                                      children: [
-
-                                        Text(
-                                          product
-                                              .name,
-
-                                          maxLines:
-                                              1,
-
-                                          overflow:
-                                              TextOverflow.ellipsis,
-
-                                          style:
-                                              const TextStyle(
-                                            fontSize:
-                                                16,
-
-                                            fontWeight:
-                                                FontWeight.bold,
-                                          ),
-                                        ),
-
-                                        const SizedBox(
-                                          height:
-                                              6,
-                                        ),
-
-                                        Text(
-                                          AppFormat.currency(
-                                            product.price,
-                                          ),
-
-                                          style:
-                                              const TextStyle(
-                                            fontWeight:
-                                                FontWeight.bold,
-
-                                            color:
-                                                Colors.green,
-                                          ),
-                                        ),
-
-                                        const SizedBox(
-                                          height:
-                                              8,
-                                        ),
-
-                                        Text(
-                                          'Stock: ${product.stock}',
-                                        ),
-
-                                        const SizedBox(
-                                          height:
-                                              12,
-                                        ),
-
-                                        Row(
-                                          children: [
-
-                                            Expanded(
-                                              child:
-                                                  SizedBox(
-                                                height:
-                                                    36,
-
-                                                child:
-                                                    ElevatedButton(
-                                                  onPressed:
-                                                      () {
-
-                                                    showProductDialog(
-                                                      product:
-                                                          product,
-                                                    );
-                                                  },
-
-                                                  child:
-                                                      const Text(
-                                                    'Edit',
-
-                                                    style:
-                                                        TextStyle(
-                                                      fontSize:
-                                                          11,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-
-                                            const SizedBox(
-                                              width:
-                                                  6,
-                                            ),
-
-                                            Expanded(
-                                              child:
-                                                  SizedBox(
-                                                height:
-                                                    36,
-
-                                                child:
-                                                    ElevatedButton(
-                                                  style:
-                                                      ElevatedButton.styleFrom(
-                                                    backgroundColor:
-                                                        Colors.orange,
-                                                  ),
-
-                                                  onPressed:
-                                                      () {
-
-                                                    addStock(
-                                                      product,
-                                                    );
-                                                  },
-
-                                                  child:
-                                                      const Text(
-                                                    'Stock',
-
-                                                    style:
-                                                        TextStyle(
-                                                      fontSize:
-                                                          11,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-
-                                            const SizedBox(
-                                              width:
-                                                  6,
-                                            ),
-
-                                            Expanded(
-                                              child:
-                                                  SizedBox(
-                                                height:
-                                                    36,
-
-                                                child:
-                                                    ElevatedButton(
-                                                  style:
-                                                      ElevatedButton.styleFrom(
-                                                    backgroundColor:
-                                                        Colors.red,
-                                                  ),
-
-                                                  onPressed:
-                                                      () {
-
-                                                    deleteProduct(
-                                                      product,
-                                                    );
-                                                  },
-
-                                                  child:
-                                                      const Text(
-                                                    'Delete',
-
-                                                    style:
-                                                        TextStyle(
-                                                      fontSize:
-                                                          11,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
-                        ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget dashboardCard({
-    required String title,
-    required String value,
-    required IconData icon,
-  }) {
-
-    return Expanded(
-      child: Container(
-        padding:
-            const EdgeInsets.all(
-          18,
-        ),
-
-        decoration:
-            BoxDecoration(
-          color: Colors.white,
-
-          borderRadius:
-              BorderRadius.circular(
-            22,
+              Navigator.pop(
+                context,
+              );
+            },
           ),
 
-          boxShadow: [
-
-            BoxShadow(
-              color:
-                  Colors.black.withOpacity(
-                0.04,
-              ),
-
-              blurRadius: 10,
-            ),
-          ],
-        ),
-
-        child: Column(
-          children: [
-
-            Icon(
-              icon,
-              size: 38,
-            ),
-
-            const SizedBox(
-              height: 12,
-            ),
-
-            Text(
-              value,
-
-              style:
-                  const TextStyle(
-                fontSize: 24,
-
-                fontWeight:
-                    FontWeight.bold,
-              ),
-            ),
-
-            const SizedBox(
-              height: 6,
-            ),
-
-            Text(
-              title,
-            ),
-          ],
-        ),
+          Expanded(
+            child: currentScreen(),
+          ),
+        ],
       ),
     );
   }

@@ -1,5 +1,3 @@
-// lib/services/storage_service.dart
-
 import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
@@ -7,16 +5,8 @@ import 'package:firebase_storage/firebase_storage.dart';
 
 class StorageService {
 
-  // =====================================================
-  // STORAGE
-  // =====================================================
-
   final FirebaseStorage _storage =
       FirebaseStorage.instance;
-
-  // =====================================================
-  // PICK IMAGE
-  // =====================================================
 
   Future<PlatformFile?> pickImage()
       async {
@@ -47,13 +37,40 @@ class StorageService {
           result.files.first;
 
       // ===============================================
-      // VALIDATE EMPTY
+      // EMPTY IMAGE
       // ===============================================
 
-      if (file.bytes == null) {
+      if (file.bytes == null ||
+          file.bytes!.isEmpty) {
 
         throw Exception(
-          'Image data not found',
+          'Image bytes not found',
+        );
+      }
+
+      // ===============================================
+      // INVALID EXTENSION
+      // ===============================================
+
+      final extension =
+          file.extension
+                  ?.toLowerCase() ??
+              '';
+
+      final allowed = [
+
+        'jpg',
+        'jpeg',
+        'png',
+        'webp',
+      ];
+
+      if (!allowed.contains(
+        extension,
+      )) {
+
+        throw Exception(
+          'Invalid image format',
         );
       }
 
@@ -81,10 +98,21 @@ class StorageService {
 
     try {
 
+      if (imageBytes.isEmpty) {
+
+        throw Exception(
+          'Image is empty',
+        );
+      }
+
       final safeName =
           fileName
               .replaceAll(
                 ' ',
+                '_',
+              )
+              .replaceAll(
+                '/',
                 '_',
               )
               .trim();
@@ -141,10 +169,11 @@ class StorageService {
 
     try {
 
-      if (file.bytes == null) {
+      if (file.bytes == null ||
+          file.bytes!.isEmpty) {
 
         throw Exception(
-          'Image data is empty',
+          'Image data empty',
         );
       }
 
@@ -152,12 +181,19 @@ class StorageService {
           imageData =
           file.bytes!;
 
+      final safeId =
+          productId
+              .replaceAll(
+                '/',
+                '_',
+              );
+
       final ref =
           _storage
               .ref()
               .child(
 
-                'product_images/$productId.jpg',
+                'product_images/$safeId.jpg',
               );
 
       final metadata =
@@ -207,10 +243,11 @@ class StorageService {
 
     try {
 
-      if (file.bytes == null) {
+      if (file.bytes == null ||
+          file.bytes!.isEmpty) {
 
         throw Exception(
-          'Image data is empty',
+          'Image data empty',
         );
       }
 
@@ -218,12 +255,18 @@ class StorageService {
           imageData =
           file.bytes!;
 
+      final safeUid =
+          uid.replaceAll(
+        '/',
+        '_',
+      );
+
       final ref =
           _storage
               .ref()
               .child(
 
-                'profile_images/$uid.jpg',
+                'profile_images/$safeUid.jpg',
               );
 
       final metadata =
@@ -273,10 +316,11 @@ class StorageService {
 
     try {
 
-      if (file.bytes == null) {
+      if (file.bytes == null ||
+          file.bytes!.isEmpty) {
 
         throw Exception(
-          'Image data is empty',
+          'Image data empty',
         );
       }
 
@@ -284,12 +328,19 @@ class StorageService {
           imageData =
           file.bytes!;
 
+      final safeId =
+          orderId
+              .replaceAll(
+                '/',
+                '_',
+              );
+
       final ref =
           _storage
               .ref()
               .child(
 
-                'payment_proofs/$orderId.jpg',
+                'payment_proofs/$safeId.jpg',
               );
 
       final metadata =
@@ -339,22 +390,28 @@ class StorageService {
         return;
       }
 
+      // ===============================================
+      // SAFE URL
+      // ===============================================
+
+      if (!imageUrl.startsWith(
+        'https://',
+      )) {
+
+        return;
+      }
+
       await _storage
           .refFromURL(
             imageUrl,
           )
           .delete();
 
-    } catch (e) {
-
-      throw Exception(
-        e.toString(),
-      );
-    }
+    } catch (_) {}
   }
 
   // =====================================================
-  // GENERIC IMAGE UPLOAD
+  // GENERIC IMAGE
   // =====================================================
 
   Future<String> uploadImage({
@@ -369,10 +426,11 @@ class StorageService {
 
     try {
 
-      if (file.bytes == null) {
+      if (file.bytes == null ||
+          file.bytes!.isEmpty) {
 
         throw Exception(
-          'Image data is empty',
+          'Image data empty',
         );
       }
 
@@ -385,12 +443,20 @@ class StorageService {
               .replaceAll(
                 ' ',
                 '_',
+              )
+              .replaceAll(
+                '/',
+                '_',
               );
 
       final safeFile =
           fileName
               .replaceAll(
                 ' ',
+                '_',
+              )
+              .replaceAll(
+                '/',
                 '_',
               );
 
