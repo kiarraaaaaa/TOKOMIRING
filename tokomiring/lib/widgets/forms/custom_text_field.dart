@@ -166,7 +166,7 @@ class _CustomTextFieldState
       style:
           const TextStyle(
 
-        fontSize: 15,
+        fontSize: 12,
       ),
 
       decoration:
@@ -177,6 +177,26 @@ class _CustomTextFieldState
 
         labelText:
             widget.labelText,
+
+        hintStyle:
+            TextStyle(
+
+          fontSize: 11,
+
+          color:
+              Colors.grey
+                  .shade500,
+        ),
+
+        labelStyle:
+            TextStyle(
+
+          fontSize: 11,
+
+          color:
+              Colors.grey
+                  .shade600,
+        ),
 
         filled: true,
 
@@ -193,9 +213,9 @@ class _CustomTextFieldState
 
                 const EdgeInsets.symmetric(
 
-              horizontal: 20,
+              horizontal: 14,
 
-              vertical: 18,
+              vertical: 14,
             ),
 
         // ===============================================
@@ -206,13 +226,23 @@ class _CustomTextFieldState
             widget.prefixIcon !=
                     null
 
-                ? Icon(
+                ? Padding(
 
-                    widget.prefixIcon,
+                    padding:
+                        const EdgeInsets.all(
+                      10,
+                    ),
 
-                    color:
-                        AppColors
-                            .primary,
+                    child: Icon(
+
+                      widget.prefixIcon,
+
+                      size: 18,
+
+                      color:
+                          AppColors
+                              .primary,
+                    ),
                   )
 
                 : null,
@@ -245,6 +275,8 @@ class _CustomTextFieldState
                           : Icons
                               .visibility_rounded,
 
+                      size: 18,
+
                       color:
                           Colors.grey
                               .shade600,
@@ -254,14 +286,24 @@ class _CustomTextFieldState
                 : widget.suffixIcon !=
                         null
 
-                    ? Icon(
+                    ? Padding(
 
-                        widget
-                            .suffixIcon,
+                        padding:
+                            const EdgeInsets.all(
+                          10,
+                        ),
 
-                        color:
-                            Colors.grey
-                                .shade600,
+                        child: Icon(
+
+                          widget
+                              .suffixIcon,
+
+                          size: 18,
+
+                          color:
+                              Colors.grey
+                                  .shade600,
+                        ),
                       )
 
                     : null,
@@ -275,7 +317,7 @@ class _CustomTextFieldState
 
           borderRadius:
               BorderRadius.circular(
-            20,
+            14,
           ),
 
           borderSide:
@@ -287,7 +329,7 @@ class _CustomTextFieldState
 
           borderRadius:
               BorderRadius.circular(
-            20,
+            14,
           ),
 
           borderSide:
@@ -304,7 +346,7 @@ class _CustomTextFieldState
 
           borderRadius:
               BorderRadius.circular(
-            20,
+            14,
           ),
 
           borderSide:
@@ -313,7 +355,7 @@ class _CustomTextFieldState
             color:
                 AppColors.primary,
 
-            width: 2,
+            width: 1.5,
           ),
         ),
 
@@ -322,7 +364,7 @@ class _CustomTextFieldState
 
           borderRadius:
               BorderRadius.circular(
-            20,
+            14,
           ),
 
           borderSide:
@@ -338,7 +380,7 @@ class _CustomTextFieldState
 
           borderRadius:
               BorderRadius.circular(
-            20,
+            14,
           ),
 
           borderSide:
@@ -347,12 +389,14 @@ class _CustomTextFieldState
             color:
                 AppColors.danger,
 
-            width: 2,
+            width: 1.5,
           ),
         ),
 
         errorStyle:
             const TextStyle(
+
+          fontSize: 10,
 
           color:
               AppColors.danger,

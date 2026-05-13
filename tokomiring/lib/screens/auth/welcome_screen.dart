@@ -19,6 +19,14 @@ class WelcomeScreen
     BuildContext context,
   ) {
 
+    final width =
+        MediaQuery.of(context)
+            .size
+            .width;
+
+    final bool isMobile =
+        width < 700;
+
     return Scaffold(
 
       body: Container(
@@ -54,8 +62,10 @@ class WelcomeScreen
                 SingleChildScrollView(
 
               padding:
-                  const EdgeInsets.all(
-                24,
+                  EdgeInsets.all(
+                isMobile
+                    ? 20
+                    : 28,
               ),
 
               child: Column(
@@ -78,19 +88,25 @@ class WelcomeScreen
 
                       'assets/images/tokomiring.png',
 
-                      height: 220,
+                      height:
+                          isMobile
+                              ? 150
+                              : 190,
                     ),
                   ),
 
-                  const SizedBox(
-                    height: 35,
+                  SizedBox(
+                    height:
+                        isMobile
+                            ? 28
+                            : 34,
                   ),
 
                   // =====================================
                   // TITLE
                   // =====================================
 
-                  const Text(
+                  Text(
 
                     'TOKO MIRING',
 
@@ -102,25 +118,28 @@ class WelcomeScreen
                       color:
                           Colors.white,
 
-                      fontSize: 42,
+                      fontSize:
+                          isMobile
+                              ? 30
+                              : 40,
 
                       fontWeight:
                           FontWeight.bold,
 
                       letterSpacing:
-                          1.5,
+                          1.2,
                     ),
                   ),
 
                   const SizedBox(
-                    height: 14,
+                    height: 12,
                   ),
 
                   // =====================================
                   // SUBTITLE
                   // =====================================
 
-                  const Text(
+                  Text(
 
                     'Realtime Ecommerce Management System',
 
@@ -132,14 +151,20 @@ class WelcomeScreen
                       color:
                           Colors.white70,
 
-                      fontSize: 16,
+                      fontSize:
+                          isMobile
+                              ? 13
+                              : 16,
 
                       height: 1.5,
                     ),
                   ),
 
-                  const SizedBox(
-                    height: 60,
+                  SizedBox(
+                    height:
+                        isMobile
+                            ? 42
+                            : 54,
                   ),
 
                   // =====================================
@@ -148,9 +173,15 @@ class WelcomeScreen
 
                   SizedBox(
 
-                    width: 280,
+                    width:
+                        isMobile
+                            ? double.infinity
+                            : 270,
 
-                    height: 58,
+                    height:
+                        isMobile
+                            ? 52
+                            : 56,
 
                     child:
                         ElevatedButton(
@@ -164,12 +195,14 @@ class WelcomeScreen
                         foregroundColor:
                             Colors.white,
 
+                        elevation: 0,
+
                         shape:
                             RoundedRectangleBorder(
 
                           borderRadius:
                               BorderRadius.circular(
-                            18,
+                            16,
                           ),
                         ),
                       ),
@@ -189,13 +222,16 @@ class WelcomeScreen
                       },
 
                       child:
-                          const Text(
+                          Text(
 
                         'Login',
 
                         style: TextStyle(
 
-                          fontSize: 17,
+                          fontSize:
+                              isMobile
+                                  ? 15
+                                  : 16,
 
                           fontWeight:
                               FontWeight.bold,
@@ -205,7 +241,7 @@ class WelcomeScreen
                   ),
 
                   const SizedBox(
-                    height: 18,
+                    height: 16,
                   ),
 
                   // =====================================
@@ -214,9 +250,15 @@ class WelcomeScreen
 
                   SizedBox(
 
-                    width: 280,
+                    width:
+                        isMobile
+                            ? double.infinity
+                            : 270,
 
-                    height: 58,
+                    height:
+                        isMobile
+                            ? 52
+                            : 56,
 
                     child:
                         OutlinedButton(
@@ -238,7 +280,7 @@ class WelcomeScreen
 
                           borderRadius:
                               BorderRadius.circular(
-                            18,
+                            16,
                           ),
                         ),
                       ),
@@ -258,13 +300,16 @@ class WelcomeScreen
                       },
 
                       child:
-                          const Text(
+                          Text(
 
                         'Create Account',
 
                         style: TextStyle(
 
-                          fontSize: 16,
+                          fontSize:
+                              isMobile
+                                  ? 14
+                                  : 15,
 
                           fontWeight:
                               FontWeight.w600,
@@ -273,8 +318,11 @@ class WelcomeScreen
                     ),
                   ),
 
-                  const SizedBox(
-                    height: 45,
+                  SizedBox(
+                    height:
+                        isMobile
+                            ? 34
+                            : 42,
                   ),
 
                   // =====================================
@@ -293,6 +341,11 @@ class WelcomeScreen
 
                       letterSpacing:
                           1,
+
+                      fontSize:
+                          isMobile
+                              ? 11
+                              : 13,
                     ),
                   ),
                 ],

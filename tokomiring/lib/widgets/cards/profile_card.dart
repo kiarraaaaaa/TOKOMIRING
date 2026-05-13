@@ -13,10 +13,6 @@ class ProfileCard
 
   final VoidCallback? onTap;
 
-  // =====================================================
-  // CONSTRUCTOR
-  // =====================================================
-
   const ProfileCard({
 
     super.key,
@@ -81,7 +77,7 @@ class ProfileCard
 
         borderRadius:
             BorderRadius.circular(
-          30,
+          18,
         ),
 
         onTap:
@@ -91,7 +87,7 @@ class ProfileCard
 
           padding:
               const EdgeInsets.all(
-            24,
+            16,
           ),
 
           decoration:
@@ -102,7 +98,7 @@ class ProfileCard
 
             borderRadius:
                 BorderRadius.circular(
-              30,
+              18,
             ),
 
             boxShadow: [
@@ -112,16 +108,16 @@ class ProfileCard
                 color:
                     Colors.black
                         .withOpacity(
-                  0.05,
+                  0.025,
                 ),
 
                 blurRadius:
-                    20,
+                    10,
 
                 offset:
                     const Offset(
                   0,
-                  10,
+                  4,
                 ),
               ),
             ],
@@ -131,7 +127,7 @@ class ProfileCard
 
             crossAxisAlignment:
                 CrossAxisAlignment
-                    .start,
+                    .center,
 
             children: [
 
@@ -154,16 +150,16 @@ class ProfileCard
                       color:
                           roleColor
                               .withOpacity(
-                        0.25,
+                        0.12,
                       ),
 
                       blurRadius:
-                          18,
+                          8,
 
                       offset:
                           const Offset(
                         0,
-                        8,
+                        3,
                       ),
                     ),
                   ],
@@ -171,7 +167,7 @@ class ProfileCard
 
                 child: CircleAvatar(
 
-                  radius: 46,
+                  radius: 30,
 
                   backgroundColor:
                       Colors.grey
@@ -195,7 +191,7 @@ class ProfileCard
 
                               Icons.person_rounded,
 
-                              size: 42,
+                              size: 28,
 
                               color:
                                   Colors.grey
@@ -207,7 +203,7 @@ class ProfileCard
               ),
 
               const SizedBox(
-                width: 22,
+                width: 14,
               ),
 
               // =====================================
@@ -241,7 +237,7 @@ class ProfileCard
                       style:
                           const TextStyle(
 
-                        fontSize: 24,
+                        fontSize: 16,
 
                         fontWeight:
                             FontWeight.bold,
@@ -249,7 +245,7 @@ class ProfileCard
                     ),
 
                     const SizedBox(
-                      height: 8,
+                      height: 2,
                     ),
 
                     // ===============================
@@ -260,6 +256,12 @@ class ProfileCard
 
                       '@${user.username}',
 
+                      maxLines: 1,
+
+                      overflow:
+                          TextOverflow
+                              .ellipsis,
+
                       style:
                           TextStyle(
 
@@ -267,12 +269,12 @@ class ProfileCard
                             Colors.grey
                                 .shade700,
 
-                        fontSize: 15,
+                        fontSize: 11,
                       ),
                     ),
 
                     const SizedBox(
-                      height: 10,
+                      height: 8,
                     ),
 
                     // ===============================
@@ -287,7 +289,7 @@ class ProfileCard
 
                           Icons.email_outlined,
 
-                          size: 18,
+                          size: 14,
 
                           color:
                               Colors.grey
@@ -295,7 +297,7 @@ class ProfileCard
                         ),
 
                         const SizedBox(
-                          width: 8,
+                          width: 5,
                         ),
 
                         Expanded(
@@ -313,6 +315,8 @@ class ProfileCard
                             style:
                                 TextStyle(
 
+                              fontSize: 11,
+
                               color:
                                   Colors.grey
                                       .shade700,
@@ -323,132 +327,162 @@ class ProfileCard
                     ),
 
                     const SizedBox(
-                      height: 18,
+                      height: 10,
                     ),
 
                     // ===============================
-                    // ROLE BADGE
+                    // BADGES
                     // ===============================
 
-                    Container(
+                    Wrap(
 
-                      padding:
-                          const EdgeInsets.symmetric(
+                      spacing: 8,
 
-                        horizontal: 14,
+                      runSpacing: 8,
 
-                        vertical: 10,
-                      ),
+                      children: [
 
-                      decoration:
-                          BoxDecoration(
+                        Container(
 
-                        color:
-                            roleColor
-                                .withOpacity(
-                          0.1,
-                        ),
+                          padding:
+                              const EdgeInsets.symmetric(
 
-                        borderRadius:
-                            BorderRadius.circular(
-                          16,
-                        ),
-                      ),
+                            horizontal: 10,
 
-                      child: Row(
+                            vertical: 6,
+                          ),
 
-                        mainAxisSize:
-                            MainAxisSize.min,
-
-                        children: [
-
-                          Icon(
-
-                            getRoleIcon(),
-
-                            size: 18,
+                          decoration:
+                              BoxDecoration(
 
                             color:
-                                roleColor,
-                          ),
+                                roleColor
+                                    .withOpacity(
+                              0.1,
+                            ),
 
-                          const SizedBox(
-                            width: 8,
-                          ),
-
-                          Text(
-
-                            user.role
-                                .toUpperCase(),
-
-                            style:
-                                TextStyle(
-
-                              fontWeight:
-                                  FontWeight.bold,
-
-                              color:
-                                  roleColor,
-
-                              letterSpacing:
-                                  0.5,
+                            borderRadius:
+                                BorderRadius.circular(
+                              10,
                             ),
                           ),
-                        ],
-                      ),
-                    ),
 
-                    // ===============================
-                    // STATUS
-                    // ===============================
+                          child: Row(
 
-                    if (user.isActive) ...[
+                            mainAxisSize:
+                                MainAxisSize.min,
 
-                      const SizedBox(
-                        height: 14,
-                      ),
+                            children: [
 
-                      Row(
+                              Icon(
 
-                        children: [
+                                getRoleIcon(),
+
+                                size: 13,
+
+                                color:
+                                    roleColor,
+                              ),
+
+                              const SizedBox(
+                                width: 4,
+                              ),
+
+                              Text(
+
+                                user.role
+                                    .toUpperCase(),
+
+                                style:
+                                    TextStyle(
+
+                                  fontSize: 10,
+
+                                  fontWeight:
+                                      FontWeight.bold,
+
+                                  color:
+                                      roleColor,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        if (user.isActive)
 
                           Container(
 
-                            width: 10,
+                            padding:
+                                const EdgeInsets.symmetric(
 
-                            height: 10,
+                              horizontal: 10,
+
+                              vertical: 6,
+                            ),
 
                             decoration:
-                                const BoxDecoration(
+                                BoxDecoration(
 
                               color:
-                                  AppColors.success,
+                                  AppColors
+                                      .success
+                                      .withOpacity(
+                                0.1,
+                              ),
 
-                              shape:
-                                  BoxShape.circle,
+                              borderRadius:
+                                  BorderRadius.circular(
+                                10,
+                              ),
+                            ),
+
+                            child: const Row(
+
+                              mainAxisSize:
+                                  MainAxisSize.min,
+
+                              children: [
+
+                                Icon(
+
+                                  Icons
+                                      .check_circle,
+
+                                  size: 13,
+
+                                  color:
+                                      AppColors
+                                          .success,
+                                ),
+
+                                SizedBox(
+                                  width: 4,
+                                ),
+
+                                Text(
+
+                                  'ACTIVE',
+
+                                  style:
+                                      TextStyle(
+
+                                    fontSize:
+                                        10,
+
+                                    fontWeight:
+                                        FontWeight.bold,
+
+                                    color:
+                                        AppColors
+                                            .success,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-
-                          const SizedBox(
-                            width: 8,
-                          ),
-
-                          const Text(
-
-                            'Active Account',
-
-                            style: TextStyle(
-
-                              color:
-                                  AppColors.success,
-
-                              fontWeight:
-                                  FontWeight.w600,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+                      ],
+                    ),
                   ],
                 ),
               ),

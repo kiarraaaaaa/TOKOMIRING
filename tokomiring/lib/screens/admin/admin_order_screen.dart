@@ -1,16 +1,3 @@
-// =====================================================
-// FULL FINAL FIX
-// lib/screens/admin/admin_order_screen.dart
-// FIX:
-// ✅ initializeOrders VOID ERROR
-// ✅ REALTIME REPORTS
-// ✅ REALTIME SOLD
-// ✅ REALTIME TOP SELLING
-// ✅ REALTIME CHART
-// ✅ OVERFLOW FIX
-// ✅ RESPONSIVE FIX
-// =====================================================
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -59,15 +46,13 @@ class _AdminOrderScreenState
     WidgetsBinding.instance
         .addPostFrameCallback((_) {
 
-      Provider.of<OrderProvider>(
-        context,
-        listen: false,
-      ).initializeOrders();
+      context
+          .read<OrderProvider>()
+          .initializeOrders();
 
-      Provider.of<ProductProvider>(
-        context,
-        listen: false,
-      ).initializeProducts();
+      context
+          .read<ProductProvider>()
+          .initializeProducts();
     });
   }
 
@@ -203,23 +188,11 @@ class _AdminOrderScreenState
                   () async {
 
                 final orderProvider =
-                    Provider.of<OrderProvider>(
-
-                  context,
-
-                  listen: false,
-                );
-
-                final productProvider =
-                    Provider.of<ProductProvider>(
-
-                  context,
-
-                  listen: false,
-                );
+                    context.read<
+                        OrderProvider>();
 
                 // =====================================
-                // UPDATE STATUS
+                // UPDATE ORDER STATUS REALTIME
                 // =====================================
 
                 await orderProvider
@@ -233,40 +206,10 @@ class _AdminOrderScreenState
                 );
 
                 // =====================================
-                // COMPLETED = UPDATE SOLD
+                // REFRESH ORDERS REALTIME
                 // =====================================
 
-                if (selectedStatus
-                            .toLowerCase() ==
-                        'completed' &&
-
-                    order.status
-                            .toLowerCase() !=
-                        'completed') {
-
-                  for (final item
-                      in order.items) {
-
-                    await productProvider
-                        .increaseSold(
-
-                      productId:
-                          item.productId,
-
-                      quantity:
-                          item.quantity,
-                    );
-                  }
-
-                  await productProvider
-                      .refreshProducts();
-                }
-
-                // =====================================
-                // REFRESH
-                // =====================================
-
-                orderProvider
+                await orderProvider
                     .initializeOrders();
 
                 if (!mounted) {
@@ -281,11 +224,28 @@ class _AdminOrderScreenState
                   context,
                 ).showSnackBar(
 
-                  const SnackBar(
+                  SnackBar(
+
+                    backgroundColor:
+                        Colors.green,
+
+                    behavior:
+                        SnackBarBehavior
+                            .floating,
+
+                    shape:
+                        RoundedRectangleBorder(
+
+                      borderRadius:
+                          BorderRadius.circular(
+                        16,
+                      ),
+                    ),
 
                     content:
                         Text(
-                      'Order updated successfully',
+
+                      'Order updated to $selectedStatus',
                     ),
                   ),
                 );
@@ -315,9 +275,8 @@ class _AdminOrderScreenState
   ) {
 
     final provider =
-        Provider.of<OrderProvider>(
-      context,
-    );
+        context.watch<
+            OrderProvider>();
 
     final allOrders =
         provider.orders;
@@ -358,14 +317,14 @@ class _AdminOrderScreenState
       analyticsCount = 2;
     }
 
-    return Container(
+    return Scaffold(
 
-      color:
+      backgroundColor:
           const Color(
         0xffF8FAFC,
       ),
 
-      child:
+      body:
           SingleChildScrollView(
 
         physics:
@@ -378,6 +337,7 @@ class _AdminOrderScreenState
 
         child:
             Column(
+
           crossAxisAlignment:
               CrossAxisAlignment
                   .start,
@@ -423,10 +383,6 @@ class _AdminOrderScreenState
             const SizedBox(
               height: 30,
             ),
-
-            // =========================================
-            // ANALYTICS
-            // =========================================
 
             GridView.builder(
 
@@ -579,10 +535,6 @@ class _AdminOrderScreenState
               height: 30,
             ),
 
-            // =========================================
-            // FILTER
-            // =========================================
-
             SizedBox(
 
               height: 56,
@@ -702,10 +654,6 @@ class _AdminOrderScreenState
               height: 30,
             ),
 
-            // =========================================
-            // ORDER LIST
-            // =========================================
-
             if (filteredOrders
                 .isEmpty)
 
@@ -775,10 +723,6 @@ class _AdminOrderScreenState
     );
   }
 
-  // =====================================================
-  // ORDER CARD
-  // =====================================================
-
   Widget orderCard(
     OrderModel order,
   ) {
@@ -813,26 +757,6 @@ class _AdminOrderScreenState
             BorderRadius.circular(
           28,
         ),
-
-        boxShadow: [
-
-          BoxShadow(
-
-            color:
-                Colors.black
-                    .withOpacity(
-              0.03,
-            ),
-
-            blurRadius: 12,
-
-            offset:
-                const Offset(
-              0,
-              4,
-            ),
-          ),
-        ],
       ),
 
       child:
@@ -840,6 +764,7 @@ class _AdminOrderScreenState
           mobile
 
               ? Column(
+
                   crossAxisAlignment:
                       CrossAxisAlignment
                           .start,
@@ -882,6 +807,35 @@ class _AdminOrderScreenState
 
                     Text(
                       'Rp ${order.totalPrice.toStringAsFixed(0)}',
+                    ),
+
+                    const SizedBox(
+                      height: 20,
+                    ),
+
+                    ...order.items.map(
+                      (
+                        item,
+                      ) {
+
+                        return Padding(
+
+                          padding:
+                              const EdgeInsets.only(
+                            bottom: 8,
+                          ),
+
+                          child: Text(
+
+                            '${item.productName} x${item.quantity}',
+
+                            style:
+                                const TextStyle(
+                              fontSize: 14,
+                            ),
+                          ),
+                        );
+                      },
                     ),
 
                     const SizedBox(
@@ -935,10 +889,11 @@ class _AdminOrderScreenState
                   children: [
 
                     Expanded(
-                      flex: 3,
+                      flex: 4,
 
                       child:
                           Column(
+
                         crossAxisAlignment:
                             CrossAxisAlignment
                                 .start,
@@ -965,6 +920,30 @@ class _AdminOrderScreenState
 
                           SelectableText(
                             'Order #${order.orderId}',
+                          ),
+
+                          const SizedBox(
+                            height: 10,
+                          ),
+
+                          ...order.items.map(
+                            (
+                              item,
+                            ) {
+
+                              return Padding(
+
+                                padding:
+                                    const EdgeInsets.only(
+                                  bottom: 6,
+                                ),
+
+                                child: Text(
+
+                                  '${item.productName} x${item.quantity}',
+                                ),
+                              );
+                            },
                           ),
                         ],
                       ),
@@ -1031,10 +1010,6 @@ class _AdminOrderScreenState
     );
   }
 
-  // =====================================================
-  // ANALYTICS CARD
-  // =====================================================
-
   Widget analyticsCard(
 
     String title,
@@ -1063,30 +1038,11 @@ class _AdminOrderScreenState
             BorderRadius.circular(
           28,
         ),
-
-        boxShadow: [
-
-          BoxShadow(
-
-            color:
-                Colors.black
-                    .withOpacity(
-              0.03,
-            ),
-
-            blurRadius: 10,
-
-            offset:
-                const Offset(
-              0,
-              4,
-            ),
-          ),
-        ],
       ),
 
       child:
           Column(
+
         crossAxisAlignment:
             CrossAxisAlignment
                 .start,
@@ -1129,12 +1085,6 @@ class _AdminOrderScreenState
 
             '$value',
 
-            maxLines: 1,
-
-            overflow:
-                TextOverflow
-                    .ellipsis,
-
             style:
                 const TextStyle(
 
@@ -1149,24 +1099,7 @@ class _AdminOrderScreenState
             height: 6,
           ),
 
-          Text(
-
-            title,
-
-            maxLines: 1,
-
-            overflow:
-                TextOverflow
-                    .ellipsis,
-
-            style:
-                TextStyle(
-
-              color:
-                  Colors.grey
-                      .shade700,
-            ),
-          ),
+          Text(title),
         ],
       ),
     );

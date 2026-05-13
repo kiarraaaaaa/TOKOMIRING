@@ -8,6 +8,10 @@ class StorageService {
   final FirebaseStorage _storage =
       FirebaseStorage.instance;
 
+  // =====================================================
+  // PICK IMAGE
+  // =====================================================
+
   Future<PlatformFile?> pickImage()
       async {
 
@@ -25,6 +29,9 @@ class StorageService {
 
         withData:
             true,
+
+        allowCompression:
+            true,
       );
 
       if (result == null ||
@@ -36,10 +43,6 @@ class StorageService {
       final file =
           result.files.first;
 
-      // ===============================================
-      // EMPTY IMAGE
-      // ===============================================
-
       if (file.bytes == null ||
           file.bytes!.isEmpty) {
 
@@ -47,10 +50,6 @@ class StorageService {
           'Image bytes not found',
         );
       }
-
-      // ===============================================
-      // INVALID EXTENSION
-      // ===============================================
 
       final extension =
           file.extension
@@ -71,6 +70,17 @@ class StorageService {
 
         throw Exception(
           'Invalid image format',
+        );
+      }
+
+      final sizeInMb =
+          file.size /
+              (1024 * 1024);
+
+      if (sizeInMb > 10) {
+
+        throw Exception(
+          'Image max 10MB',
         );
       }
 
@@ -130,6 +140,9 @@ class StorageService {
 
         contentType:
             'image/jpeg',
+
+        cacheControl:
+            'public,max-age=3600',
       );
 
       final snapshot =
@@ -201,6 +214,9 @@ class StorageService {
 
         contentType:
             'image/jpeg',
+
+        cacheControl:
+            'public,max-age=3600',
       );
 
       final uploadTask =
@@ -274,6 +290,9 @@ class StorageService {
 
         contentType:
             'image/jpeg',
+
+        cacheControl:
+            'public,max-age=3600',
       );
 
       final uploadTask =
@@ -348,6 +367,9 @@ class StorageService {
 
         contentType:
             'image/jpeg',
+
+        cacheControl:
+            'public,max-age=3600',
       );
 
       final uploadTask =
@@ -389,10 +411,6 @@ class StorageService {
 
         return;
       }
-
-      // ===============================================
-      // SAFE URL
-      // ===============================================
 
       if (!imageUrl.startsWith(
         'https://',
@@ -473,6 +491,9 @@ class StorageService {
 
         contentType:
             'image/jpeg',
+
+        cacheControl:
+            'public,max-age=3600',
       );
 
       final uploadTask =

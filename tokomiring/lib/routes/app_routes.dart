@@ -188,7 +188,7 @@ class AppRoutes {
 
         return MaterialPageRoute(
           builder: (_) =>
-               AdminDashboardScreen(),
+              const AdminDashboardScreen(),
         );
 
       case adminProducts:

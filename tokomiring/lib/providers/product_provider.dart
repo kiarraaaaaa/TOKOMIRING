@@ -1,14 +1,3 @@
-// =====================================================
-// FULL REVISED VERSION
-// lib/providers/product_provider.dart
-// FIX:
-// ✅ REALTIME TOP SELLING
-// ✅ REALTIME SOLD UPDATE
-// ✅ REALTIME REPORTS
-// ✅ AUTO REFRESH PRODUCTS
-// ✅ CHART LIVE UPDATE
-// =====================================================
-
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -56,6 +45,12 @@ class ProductProvider
   List<ProductModel> get products {
 
     return _filteredProducts;
+  }
+
+  List<ProductModel>
+      get allProducts {
+
+    return _products;
   }
 
   bool get isLoading =>
@@ -159,10 +154,6 @@ class ProductProvider
     _productSubscription
         ?.cancel();
 
-    // ===================================================
-    // REALTIME LISTENER
-    // ===================================================
-
     _productSubscription =
         _databaseService
             .getProducts()
@@ -171,6 +162,18 @@ class ProductProvider
       (data) {
 
         _products = data;
+
+        _products.sort(
+          (
+            a,
+            b,
+          ) {
+
+            return b.sold.compareTo(
+              a.sold,
+            );
+          },
+        );
 
         _applyFilters();
 
@@ -216,6 +219,18 @@ class ProductProvider
         (data) {
 
           _products = data;
+
+          _products.sort(
+            (
+              a,
+              b,
+            ) {
+
+              return b.sold.compareTo(
+                a.sold,
+              );
+            },
+          );
 
           _applyFilters();
 
@@ -274,10 +289,6 @@ class ProductProvider
       _products,
     );
 
-    // ===================================================
-    // CATEGORY
-    // ===================================================
-
     if (_selectedCategory !=
         'All') {
 
@@ -296,10 +307,6 @@ class ProductProvider
           )
           .toList();
     }
-
-    // ===================================================
-    // SEARCH
-    // ===================================================
 
     if (_searchQuery
         .isNotEmpty) {
@@ -689,7 +696,7 @@ class ProductProvider
   }
 
   // =====================================================
-  // UPDATE SOLD
+  // REALTIME SOLD FROM ORDERS ONLY
   // =====================================================
 
   Future<void> increaseSold({
@@ -700,47 +707,10 @@ class ProductProvider
 
   }) async {
 
-    try {
-
-      final index =
-          _products.indexWhere(
-        (
-          product,
-        ) {
-
-          return product.id ==
-              productId;
-        },
-      );
-
-      if (index == -1) {
-        return;
-      }
-
-      final current =
-          _products[index];
-
-      final updated =
-          current.copyWith(
-
-        sold:
-            current.sold +
-                quantity,
-      );
-
-      _products[index] =
-          updated;
-
-      await _databaseService
-          .updateProduct(
-        updated,
-      );
-
-      _applyFilters();
-
-      notifyListeners();
-
-    } catch (_) {}
+    // DISABLED
+    // SOLD NOW CALCULATED
+    // FROM COMPLETED ORDERS
+    // IN REALTIME REPORT
   }
 
   // =====================================================

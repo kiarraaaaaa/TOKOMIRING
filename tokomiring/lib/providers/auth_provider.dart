@@ -1,7 +1,9 @@
 // =====================================================
 // lib/providers/auth_provider.dart
-// FULL FIXED VERSION
+// REALTIME STABLE VERSION
 // =====================================================
+
+import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -29,6 +31,12 @@ class AuthProvider
   bool _isLoggedIn = false;
 
   String? _errorMessage;
+
+  StreamSubscription?
+      _userSubscription;
+
+  bool _isRefreshing =
+      false;
 
   // =====================================================
   // GETTERS
@@ -92,7 +100,28 @@ class AuthProvider
 
           _isLoggedIn =
               true;
+
+          notifyListeners();
         }
+
+        // ===============================================
+        // STABLE REALTIME LISTENER
+        // ===============================================
+
+        await _userSubscription
+            ?.cancel();
+
+        _userSubscription =
+
+            FirebaseAuth
+                .instance
+                .userChanges()
+                .listen((_) async {
+
+          await refreshUser(
+            silent: true,
+          );
+        });
       }
 
       else {
@@ -102,6 +131,8 @@ class AuthProvider
 
         _isLoggedIn =
             false;
+
+        notifyListeners();
       }
 
     } catch (e) {
@@ -175,9 +206,9 @@ class AuthProvider
 
         _users[index] =
             user;
-      }
 
-      notifyListeners();
+        notifyListeners();
+      }
 
     } catch (e) {
 
@@ -359,6 +390,10 @@ class AuthProvider
 
       _setLoading(true);
 
+      // ===============================================
+      // UPDATE FIREBASE
+      // ===============================================
+
       await _authService
           .updateProfile(
 
@@ -381,26 +416,45 @@ class AuthProvider
             photoUrl,
       );
 
+      // ===============================================
+      // INSTANT LOCAL UPDATE
+      // ===============================================
+
       _userModel =
           _userModel!.copyWith(
 
         name:
-            name,
+            name.trim(),
 
         username:
-            username,
+            username.trim(),
 
         phone:
-            phone,
+            phone.trim(),
 
         address:
-            address,
+            address.trim(),
 
         photoUrl:
             photoUrl,
       );
 
+      // ===============================================
+      // INSTANT REALTIME UPDATE
+      // ===============================================
+
       notifyListeners();
+
+      // ===============================================
+      // BACKGROUND REFRESH
+      // ===============================================
+
+      Future.microtask(() async {
+
+        await refreshUser(
+          silent: true,
+        );
+      });
 
       return true;
 
@@ -472,6 +526,9 @@ class AuthProvider
     try {
 
       _setLoading(true);
+
+      await _userSubscription
+          ?.cancel();
 
       await _authService
           .logout();
@@ -556,14 +613,24 @@ class AuthProvider
   // REFRESH USER
   // =====================================================
 
-  Future<void> refreshUser()
-      async {
+  Future<void> refreshUser({
+
+    bool silent = false,
+
+  }) async {
 
     try {
 
       if (_userModel == null) {
         return;
       }
+
+      if (_isRefreshing) {
+        return;
+      }
+
+      _isRefreshing =
+          true;
 
       final userData =
           await _authService
@@ -573,10 +640,46 @@ class AuthProvider
 
       if (userData != null) {
 
-        _userModel =
-            userData;
+        final changed =
 
-        notifyListeners();
+            userData.name !=
+                    _userModel!.name ||
+
+                userData.photoUrl !=
+                    _userModel!
+                        .photoUrl ||
+
+                userData.username !=
+                    _userModel!
+                        .username ||
+
+                userData.phone !=
+                    _userModel!
+                        .phone ||
+
+                userData.address !=
+                    _userModel!
+                        .address;
+
+        if (changed) {
+
+          _userModel =
+              userData;
+
+          if (!silent) {
+
+            notifyListeners();
+
+          } else {
+
+            WidgetsBinding
+                .instance
+                .addPostFrameCallback((_) {
+
+              notifyListeners();
+            });
+          }
+        }
       }
 
     } catch (e) {
@@ -588,7 +691,10 @@ class AuthProvider
         e.toString(),
       );
 
-      notifyListeners();
+    } finally {
+
+      _isRefreshing =
+          false;
     }
   }
 
@@ -610,5 +716,14 @@ class AuthProvider
 
     _errorMessage =
         null;
+  }
+
+  @override
+  void dispose() {
+
+    _userSubscription
+        ?.cancel();
+
+    super.dispose();
   }
 }

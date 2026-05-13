@@ -63,35 +63,52 @@ class UserModel {
           uid,
 
       name:
-          map['name'] ?? '',
+          map['name']
+                  ?.toString() ??
+              '',
 
       username:
-          map['username'] ?? '',
+          map['username']
+                  ?.toString() ??
+              '',
 
       email:
-          map['email'] ?? '',
+          map['email']
+                  ?.toString() ??
+              '',
 
       role:
-          map['role'] ?? 'user',
+          map['role']
+                  ?.toString() ??
+              'user',
 
       photoUrl:
-          map['photoUrl'] ?? '',
+          map['photoUrl']
+                  ?.toString() ??
+              '',
 
       phone:
-          map['phone'] ?? '',
+          map['phone']
+                  ?.toString() ??
+              '',
 
       address:
-          map['address'] ?? '',
+          map['address']
+                  ?.toString() ??
+              '',
 
       isActive:
-          map['isActive'] ?? true,
+          map['isActive'] ??
+              true,
 
       createdAt:
           DateTime.tryParse(
+
                 map['createdAt']
                         ?.toString() ??
                     '',
               ) ??
+
               DateTime.now(),
     );
   }
@@ -108,13 +125,13 @@ class UserModel {
           uid,
 
       'name':
-          name,
+          name.trim(),
 
       'username':
-          username,
+          username.trim(),
 
       'email':
-          email,
+          email.trim(),
 
       'role':
           role,
@@ -152,25 +169,66 @@ class UserModel {
   // =====================================================
 
   bool get hasPhoto =>
-      photoUrl.isNotEmpty;
+
+      photoUrl
+          .trim()
+          .isNotEmpty;
 
   bool get hasPhone =>
-      phone.isNotEmpty;
+
+      phone
+          .trim()
+          .isNotEmpty;
 
   bool get hasAddress =>
-      address.isNotEmpty;
+
+      address
+          .trim()
+          .isNotEmpty;
 
   // =====================================================
-  // DISPLAY NAME
+  // DISPLAY NAME REALTIME
   // =====================================================
 
   String get displayName {
 
-    if (name.isNotEmpty) {
-      return name;
+    final cleanName =
+        name.trim();
+
+    final cleanUsername =
+        username.trim();
+
+    if (cleanName
+        .isNotEmpty) {
+
+      return cleanName;
     }
 
-    return username;
+    if (cleanUsername
+        .isNotEmpty) {
+
+      return cleanUsername;
+    }
+
+    return 'Administrator';
+  }
+
+  // =====================================================
+  // PHOTO REALTIME
+  // =====================================================
+
+  String get safePhotoUrl {
+
+    final cleanPhoto =
+        photoUrl.trim();
+
+    if (cleanPhoto
+        .isEmpty) {
+
+      return '';
+    }
+
+    return cleanPhoto;
   }
 
   // =====================================================
@@ -210,7 +268,8 @@ class UserModel {
           name ?? this.name,
 
       username:
-          username ?? this.username,
+          username ??
+              this.username,
 
       email:
           email ?? this.email,
@@ -219,20 +278,87 @@ class UserModel {
           role ?? this.role,
 
       photoUrl:
-          photoUrl ?? this.photoUrl,
+          photoUrl ??
+              this.photoUrl,
 
       phone:
           phone ?? this.phone,
 
       address:
-          address ?? this.address,
+          address ??
+              this.address,
 
       isActive:
-          isActive ?? this.isActive,
+          isActive ??
+              this.isActive,
 
       createdAt:
           createdAt ??
               this.createdAt,
     );
+  }
+
+  // =====================================================
+  // EQUALITY
+  // =====================================================
+
+  @override
+  bool operator ==(
+    Object other,
+  ) {
+
+    if (identical(
+      this,
+      other,
+    )) {
+
+      return true;
+    }
+
+    return other is UserModel &&
+
+        other.uid == uid &&
+
+        other.name == name &&
+
+        other.username ==
+            username &&
+
+        other.email == email &&
+
+        other.role == role &&
+
+        other.photoUrl ==
+            photoUrl &&
+
+        other.phone == phone &&
+
+        other.address ==
+            address &&
+
+        other.isActive ==
+            isActive;
+  }
+
+  @override
+  int get hashCode {
+
+    return uid.hashCode ^
+
+        name.hashCode ^
+
+        username.hashCode ^
+
+        email.hashCode ^
+
+        role.hashCode ^
+
+        photoUrl.hashCode ^
+
+        phone.hashCode ^
+
+        address.hashCode ^
+
+        isActive.hashCode;
   }
 }

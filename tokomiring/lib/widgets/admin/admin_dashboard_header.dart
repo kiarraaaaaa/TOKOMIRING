@@ -38,7 +38,7 @@ class _AdminDashboardHeaderState
 
       duration:
           const Duration(
-        milliseconds: 700,
+        milliseconds: 500,
       ),
     );
 
@@ -58,7 +58,7 @@ class _AdminDashboardHeaderState
       begin:
           const Offset(
         0,
-        -0.15,
+        -0.08,
       ),
 
       end:
@@ -140,8 +140,8 @@ class _AdminDashboardHeaderState
           padding:
               EdgeInsets.all(
             isMobile
-                ? 20
-                : 24,
+                ? 16
+                : 18,
           ),
 
           decoration:
@@ -152,7 +152,7 @@ class _AdminDashboardHeaderState
 
             borderRadius:
                 BorderRadius.circular(
-              30,
+              24,
             ),
 
             boxShadow: [
@@ -162,16 +162,16 @@ class _AdminDashboardHeaderState
                 color:
                     Colors.black
                         .withOpacity(
-                  0.04,
+                  0.03,
                 ),
 
                 blurRadius:
-                    16,
+                    12,
 
                 offset:
                     const Offset(
                   0,
-                  8,
+                  6,
                 ),
               ),
             ],
@@ -221,7 +221,7 @@ class _AdminDashboardHeaderState
                 style:
                     const TextStyle(
 
-                  fontSize: 28,
+                  fontSize: 22,
 
                   fontWeight:
                       FontWeight.bold,
@@ -229,7 +229,7 @@ class _AdminDashboardHeaderState
               ),
 
               const SizedBox(
-                height: 8,
+                height: 5,
               ),
 
               Text(
@@ -247,7 +247,7 @@ class _AdminDashboardHeaderState
                       Colors.grey
                           .shade600,
 
-                  fontSize: 14,
+                  fontSize: 12,
                 ),
               ),
             ],
@@ -255,7 +255,7 @@ class _AdminDashboardHeaderState
         ),
 
         const SizedBox(
-          width: 24,
+          width: 18,
         ),
 
         // ===============================================
@@ -265,7 +265,7 @@ class _AdminDashboardHeaderState
         notificationButton(),
 
         const SizedBox(
-          width: 16,
+          width: 12,
         ),
 
         profileCard(),
@@ -305,9 +305,9 @@ class _AdminDashboardHeaderState
 
                   child: Container(
 
-                    width: 50,
+                    width: 42,
 
-                    height: 50,
+                    height: 42,
 
                     decoration:
                         BoxDecoration(
@@ -319,13 +319,14 @@ class _AdminDashboardHeaderState
 
                       borderRadius:
                           BorderRadius.circular(
-                        16,
+                        14,
                       ),
                     ),
 
                     child:
                         const Icon(
                       Icons.menu_rounded,
+                      size: 20,
                     ),
                   ),
                 );
@@ -333,7 +334,7 @@ class _AdminDashboardHeaderState
             ),
 
             const SizedBox(
-              width: 16,
+              width: 14,
             ),
 
             Expanded(
@@ -355,7 +356,7 @@ class _AdminDashboardHeaderState
                     style:
                         const TextStyle(
 
-                      fontSize: 20,
+                      fontSize: 18,
 
                       fontWeight:
                           FontWeight.bold,
@@ -363,7 +364,7 @@ class _AdminDashboardHeaderState
                   ),
 
                   const SizedBox(
-                    height: 4,
+                    height: 2,
                   ),
 
                   Text(
@@ -381,7 +382,7 @@ class _AdminDashboardHeaderState
                           Colors.grey
                               .shade600,
 
-                      fontSize: 13,
+                      fontSize: 11,
                     ),
                   ),
                 ],
@@ -393,7 +394,7 @@ class _AdminDashboardHeaderState
         ),
 
         const SizedBox(
-          height: 22,
+          height: 18,
         ),
 
         profileCard(
@@ -419,9 +420,9 @@ class _AdminDashboardHeaderState
             milliseconds: 250,
           ),
 
-          width: 56,
+          width: 48,
 
-          height: 56,
+          height: 48,
 
           decoration:
               BoxDecoration(
@@ -433,27 +434,28 @@ class _AdminDashboardHeaderState
 
             borderRadius:
                 BorderRadius.circular(
-              18,
+              16,
             ),
           ),
 
           child: const Icon(
             Icons
                 .notifications_rounded,
+            size: 22,
           ),
         ),
 
         Positioned(
 
-          top: 10,
+          top: 8,
 
-          right: 10,
+          right: 8,
 
           child: Container(
 
-            width: 12,
+            width: 10,
 
-            height: 12,
+            height: 10,
 
             decoration:
                 const BoxDecoration(
@@ -490,13 +492,13 @@ class _AdminDashboardHeaderState
 
         horizontal:
             mobile
-                ? 16
-                : 18,
+                ? 14
+                : 16,
 
         vertical:
             mobile
-                ? 12
-                : 14,
+                ? 10
+                : 12,
       ),
 
       decoration:
@@ -521,7 +523,7 @@ class _AdminDashboardHeaderState
 
         borderRadius:
             BorderRadius.circular(
-          22,
+          18,
         ),
       ),
 
@@ -535,7 +537,7 @@ class _AdminDashboardHeaderState
                     avatar(),
 
                     const SizedBox(
-                      width: 14,
+                      width: 12,
                     ),
 
                     Expanded(
@@ -561,12 +563,12 @@ class _AdminDashboardHeaderState
                                   FontWeight.bold,
 
                               fontSize:
-                                  15,
+                                  13,
                             ),
                           ),
 
                           const SizedBox(
-                            height: 4,
+                            height: 2,
                           ),
 
                           Text(
@@ -585,7 +587,7 @@ class _AdminDashboardHeaderState
                                       .shade600,
 
                               fontSize:
-                                  12,
+                                  10,
                             ),
                           ),
                         ],
@@ -600,7 +602,7 @@ class _AdminDashboardHeaderState
                     avatar(),
 
                     const SizedBox(
-                      width: 14,
+                      width: 12,
                     ),
 
                     Column(
@@ -624,12 +626,12 @@ class _AdminDashboardHeaderState
                             fontWeight:
                                 FontWeight.bold,
 
-                            fontSize: 15,
+                            fontSize: 13,
                           ),
                         ),
 
                         const SizedBox(
-                          height: 4,
+                          height: 2,
                         ),
 
                         Text(
@@ -647,7 +649,7 @@ class _AdminDashboardHeaderState
                                 Colors.grey
                                     .shade600,
 
-                            fontSize: 12,
+                            fontSize: 10,
                           ),
                         ),
                       ],
@@ -665,9 +667,9 @@ class _AdminDashboardHeaderState
 
     return Container(
 
-      width: 50,
+      width: 42,
 
-      height: 50,
+      height: 42,
 
       decoration:
           const BoxDecoration(
@@ -698,6 +700,8 @@ class _AdminDashboardHeaderState
 
         color:
             Colors.white,
+
+        size: 20,
       ),
     );
   }

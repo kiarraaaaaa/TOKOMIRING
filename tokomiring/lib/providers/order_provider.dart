@@ -136,10 +136,6 @@ class OrderProvider
   Future<void>
       initializeOrders() async {
 
-    // ===============================================
-    // PREVENT MULTIPLE LISTENER
-    // ===============================================
-
     if (_initialized) {
       return;
     }
@@ -153,10 +149,6 @@ class OrderProvider
     await _orderSubscription
         ?.cancel();
 
-    // ===============================================
-    // REALTIME STREAM
-    // ===============================================
-
     _orderSubscription =
         _databaseService
             .getOrders()
@@ -165,6 +157,19 @@ class OrderProvider
       (data) {
 
         _orders = data;
+
+        _orders.sort(
+          (
+            a,
+            b,
+          ) {
+
+            return b.createdAt
+                .compareTo(
+              a.createdAt,
+            );
+          },
+        );
 
         _setLoading(false);
 
@@ -208,6 +213,19 @@ class OrderProvider
         (data) {
 
           _orders = data;
+
+          _orders.sort(
+            (
+              a,
+              b,
+            ) {
+
+              return b.createdAt
+                  .compareTo(
+                a.createdAt,
+              );
+            },
+          );
 
           _setLoading(false);
 
@@ -402,7 +420,7 @@ class OrderProvider
       );
 
       // ===============================================
-      // UPDATE LOCAL
+      // UPDATE LOCAL REALTIME
       // ===============================================
 
       _orders[index] =
@@ -411,37 +429,7 @@ class OrderProvider
       );
 
       // ===============================================
-      // COMPLETED = UPDATE SOLD
-      // ===============================================
-
-      if (status
-                  .toLowerCase() ==
-              'completed' &&
-          oldOrder.status
-                  .toLowerCase() !=
-              'completed') {
-
-        for (final item
-            in oldOrder.items) {
-
-          try {
-
-            await _databaseService
-                .increaseProductSold(
-
-              productId:
-                  item.productId,
-
-              quantity:
-                  item.quantity,
-            );
-
-          } catch (_) {}
-        }
-      }
-
-      // ===============================================
-      // REFRESH
+      // REFRESH REALTIME
       // ===============================================
 
       await refreshOrders();

@@ -1,10 +1,9 @@
-// =====================================================
-// FULL FIXED VERSION
-// lib/screens/admin/admin_dashboard_screen.dart
-// NO CONST ERROR
-// =====================================================
-
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../../providers/auth_provider.dart';
+import '../../providers/order_provider.dart';
+import '../../providers/product_provider.dart';
 
 import '../../widgets/admin/admin_sidebar.dart';
 
@@ -13,15 +12,12 @@ import 'admin_order_screen.dart';
 import 'admin_sales_report_screen.dart';
 import 'admin_user_screen.dart';
 import 'admin_notification_screen.dart';
+import 'admin_profile_screen.dart';
 
 class AdminDashboardScreen
     extends StatefulWidget {
 
-  // ===================================================
-  // FIXED
-  // ===================================================
-
-  AdminDashboardScreen({
+  const AdminDashboardScreen({
     super.key,
   });
 
@@ -32,114 +28,37 @@ class AdminDashboardScreen
 }
 
 class _AdminDashboardScreenState
-    extends State<AdminDashboardScreen>
-    with TickerProviderStateMixin {
+    extends State<AdminDashboardScreen> {
 
   int selectedIndex = 0;
 
-  late AnimationController
-      _animationController;
-
-  late Animation<double>
-      _fadeAnimation;
-
-  @override
-  void initState() {
-
-    super.initState();
-
-    _animationController =
-        AnimationController(
-
-      vsync: this,
-
-      duration:
-          const Duration(
-        milliseconds: 400,
-      ),
-    );
-
-    _fadeAnimation =
-        CurvedAnimation(
-
-      parent:
-          _animationController,
-
-      curve:
-          Curves.easeInOut,
-    );
-
-    _animationController
-        .forward();
-  }
-
-  @override
-  void dispose() {
-
-    _animationController
-        .dispose();
-
-    super.dispose();
-  }
-
   // =====================================================
-  // SCREENS
+  // SCREEN
   // =====================================================
 
   Widget currentScreen() {
 
     switch (selectedIndex) {
 
-      // ===============================================
-      // DASHBOARD
-      // ===============================================
-
-      case 0:
-
-        return dashboardHome();
-
-      // ===============================================
-      // PRODUCTS
-      // ===============================================
-
       case 1:
-
-        return AdminProductScreen();
-
-      // ===============================================
-      // ORDERS
-      // ===============================================
+        return const AdminProductScreen();
 
       case 2:
-
-        return AdminOrderScreen();
-
-      // ===============================================
-      // REPORTS
-      // ===============================================
+        return const AdminOrderScreen();
 
       case 3:
-
-        return AdminSalesReportScreen();
-
-      // ===============================================
-      // USERS
-      // ===============================================
+        return const AdminSalesReportScreen();
 
       case 4:
-
-        return AdminUserScreen();
-
-      // ===============================================
-      // NOTIFICATIONS
-      // ===============================================
+        return const AdminUserScreen();
 
       case 5:
+        return const AdminNotificationScreen();
 
-        return AdminNotificationScreen();
+      case 6:
+        return const AdminProfileScreen();
 
       default:
-
         return dashboardHome();
     }
   }
@@ -150,295 +69,538 @@ class _AdminDashboardScreenState
 
   Widget dashboardHome() {
 
-    return FadeTransition(
+    final orderProvider =
+        context.watch<OrderProvider>();
 
-      opacity:
-          _fadeAnimation,
+    final productProvider =
+        context.watch<ProductProvider>();
 
-      child:
-          SingleChildScrollView(
+    final orders =
+        orderProvider.orders;
 
-        padding:
-            const EdgeInsets.all(
-          30,
-        ),
+    final products =
+        productProvider.allProducts;
 
-        child: Column(
-          crossAxisAlignment:
-              CrossAxisAlignment
-                  .start,
+    double revenue = 0;
 
-          children: [
+    int completedOrders = 0;
 
-            // =========================================
-            // HEADER
-            // =========================================
+    int pendingOrders = 0;
 
-            Row(
-              children: [
+    for (final order in orders) {
 
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment:
-                        CrossAxisAlignment
-                            .start,
+      if (order.status
+              .toLowerCase() ==
+          'completed') {
 
-                    children: [
+        revenue +=
+            order.totalPrice;
 
-                      Text(
+        completedOrders++;
+      }
 
-                        'Admin Dashboard',
+      if (order.status
+              .toLowerCase() !=
+          'completed') {
 
-                        style:
-                            TextStyle(
+        pendingOrders++;
+      }
+    }
 
-                          fontSize:
-                              MediaQuery.of(
-                                            context,
-                                          ).size.width <
-                                          700
+    return SingleChildScrollView(
 
-                                  ? 28
+      padding:
+          const EdgeInsets.all(
+        16,
+      ),
 
-                                  : 38,
+      child: Column(
 
-                          fontWeight:
-                              FontWeight.bold,
-                        ),
-                      ),
+        crossAxisAlignment:
+            CrossAxisAlignment
+                .start,
 
-                      const SizedBox(
-                        height: 10,
-                      ),
+        children: [
 
-                      Text(
+          Text(
 
-                        'Manage products, orders, reports, users and notifications.',
+            'Admin Dashboard',
 
-                        style:
-                            TextStyle(
+            style: TextStyle(
 
-                          color:
-                              Colors.grey
-                                  .shade600,
+              fontSize:
+                  MediaQuery.of(context)
+                              .size
+                              .width <
+                          700
 
-                          fontSize: 15,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                      ? 20
 
-                Container(
+                      : 26,
 
-                  padding:
-                      const EdgeInsets.all(
-                    18,
-                  ),
+              fontWeight:
+                  FontWeight.bold,
+            ),
+          ),
 
-                  decoration:
-                      BoxDecoration(
+          const SizedBox(
+            height: 4,
+          ),
+
+          Text(
+
+            'Realtime ecommerce analytics.',
+
+            style: TextStyle(
+
+              fontSize: 11,
+
+              color:
+                  Colors.grey.shade600,
+            ),
+          ),
+
+          const SizedBox(
+            height: 18,
+          ),
+
+          // =================================================
+          // STATS
+          // =================================================
+
+          LayoutBuilder(
+
+            builder:
+                (
+                  context,
+                  constraints,
+                ) {
+
+              int count = 4;
+
+              if (constraints
+                      .maxWidth <
+                  700) {
+
+                count = 1;
+
+              } else if (constraints
+                      .maxWidth <
+                  1100) {
+
+                count = 2;
+              }
+
+              return GridView.count(
+
+                crossAxisCount:
+                    count,
+
+                shrinkWrap: true,
+
+                physics:
+                    const NeverScrollableScrollPhysics(),
+
+                crossAxisSpacing:
+                    10,
+
+                mainAxisSpacing:
+                    10,
+
+                childAspectRatio:
+                    2.7,
+
+                children: [
+
+                  statsCard(
+
+                    title:
+                        'Revenue',
+
+                    value:
+                        'Rp ${revenue.toStringAsFixed(0)}',
+
+                    icon:
+                        Icons.payments_rounded,
 
                     color:
-                        Colors.white,
-
-                    borderRadius:
-                        BorderRadius.circular(
-                      24,
-                    ),
+                        Colors.green,
                   ),
 
-                  child: const Icon(
+                  statsCard(
 
-                    Icons
-                        .admin_panel_settings,
+                    title:
+                        'Transactions',
 
-                    size: 40,
+                    value:
+                        completedOrders
+                            .toString(),
+
+                    icon:
+                        Icons.receipt_long_rounded,
 
                     color:
                         Colors.blue,
                   ),
-                ),
-              ],
-            ),
 
-            const SizedBox(
-              height: 35,
-            ),
+                  statsCard(
 
-            // =========================================
-            // QUICK MENU
-            // =========================================
+                    title:
+                        'Products',
 
-            GridView(
+                    value:
+                        products.length
+                            .toString(),
 
-              shrinkWrap: true,
+                    icon:
+                        Icons.inventory_2_rounded,
 
-              physics:
-                  const NeverScrollableScrollPhysics(),
+                    color:
+                        Colors.orange,
+                  ),
 
-              gridDelegate:
-                  SliverGridDelegateWithFixedCrossAxisCount(
+                  statsCard(
+
+                    title:
+                        'Pending',
+
+                    value:
+                        pendingOrders
+                            .toString(),
+
+                    icon:
+                        Icons.access_time_rounded,
+
+                    color:
+                        Colors.red,
+                  ),
+                ],
+              );
+            },
+          ),
+
+          const SizedBox(
+            height: 18,
+          ),
+
+          // =================================================
+          // MENU GRID
+          // =================================================
+
+          LayoutBuilder(
+
+            builder:
+                (
+                  context,
+                  constraints,
+                ) {
+
+              int count = 3;
+
+              if (constraints
+                      .maxWidth <
+                  700) {
+
+                count = 1;
+
+              } else if (constraints
+                      .maxWidth <
+                  1050) {
+
+                count = 2;
+              }
+
+              return GridView.count(
 
                 crossAxisCount:
+                    count,
 
-                    MediaQuery.of(
-                                  context,
-                                ).size.width <
-                                700
+                shrinkWrap: true,
 
-                        ? 1
-
-                        : MediaQuery.of(
-                                      context,
-                                    ).size.width <
-                                    1200
-
-                            ? 2
-
-                            : 3,
+                physics:
+                    const NeverScrollableScrollPhysics(),
 
                 crossAxisSpacing:
-                    20,
+                    10,
 
                 mainAxisSpacing:
-                    20,
+                    10,
 
                 childAspectRatio:
-                    1.6,
-              ),
+                    2.05,
 
-              children: [
+                children: [
 
-                dashboardCard(
+                  dashboardCard(
+                    title: 'Products',
+                    subtitle:
+                        'Manage inventory',
+                    icon:
+                        Icons.inventory_2,
+                    color:
+                        Colors.blue,
+                    onTap: () {
 
-                  title:
-                      'Products',
+                      setState(() {
 
-                  subtitle:
-                      'Manage product inventory',
+                        selectedIndex =
+                            1;
+                      });
+                    },
+                  ),
 
-                  icon:
-                      Icons.inventory_2,
+                  dashboardCard(
+                    title: 'Orders',
+                    subtitle:
+                        'Customer orders',
+                    icon:
+                        Icons.shopping_bag,
+                    color:
+                        Colors.orange,
+                    onTap: () {
 
-                  color:
-                      Colors.blue,
+                      setState(() {
 
-                  onTap: () {
+                        selectedIndex =
+                            2;
+                      });
+                    },
+                  ),
 
-                    setState(() {
+                  dashboardCard(
+                    title: 'Reports',
+                    subtitle:
+                        'Sales analytics',
+                    icon:
+                        Icons.bar_chart,
+                    color:
+                        Colors.green,
+                    onTap: () {
 
-                      selectedIndex =
-                          1;
-                    });
-                  },
-                ),
+                      setState(() {
 
-                dashboardCard(
+                        selectedIndex =
+                            3;
+                      });
+                    },
+                  ),
 
-                  title:
-                      'Orders',
+                  dashboardCard(
+                    title: 'Users',
+                    subtitle:
+                        'Manage users',
+                    icon:
+                        Icons.people,
+                    color:
+                        Colors.purple,
+                    onTap: () {
 
-                  subtitle:
-                      'Monitor customer orders',
+                      setState(() {
 
-                  icon:
-                      Icons.shopping_bag,
+                        selectedIndex =
+                            4;
+                      });
+                    },
+                  ),
 
-                  color:
-                      Colors.orange,
+                  dashboardCard(
+                    title:
+                        'Notifications',
+                    subtitle:
+                        'Realtime activity',
+                    icon:
+                        Icons.notifications,
+                    color:
+                        Colors.red,
+                    onTap: () {
 
-                  onTap: () {
+                      setState(() {
 
-                    setState(() {
+                        selectedIndex =
+                            5;
+                      });
+                    },
+                  ),
 
-                      selectedIndex =
-                          2;
-                    });
-                  },
-                ),
+                  dashboardCard(
+                    title:
+                        'Profile',
+                    subtitle:
+                        'Manage account',
+                    icon:
+                        Icons.person,
+                    color:
+                        Colors.indigo,
+                    onTap: () {
 
-                dashboardCard(
+                      setState(() {
 
-                  title:
-                      'Reports',
-
-                  subtitle:
-                      'Sales analytics & revenue',
-
-                  icon:
-                      Icons.bar_chart,
-
-                  color:
-                      Colors.green,
-
-                  onTap: () {
-
-                    setState(() {
-
-                      selectedIndex =
-                          3;
-                    });
-                  },
-                ),
-
-                dashboardCard(
-
-                  title:
-                      'Users',
-
-                  subtitle:
-                      'User management system',
-
-                  icon:
-                      Icons.people,
-
-                  color:
-                      Colors.purple,
-
-                  onTap: () {
-
-                    setState(() {
-
-                      selectedIndex =
-                          4;
-                    });
-                  },
-                ),
-
-                dashboardCard(
-
-                  title:
-                      'Notifications',
-
-                  subtitle:
-                      'System activity & logs',
-
-                  icon:
-                      Icons.notifications,
-
-                  color:
-                      Colors.red,
-
-                  onTap: () {
-
-                    setState(() {
-
-                      selectedIndex =
-                          5;
-                    });
-                  },
-                ),
-              ],
-            ),
-          ],
-        ),
+                        selectedIndex =
+                            6;
+                      });
+                    },
+                  ),
+                ],
+              );
+            },
+          ),
+        ],
       ),
     );
   }
 
   // =====================================================
-  // CARD
+  // STATS CARD
+  // =====================================================
+
+  Widget statsCard({
+
+    required String title,
+
+    required String value,
+
+    required IconData icon,
+
+    required Color color,
+  }) {
+
+    return Container(
+
+      padding:
+          const EdgeInsets.all(
+        12,
+      ),
+
+      decoration:
+          BoxDecoration(
+
+        color:
+            Colors.white,
+
+        borderRadius:
+            BorderRadius.circular(
+          18,
+        ),
+
+        boxShadow: [
+
+          BoxShadow(
+
+            color:
+                Colors.black
+                    .withOpacity(
+              0.02,
+            ),
+
+            blurRadius:
+                8,
+
+            offset:
+                const Offset(
+              0,
+              3,
+            ),
+          ),
+        ],
+      ),
+
+      child: Row(
+        children: [
+
+          Container(
+
+            width: 42,
+
+            height: 42,
+
+            decoration:
+                BoxDecoration(
+
+              color:
+                  color.withOpacity(
+                0.12,
+              ),
+
+              borderRadius:
+                  BorderRadius.circular(
+                12,
+              ),
+            ),
+
+            child: Icon(
+
+              icon,
+
+              color: color,
+
+              size: 20,
+            ),
+          ),
+
+          const SizedBox(
+            width: 10,
+          ),
+
+          Expanded(
+            child: Column(
+
+              mainAxisAlignment:
+                  MainAxisAlignment
+                      .center,
+
+              crossAxisAlignment:
+                  CrossAxisAlignment
+                      .start,
+
+              children: [
+
+                Text(
+
+                  value,
+
+                  maxLines: 1,
+
+                  overflow:
+                      TextOverflow
+                          .ellipsis,
+
+                  style:
+                      const TextStyle(
+
+                    fontSize: 18,
+
+                    fontWeight:
+                        FontWeight.bold,
+                  ),
+                ),
+
+                const SizedBox(
+                  height: 2,
+                ),
+
+                Text(
+
+                  title,
+
+                  style: TextStyle(
+
+                    fontSize: 10,
+
+                    color:
+                        Colors.grey
+                            .shade600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // =====================================================
+  // MENU CARD
   // =====================================================
 
   Widget dashboardCard({
@@ -454,21 +616,20 @@ class _AdminDashboardScreenState
     required VoidCallback onTap,
   }) {
 
-    return GestureDetector(
+    return InkWell(
+
+      borderRadius:
+          BorderRadius.circular(
+        18,
+      ),
 
       onTap: onTap,
 
-      child:
-          AnimatedContainer(
-
-        duration:
-            const Duration(
-          milliseconds: 250,
-        ),
+      child: Container(
 
         padding:
             const EdgeInsets.all(
-          24,
+          14,
         ),
 
         decoration:
@@ -479,7 +640,7 @@ class _AdminDashboardScreenState
 
           borderRadius:
               BorderRadius.circular(
-            30,
+            18,
           ),
 
           boxShadow: [
@@ -489,33 +650,29 @@ class _AdminDashboardScreenState
               color:
                   Colors.black
                       .withOpacity(
-                0.04,
+                0.02,
               ),
 
               blurRadius:
-                  14,
+                  8,
 
               offset:
                   const Offset(
                 0,
-                8,
+                3,
               ),
             ),
           ],
         ),
 
-        child: Column(
-          crossAxisAlignment:
-              CrossAxisAlignment
-                  .start,
-
+        child: Row(
           children: [
 
             Container(
 
-              width: 65,
+              width: 46,
 
-              height: 65,
+              height: 46,
 
               decoration:
                   BoxDecoration(
@@ -527,7 +684,7 @@ class _AdminDashboardScreenState
 
                 borderRadius:
                     BorderRadius.circular(
-                  22,
+                  14,
                 ),
               ),
 
@@ -537,42 +694,71 @@ class _AdminDashboardScreenState
 
                 color: color,
 
-                size: 34,
-              ),
-            ),
-
-            const Spacer(),
-
-            Text(
-
-              title,
-
-              style:
-                  const TextStyle(
-
-                fontSize: 22,
-
-                fontWeight:
-                    FontWeight.bold,
+                size: 22,
               ),
             ),
 
             const SizedBox(
-              height: 10,
+              width: 12,
             ),
 
-            Text(
+            Expanded(
+              child: Column(
 
-              subtitle,
+                mainAxisAlignment:
+                    MainAxisAlignment
+                        .center,
 
-              style:
-                  TextStyle(
+                crossAxisAlignment:
+                    CrossAxisAlignment
+                        .start,
 
-                color:
-                    Colors.grey
-                        .shade600,
+                children: [
 
-                fontSize: 14,
+                  Text(
+
+                    title,
+
+                    maxLines: 1,
+
+                    overflow:
+                        TextOverflow
+                            .ellipsis,
+
+                    style:
+                        const TextStyle(
+
+                      fontSize: 14,
+
+                      fontWeight:
+                          FontWeight.bold,
+                    ),
+                  ),
+
+                  const SizedBox(
+                    height: 2,
+                  ),
+
+                  Text(
+
+                    subtitle,
+
+                    maxLines: 1,
+
+                    overflow:
+                        TextOverflow
+                            .ellipsis,
+
+                    style: TextStyle(
+
+                      fontSize: 10,
+
+                      color:
+                          Colors.grey
+                              .shade600,
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
@@ -593,38 +779,64 @@ class _AdminDashboardScreenState
         0xffF8FAFC,
       ),
 
-      body: Row(
-        children: [
+      body: SafeArea(
 
-          AdminSidebar(
+        child: Row(
+          children: [
 
-            selectedIndex:
-                selectedIndex,
+            AdminSidebar(
 
-            onSelected:
-                (
-                  index,
-                ) {
+              selectedIndex:
+                  selectedIndex,
 
-              setState(() {
+              onSelected:
+                  (
+                    index,
+                  ) {
 
-                selectedIndex =
-                    index;
-              });
-            },
+                setState(() {
 
-            onLogout: () {
+                  selectedIndex =
+                      index;
+                });
+              },
 
-              Navigator.pop(
-                context,
-              );
-            },
-          ),
+              onLogout: () async {
 
-          Expanded(
-            child: currentScreen(),
-          ),
-        ],
+                await context
+                    .read<AuthProvider>()
+                    .logout();
+
+                if (!context.mounted) {
+                  return;
+                }
+
+                Navigator.pushNamedAndRemoveUntil(
+
+                  context,
+
+                  '/welcome',
+
+                  (route) => false,
+                );
+              },
+            ),
+
+            Expanded(
+
+              child: Container(
+
+                color:
+                    const Color(
+                  0xffF8FAFC,
+                ),
+
+                child:
+                    currentScreen(),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

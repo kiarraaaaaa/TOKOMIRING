@@ -101,9 +101,13 @@ class ProductModel {
           map['isPopular'] ??
               false,
 
+      // ===============================================
+      // SOLD AUTO SAFE
+      // ===============================================
+
       sold:
           _safeInt(
-        map['sold'],
+        map['sold'] ?? 0,
       ),
 
       createdAt:
@@ -147,6 +151,10 @@ class ProductModel {
 
       'isPopular':
           isPopular,
+
+      // ===============================================
+      // SOLD REALTIME
+      // ===============================================
 
       'sold':
           sold,
@@ -254,13 +262,13 @@ class ProductModel {
   }
 
   // =====================================================
-  // JSON DEBUG
+  // REALTIME PRODUCT JSON DEBUG
   // =====================================================
 
   @override
   String toString() {
 
-    return 'ProductModel(id: $id, name: $name, sold: $sold)';
+    return 'ProductModel(id: $id, name: $name, stock: $stock, sold: $sold)';
   }
 }
 

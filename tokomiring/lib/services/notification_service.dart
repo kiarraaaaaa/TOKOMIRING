@@ -2,6 +2,7 @@
 
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/foundation.dart';
+import 'package:intl/intl.dart';
 
 class NotificationService {
 
@@ -11,6 +12,60 @@ class NotificationService {
 
   final DatabaseReference _database =
       FirebaseDatabase.instance.ref();
+
+  // =====================================================
+  // REALTIME TIME
+  // =====================================================
+
+  String formatRealtimeTime(
+    String createdAt,
+  ) {
+
+    try {
+
+      final date =
+          DateTime.parse(
+        createdAt,
+      ).toLocal();
+
+      return DateFormat(
+        'HH:mm:ss',
+      ).format(
+        date,
+      );
+
+    } catch (_) {
+
+      return '--:--';
+    }
+  }
+
+  // =====================================================
+  // REALTIME DATE
+  // =====================================================
+
+  String formatRealtimeDate(
+    String createdAt,
+  ) {
+
+    try {
+
+      final date =
+          DateTime.parse(
+        createdAt,
+      ).toLocal();
+
+      return DateFormat(
+        'dd MMM yyyy',
+      ).format(
+        date,
+      );
+
+    } catch (_) {
+
+      return '-- --- ----';
+    }
+  }
 
   // =====================================================
   // CREATE NOTIFICATION
@@ -30,10 +85,6 @@ class NotificationService {
 
     try {
 
-      // ===============================================
-      // GENERATE UNIQUE ID
-      // ===============================================
-
       final notificationId =
           _database
               .child('notifications')
@@ -47,9 +98,8 @@ class NotificationService {
         );
       }
 
-      // ===============================================
-      // SAVE NOTIFICATION
-      // ===============================================
+      final now =
+          DateTime.now().toLocal();
 
       await _database
           .child('notifications')
@@ -74,9 +124,26 @@ class NotificationService {
         'isRead':
             false,
 
+        // ===============================================
+        // REALTIME TIMESTAMP
+        // ===============================================
+
         'createdAt':
-            DateTime.now()
-                .toIso8601String(),
+            now.toIso8601String(),
+
+        'time':
+            DateFormat(
+              'HH:mm:ss',
+            ).format(
+              now,
+            ),
+
+        'date':
+            DateFormat(
+              'dd MMM yyyy',
+            ).format(
+              now,
+            ),
       });
 
     } catch (e) {
@@ -106,18 +173,10 @@ class NotificationService {
       final data =
           event.snapshot.value;
 
-      // ===============================================
-      // EMPTY
-      // ===============================================
-
       if (data == null) {
 
         return [];
       }
-
-      // ===============================================
-      // INVALID FORMAT
-      // ===============================================
 
       if (data is! Map) {
 
@@ -147,15 +206,22 @@ class NotificationService {
             value,
           );
 
-          // ===========================================
-          // FILTER ROLE
-          // ===========================================
+          final targetRole =
+              item['targetRole']
+                      ?.toString() ??
+                  '';
 
-          if (item['targetRole'] ==
+          if (targetRole ==
                   role ||
 
-              item['targetRole'] ==
+              targetRole ==
                   'all') {
+
+            final createdAt =
+                item['createdAt']
+                        ?.toString() ??
+                    DateTime.now()
+                        .toIso8601String();
 
             notifications.add({
 
@@ -172,13 +238,33 @@ class NotificationService {
                   item['type'] ?? '',
 
               'targetRole':
-                  item['targetRole'] ?? '',
+                  targetRole,
 
               'isRead':
                   item['isRead'] ?? false,
 
               'createdAt':
-                  item['createdAt'] ?? '',
+                  createdAt,
+
+              // =========================================
+              // REALTIME FORMATTED
+              // =========================================
+
+              'time':
+
+                  item['time'] ??
+
+                      formatRealtimeTime(
+                        createdAt,
+                      ),
+
+              'date':
+
+                  item['date'] ??
+
+                      formatRealtimeDate(
+                        createdAt,
+                      ),
             });
           }
 
@@ -186,7 +272,7 @@ class NotificationService {
       });
 
       // ===============================================
-      // SORT NEWEST FIRST
+      // SORT NEWEST
       // ===============================================
 
       notifications.sort(
@@ -454,13 +540,40 @@ class NotificationService {
           'Order Status Updated',
 
       message:
-          'Your order status changed to $status',
+          'Order status changed to $status',
 
       type:
           'status',
 
       targetRole:
-          'user',
+          'admin',
+    );
+  }
+
+  // =====================================================
+  // ORDER VALIDATION
+  // =====================================================
+
+  Future<void>
+      sendValidationNotification({
+
+    required String customerName,
+
+  }) async {
+
+    await createNotification(
+
+      title:
+          'Order Validated',
+
+      message:
+          '$customerName order has been validated',
+
+      type:
+          'validation',
+
+      targetRole:
+          'admin',
     );
   }
 

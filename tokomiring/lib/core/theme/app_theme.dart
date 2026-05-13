@@ -15,6 +15,9 @@ class AppTheme {
     brightness:
         Brightness.light,
 
+    visualDensity:
+        VisualDensity.adaptivePlatformDensity,
+
     // ===================================================
     // SCAFFOLD
     // ===================================================
@@ -27,6 +30,7 @@ class AppTheme {
 
     colorScheme:
         ColorScheme.fromSeed(
+
       seedColor:
           AppColors.primary,
 
@@ -43,24 +47,57 @@ class AppTheme {
 
     textTheme:
         GoogleFonts.poppinsTextTheme(
+
       const TextTheme(
 
-        bodyLarge: TextStyle(
+        displayLarge: TextStyle(
+          fontSize: 34,
+          fontWeight:
+              FontWeight.bold,
           color:
               AppColors.textPrimary,
         ),
 
-        bodyMedium: TextStyle(
+        displayMedium: TextStyle(
+          fontSize: 28,
+          fontWeight:
+              FontWeight.bold,
           color:
               AppColors.textPrimary,
         ),
 
         titleLarge: TextStyle(
-          color:
-              AppColors.textPrimary,
-
+          fontSize: 20,
           fontWeight:
               FontWeight.bold,
+          color:
+              AppColors.textPrimary,
+        ),
+
+        titleMedium: TextStyle(
+          fontSize: 16,
+          fontWeight:
+              FontWeight.w600,
+          color:
+              AppColors.textPrimary,
+        ),
+
+        bodyLarge: TextStyle(
+          fontSize: 15,
+          color:
+              AppColors.textPrimary,
+        ),
+
+        bodyMedium: TextStyle(
+          fontSize: 13,
+          color:
+              AppColors.textPrimary,
+        ),
+
+        bodySmall: TextStyle(
+          fontSize: 11,
+          color:
+              AppColors.textSecondary,
         ),
       ),
     ),
@@ -87,16 +124,20 @@ class AppTheme {
 
       iconTheme:
           IconThemeData(
+
         color:
             AppColors.dark,
+
+        size: 22,
       ),
 
       titleTextStyle:
           TextStyle(
+
         color:
             AppColors.dark,
 
-        fontSize: 20,
+        fontSize: 18,
 
         fontWeight:
             FontWeight.bold,
@@ -125,22 +166,32 @@ class AppTheme {
         minimumSize:
             const Size(
           double.infinity,
-          55,
+          48,
         ),
 
         elevation: 0,
 
+        padding:
+            const EdgeInsets.symmetric(
+
+          horizontal: 18,
+
+          vertical: 14,
+        ),
+
         shape:
             RoundedRectangleBorder(
+
           borderRadius:
               BorderRadius.circular(
-            18,
+            16,
           ),
         ),
 
         textStyle:
             const TextStyle(
-          fontSize: 16,
+
+          fontSize: 14,
 
           fontWeight:
               FontWeight.bold,
@@ -161,7 +212,7 @@ class AppTheme {
         minimumSize:
             const Size(
           double.infinity,
-          55,
+          48,
         ),
 
         foregroundColor:
@@ -173,17 +224,27 @@ class AppTheme {
               AppColors.primary,
         ),
 
+        padding:
+            const EdgeInsets.symmetric(
+
+          horizontal: 18,
+
+          vertical: 14,
+        ),
+
         shape:
             RoundedRectangleBorder(
+
           borderRadius:
               BorderRadius.circular(
-            18,
+            16,
           ),
         ),
 
         textStyle:
             const TextStyle(
-          fontSize: 16,
+
+          fontSize: 14,
 
           fontWeight:
               FontWeight.bold,
@@ -205,21 +266,27 @@ class AppTheme {
 
       contentPadding:
           const EdgeInsets.symmetric(
-        horizontal: 20,
-        vertical: 18,
+
+        horizontal: 18,
+
+        vertical: 16,
       ),
 
       hintStyle:
           const TextStyle(
+
         color:
             AppColors.textSecondary,
+
+        fontSize: 13,
       ),
 
       border:
           OutlineInputBorder(
+
         borderRadius:
             BorderRadius.circular(
-          18,
+          16,
         ),
 
         borderSide:
@@ -228,9 +295,10 @@ class AppTheme {
 
       enabledBorder:
           OutlineInputBorder(
+
         borderRadius:
             BorderRadius.circular(
-          18,
+          16,
         ),
 
         borderSide:
@@ -239,17 +307,19 @@ class AppTheme {
 
       focusedBorder:
           OutlineInputBorder(
+
         borderRadius:
             BorderRadius.circular(
-          18,
+          16,
         ),
 
         borderSide:
             const BorderSide(
+
           color:
               AppColors.primary,
 
-          width: 2,
+          width: 1.8,
         ),
       ),
     ),
@@ -264,16 +334,22 @@ class AppTheme {
       color:
           AppColors.card,
 
-      elevation: 3,
+      elevation: 2,
 
       shadowColor:
           Colors.black12,
 
+      margin:
+          const EdgeInsets.all(
+        6,
+      ),
+
       shape:
           RoundedRectangleBorder(
+
         borderRadius:
             BorderRadius.circular(
-          24,
+          20,
         ),
       ),
     ),
@@ -290,8 +366,11 @@ class AppTheme {
 
       contentTextStyle:
           const TextStyle(
+
         color:
             AppColors.white,
+
+        fontSize: 13,
       ),
 
       behavior:
@@ -299,9 +378,10 @@ class AppTheme {
 
       shape:
           RoundedRectangleBorder(
+
         borderRadius:
             BorderRadius.circular(
-          14,
+          12,
         ),
       ),
     ),

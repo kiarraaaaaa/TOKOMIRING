@@ -1,6 +1,3 @@
-
-
-
 // lib/services/auth_service.dart
 
 import 'package:firebase_auth/firebase_auth.dart';
@@ -382,6 +379,10 @@ class AuthService {
 
     try {
 
+      // ===============================================
+      // UPDATE DATABASE
+      // ===============================================
+
       await _database
           .child('users')
           .child(uid)
@@ -405,10 +406,35 @@ class AuthService {
             photoUrl.trim(),
       });
 
+      // ===============================================
+      // UPDATE FIREBASE AUTH
+      // ===============================================
+
       await _auth.currentUser
           ?.updateDisplayName(
         name.trim(),
       );
+
+      // ===============================================
+      // PHOTO REALTIME REFRESH
+      // ===============================================
+
+      if (photoUrl
+          .trim()
+          .isNotEmpty) {
+
+        await _auth.currentUser
+            ?.updatePhotoURL(
+          photoUrl.trim(),
+        );
+      }
+
+      // ===============================================
+      // FORCE REFRESH
+      // ===============================================
+
+      await _auth.currentUser
+          ?.reload();
 
     } catch (e) {
 
@@ -585,4 +611,3 @@ class AuthService {
     } catch (_) {}
   }
 }
-

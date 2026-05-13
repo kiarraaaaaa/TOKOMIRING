@@ -14,6 +14,8 @@ import 'providers/cart_provider.dart';
 import 'providers/product_provider.dart';
 import 'providers/order_provider.dart';
 
+import 'services/notification_service.dart';
+
 import 'routes/app_routes.dart';
 
 import 'screens/shared/splash_screen.dart';
@@ -33,6 +35,13 @@ void main() async {
         DefaultFirebaseOptions
             .currentPlatform,
   );
+
+  // =====================================================
+  // REALTIME NOTIFICATION LISTENER
+  // =====================================================
+
+  NotificationService()
+      .listenNotifications();
 
   runApp(
 

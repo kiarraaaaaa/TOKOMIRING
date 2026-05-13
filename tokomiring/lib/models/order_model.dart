@@ -27,10 +27,6 @@ class OrderItemModel {
     required this.subtotal,
   });
 
-  // =====================================================
-  // FROM MAP
-  // =====================================================
-
   factory OrderItemModel.fromMap(
     Map<dynamic, dynamic> map,
   ) {
@@ -69,10 +65,6 @@ class OrderItemModel {
     );
   }
 
-  // =====================================================
-  // TO MAP
-  // =====================================================
-
   Map<String, dynamic> toMap() {
 
     return {
@@ -96,10 +88,6 @@ class OrderItemModel {
           subtotal,
     };
   }
-
-  // =====================================================
-  // COPY WITH
-  // =====================================================
 
   OrderItemModel copyWith({
 
@@ -181,6 +169,8 @@ class OrderModel {
 
   final DateTime updatedAt;
 
+  final DateTime? completedAt;
+
   OrderModel({
 
     required this.orderId,
@@ -210,6 +200,8 @@ class OrderModel {
     required this.createdAt,
 
     required this.updatedAt,
+
+    this.completedAt,
   });
 
   // =====================================================
@@ -226,20 +218,12 @@ class OrderModel {
     List<OrderItemModel>
         parsedItems = [];
 
-    // ===================================================
-    // SAFE PARSE ITEMS
-    // ===================================================
-
     final rawItems =
         map['items'];
 
     if (rawItems != null) {
 
       try {
-
-        // ===============================================
-        // LIST
-        // ===============================================
 
         if (rawItems is List) {
 
@@ -274,10 +258,6 @@ class OrderModel {
 
                   .toList();
         }
-
-        // ===============================================
-        // MAP
-        // ===============================================
 
         else if (rawItems
             is Map) {
@@ -386,6 +366,16 @@ class OrderModel {
           _safeDate(
         map['updatedAt'],
       ),
+
+      completedAt:
+          map['completedAt'] ==
+                  null
+
+              ? null
+
+              : _safeDate(
+                  map['completedAt'],
+                ),
     );
   }
 
@@ -449,6 +439,10 @@ class OrderModel {
       'updatedAt':
           updatedAt
               .toIso8601String(),
+
+      'completedAt':
+          completedAt
+              ?.toIso8601String(),
     };
   }
 
@@ -485,6 +479,8 @@ class OrderModel {
     DateTime? createdAt,
 
     DateTime? updatedAt,
+
+    DateTime? completedAt,
   }) {
 
     return OrderModel(
@@ -544,12 +540,12 @@ class OrderModel {
       updatedAt:
           updatedAt ??
               this.updatedAt,
+
+      completedAt:
+          completedAt ??
+              this.completedAt,
     );
   }
-
-  // =====================================================
-  // JSON
-  // =====================================================
 
   @override
   String toString() {

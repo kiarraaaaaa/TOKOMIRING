@@ -1,9 +1,9 @@
-// =====================================================
-// FULL FIXED VERSION
-// lib/screens/admin/admin_notification_screen.dart
-// =====================================================
+import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+
+import '../../services/notification_service.dart';
 
 import '../../widgets/admin/admin_dashboard_header.dart';
 
@@ -30,6 +30,10 @@ class _AdminNotificationScreenState
   late Animation<double>
       _fadeAnimation;
 
+  final NotificationService
+      _notificationService =
+      NotificationService();
+
   String selectedTab =
       'Notifications';
 
@@ -42,170 +46,52 @@ class _AdminNotificationScreenState
     'System Logs',
   ];
 
-  final List<Map<String, dynamic>>
-      notifications = [
+  // =====================================================
+  // REALTIME CLOCK
+  // =====================================================
 
-    {
-      'title':
-          'New Order Received',
+  final ValueNotifier<String>
+      realtimeClock =
+      ValueNotifier<String>('');
 
-      'description':
-          'Customer has successfully placed a new order.',
+  Timer? clockTimer;
 
-      'time':
-          '2 minutes ago',
+  void startRealtimeClock() {
 
-      'icon':
-          Icons.shopping_bag_rounded,
+    realtimeClock.value =
+        formattedRealtime();
 
-      'color':
-          Colors.blue,
-    },
+    clockTimer = Timer.periodic(
 
-    {
-      'title':
-          'Payment Confirmed',
+      const Duration(
+        seconds: 1,
+      ),
 
-      'description':
-          'Payment from customer has been confirmed.',
+      (_) {
 
-      'time':
-          '15 minutes ago',
+        realtimeClock.value =
+            formattedRealtime();
+      },
+    );
+  }
 
-      'icon':
-          Icons.payments_rounded,
+  String formattedRealtime() {
 
-      'color':
-          Colors.green,
-    },
+    final now =
+        DateTime.now();
 
-    {
-      'title':
-          'Low Stock Warning',
+    final date =
+        DateFormat(
+      'dd MMM yyyy',
+    ).format(now);
 
-      'description':
-          'Several products are running low on stock.',
+    final time =
+        DateFormat(
+      'HH:mm:ss',
+    ).format(now);
 
-      'time':
-          '40 minutes ago',
-
-      'icon':
-          Icons.warning_amber_rounded,
-
-      'color':
-          Colors.orange,
-    },
-  ];
-
-  final List<Map<String, dynamic>>
-      activities = [
-
-    {
-      'title':
-          'Admin Updated Product',
-
-      'description':
-          'Product stock and price have been updated.',
-
-      'time':
-          '1 hour ago',
-
-      'icon':
-          Icons.edit_rounded,
-
-      'color':
-          Colors.purple,
-    },
-
-    {
-      'title':
-          'Order Validated',
-
-      'description':
-          'Customer order successfully validated.',
-
-      'time':
-          '2 hours ago',
-
-      'icon':
-          Icons.check_circle_rounded,
-
-      'color':
-          Colors.green,
-    },
-
-    {
-      'title':
-          'User Account Banned',
-
-      'description':
-          'Suspicious account has been disabled.',
-
-      'time':
-          '5 hours ago',
-
-      'icon':
-          Icons.block_rounded,
-
-      'color':
-          Colors.red,
-    },
-  ];
-
-  final List<Map<String, dynamic>>
-      systemLogs = [
-
-    {
-      'title':
-          'Database Backup Completed',
-
-      'description':
-          'Realtime database backup completed successfully.',
-
-      'time':
-          'Today 01:40',
-
-      'icon':
-          Icons.storage_rounded,
-
-      'color':
-          Colors.blue,
-    },
-
-    {
-      'title':
-          'Server Restarted',
-
-      'description':
-          'System server restarted automatically.',
-
-      'time':
-          'Today 03:12',
-
-      'icon':
-          Icons.restart_alt_rounded,
-
-      'color':
-          Colors.orange,
-    },
-
-    {
-      'title':
-          'Firebase Connected',
-
-      'description':
-          'All Firebase services are online and active.',
-
-      'time':
-          'Today 04:10',
-
-      'icon':
-          Icons.cloud_done_rounded,
-
-      'color':
-          Colors.green,
-    },
-  ];
+    return '$date • $time';
+  }
 
   @override
   void initState() {
@@ -235,10 +121,20 @@ class _AdminNotificationScreenState
 
     _animationController
         .forward();
+
+    // ===============================================
+    // START CLOCK
+    // ===============================================
+
+    startRealtimeClock();
   }
 
   @override
   void dispose() {
+
+    clockTimer?.cancel();
+
+    realtimeClock.dispose();
 
     _animationController
         .dispose();
@@ -269,10 +165,12 @@ class _AdminNotificationScreenState
 
           padding:
               const EdgeInsets.all(
-            24,
+            18,
           ),
 
-          child: Column(
+          child:
+              Column(
+
             crossAxisAlignment:
                 CrossAxisAlignment
                     .start,
@@ -282,7 +180,7 @@ class _AdminNotificationScreenState
               const AdminDashboardHeader(),
 
               const SizedBox(
-                height: 30,
+                height: 20,
               ),
 
               // =================================================
@@ -293,15 +191,16 @@ class _AdminNotificationScreenState
 
                 'Notifications Center',
 
-                style: TextStyle(
+                style:
+                    TextStyle(
 
                   fontSize:
                       MediaQuery.of(
                                 context,
                               ).size.width <
                               700
-                          ? 26
-                          : 34,
+                          ? 22
+                          : 28,
 
                   fontWeight:
                       FontWeight.bold,
@@ -309,25 +208,130 @@ class _AdminNotificationScreenState
               ),
 
               const SizedBox(
-                height: 10,
+                height: 6,
               ),
 
               Text(
 
-                'Manage admin notifications, activities, and system logs.',
+                'Realtime admin notifications and activities.',
 
-                style: TextStyle(
+                style:
+                    TextStyle(
 
                   color:
                       Colors.grey
                           .shade600,
 
-                  fontSize: 15,
+                  fontSize: 12,
                 ),
               ),
 
               const SizedBox(
-                height: 30,
+                height: 14,
+              ),
+
+              // =================================================
+              // REALTIME CLOCK
+              // =================================================
+
+              ValueListenableBuilder<String>(
+
+                valueListenable:
+                    realtimeClock,
+
+                builder: (
+
+                  context,
+
+                  value,
+
+                  _,
+
+                ) {
+
+                  return Container(
+
+                    padding:
+                        const EdgeInsets.symmetric(
+
+                      horizontal: 16,
+
+                      vertical: 12,
+                    ),
+
+                    decoration:
+                        BoxDecoration(
+
+                      color:
+                          Colors.white,
+
+                      borderRadius:
+                          BorderRadius.circular(
+                        16,
+                      ),
+
+                      boxShadow: [
+
+                        BoxShadow(
+
+                          color:
+                              Colors.black
+                                  .withOpacity(
+                            0.02,
+                          ),
+
+                          blurRadius:
+                              8,
+
+                          offset:
+                              const Offset(
+                            0,
+                            3,
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    child:
+                        Row(
+
+                      mainAxisSize:
+                          MainAxisSize.min,
+
+                      children: [
+
+                        const Icon(
+
+                          Icons.access_time,
+
+                          size: 18,
+                        ),
+
+                        const SizedBox(
+                          width: 10,
+                        ),
+
+                        Text(
+
+                          value,
+
+                          style:
+                              const TextStyle(
+
+                            fontWeight:
+                                FontWeight.bold,
+
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+
+              const SizedBox(
+                height: 20,
               ),
 
               // =================================================
@@ -339,7 +343,8 @@ class _AdminNotificationScreenState
                 scrollDirection:
                     Axis.horizontal,
 
-                child: Row(
+                child:
+                    Row(
 
                   children:
                       tabs.map(
@@ -355,7 +360,7 @@ class _AdminNotificationScreenState
 
                         padding:
                             const EdgeInsets.only(
-                          right: 14,
+                          right: 10,
                         ),
 
                         child:
@@ -383,10 +388,10 @@ class _AdminNotificationScreenState
                                 const EdgeInsets.symmetric(
 
                               horizontal:
-                                  22,
+                                  18,
 
                               vertical:
-                                  14,
+                                  12,
                             ),
 
                             decoration:
@@ -403,28 +408,12 @@ class _AdminNotificationScreenState
 
                               borderRadius:
                                   BorderRadius.circular(
-                                18,
+                                14,
                               ),
-
-                              boxShadow: [
-
-                                if (isSelected)
-
-                                  BoxShadow(
-
-                                    color:
-                                        Colors.blue
-                                            .withOpacity(
-                                      0.2,
-                                    ),
-
-                                    blurRadius:
-                                        12,
-                                  ),
-                              ],
                             ),
 
-                            child: Text(
+                            child:
+                                Text(
 
                               tab,
 
@@ -442,6 +431,8 @@ class _AdminNotificationScreenState
 
                                 fontWeight:
                                     FontWeight.bold,
+
+                                fontSize: 12,
                               ),
                             ),
                           ),
@@ -453,46 +444,183 @@ class _AdminNotificationScreenState
               ),
 
               const SizedBox(
-                height: 30,
+                height: 20,
               ),
 
-              if (selectedTab ==
-                  'Notifications')
+              // =================================================
+              // FIREBASE NOTIFICATIONS
+              // =================================================
 
-                buildSection(
-                  title:
-                      'Admin Notifications',
+              StreamBuilder<List<Map<String, dynamic>>>(
 
-                  items:
-                      notifications,
+                stream:
+                    _notificationService
+                        .getNotifications(
+
+                  role: 'admin',
                 ),
 
-              if (selectedTab ==
-                  'Activity')
+                builder: (
 
-                buildSection(
-                  title:
-                      'Recent Activities',
+                  context,
 
-                  items:
-                      activities,
-                ),
+                  snapshot,
 
-              if (selectedTab ==
-                  'System Logs')
+                ) {
 
-                buildSection(
-                  title:
-                      'System Logs',
+                  if (snapshot.connectionState ==
+                      ConnectionState.waiting) {
 
-                  items:
-                      systemLogs,
-                ),
+                    return const Center(
+
+                      child:
+                          Padding(
+
+                        padding:
+                            EdgeInsets.all(
+                          30,
+                        ),
+
+                        child:
+                            CircularProgressIndicator(),
+                      ),
+                    );
+                  }
+
+                  final notifications =
+                      snapshot.data ?? [];
+
+                  if (notifications
+                      .isEmpty) {
+
+                    return Container(
+
+                      width:
+                          double.infinity,
+
+                      padding:
+                          const EdgeInsets.all(
+                        40,
+                      ),
+
+                      decoration:
+                          BoxDecoration(
+
+                        color:
+                            Colors.white,
+
+                        borderRadius:
+                            BorderRadius.circular(
+                          22,
+                        ),
+                      ),
+
+                      child:
+                          const Center(
+
+                        child:
+                            Text(
+                          'No notifications yet',
+                        ),
+                      ),
+                    );
+                  }
+
+                  return buildSection(
+
+                    title:
+                        'Realtime Notifications',
+
+                    items:
+                        notifications,
+                  );
+                },
+              ),
             ],
           ),
         ),
       ),
     );
+  }
+
+  // =====================================================
+  // ICON
+  // =====================================================
+
+  IconData notificationIcon(
+    String type,
+  ) {
+
+    switch (type
+        .toLowerCase()) {
+
+      case 'order':
+
+        return Icons
+            .shopping_bag_rounded;
+
+      case 'payment':
+
+        return Icons
+            .payments_rounded;
+
+      case 'validation':
+
+        return Icons
+            .check_circle_rounded;
+
+      case 'status':
+
+        return Icons
+            .local_shipping_rounded;
+
+      case 'stock':
+
+        return Icons
+            .warning_amber_rounded;
+
+      default:
+
+        return Icons
+            .notifications_rounded;
+    }
+  }
+
+  // =====================================================
+  // COLOR
+  // =====================================================
+
+  Color notificationColor(
+    String type,
+  ) {
+
+    switch (type
+        .toLowerCase()) {
+
+      case 'order':
+
+        return Colors.blue;
+
+      case 'payment':
+
+        return Colors.green;
+
+      case 'validation':
+
+        return Colors.orange;
+
+      case 'status':
+
+        return Colors.purple;
+
+      case 'stock':
+
+        return Colors.red;
+
+      default:
+
+        return Colors.grey;
+    }
   }
 
   // =====================================================
@@ -515,7 +643,7 @@ class _AdminNotificationScreenState
 
       padding:
           const EdgeInsets.all(
-        24,
+        18,
       ),
 
       decoration:
@@ -526,48 +654,82 @@ class _AdminNotificationScreenState
 
         borderRadius:
             BorderRadius.circular(
-          30,
+          24,
         ),
-
-        boxShadow: [
-
-          BoxShadow(
-
-            color:
-                Colors.black
-                    .withOpacity(
-              0.04,
-            ),
-
-            blurRadius:
-                14,
-          ),
-        ],
       ),
 
-      child: Column(
+      child:
+          Column(
+
         crossAxisAlignment:
             CrossAxisAlignment
                 .start,
 
         children: [
 
-          Text(
+          Row(
 
-            title,
+            mainAxisAlignment:
+                MainAxisAlignment
+                    .spaceBetween,
 
-            style:
-                const TextStyle(
+            children: [
 
-              fontSize: 24,
+              Text(
 
-              fontWeight:
-                  FontWeight.bold,
-            ),
+                title,
+
+                style:
+                    const TextStyle(
+
+                  fontSize: 20,
+
+                  fontWeight:
+                      FontWeight.bold,
+                ),
+              ),
+
+              Container(
+
+                padding:
+                    const EdgeInsets.symmetric(
+
+                  horizontal: 12,
+
+                  vertical: 7,
+                ),
+
+                decoration:
+                    BoxDecoration(
+
+                  color:
+                      Colors.green
+                          .withOpacity(
+                    0.1,
+                  ),
+
+                  borderRadius:
+                      BorderRadius.circular(
+                    12,
+                  ),
+                ),
+
+                child:
+                    const Text(
+
+                  'LIVE',
+
+                  style:
+                      TextStyle(
+                    fontSize: 11,
+                  ),
+                ),
+              ),
+            ],
           ),
 
           const SizedBox(
-            height: 24,
+            height: 18,
           ),
 
           ListView.separated(
@@ -587,7 +749,7 @@ class _AdminNotificationScreenState
                 ) {
 
               return const SizedBox(
-                height: 18,
+                height: 12,
               );
             },
 
@@ -600,17 +762,26 @@ class _AdminNotificationScreenState
               final item =
                   items[index];
 
-              return AnimatedContainer(
+              final type =
+                  item['type']
+                          ?.toString() ??
+                      '';
 
-                duration:
-                    const Duration(
-                  milliseconds:
-                      250,
-                ),
+              final color =
+                  notificationColor(
+                type,
+              );
+
+              final icon =
+                  notificationIcon(
+                type,
+              );
+
+              return Container(
 
                 padding:
                     const EdgeInsets.all(
-                  22,
+                  16,
                 ),
 
                 decoration:
@@ -623,259 +794,162 @@ class _AdminNotificationScreenState
 
                   borderRadius:
                       BorderRadius.circular(
-                    24,
+                    18,
                   ),
                 ),
 
                 child:
+                    Row(
+                  children: [
 
-                    MediaQuery.of(
-                                  context,
-                                ).size.width <
-                            700
+                    Container(
 
-                        ? mobileTile(
-                            item,
-                          )
+                      width: 54,
 
-                        : desktopTile(
-                            item,
+                      height: 54,
+
+                      decoration:
+                          BoxDecoration(
+
+                        color:
+                            color
+                                .withOpacity(
+                          0.12,
+                        ),
+
+                        borderRadius:
+                            BorderRadius.circular(
+                          16,
+                        ),
+                      ),
+
+                      child:
+                          Icon(
+
+                        icon,
+
+                        color:
+                            color,
+
+                        size: 24,
+                      ),
+                    ),
+
+                    const SizedBox(
+                      width: 14,
+                    ),
+
+                    Expanded(
+
+                      child:
+                          Column(
+
+                        crossAxisAlignment:
+                            CrossAxisAlignment
+                                .start,
+
+                        children: [
+
+                          Text(
+
+                            item['title']
+                                    ?.toString() ??
+                                '',
+
+                            overflow:
+                                TextOverflow
+                                    .ellipsis,
+
+                            style:
+                                const TextStyle(
+
+                              fontSize: 14,
+
+                              fontWeight:
+                                  FontWeight.bold,
+                            ),
                           ),
+
+                          const SizedBox(
+                            height: 5,
+                          ),
+
+                          Text(
+
+                            item['message']
+                                    ?.toString() ??
+                                '',
+
+                            style:
+                                const TextStyle(
+                              fontSize: 11,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(
+                      width: 10,
+                    ),
+
+                    Column(
+
+                      crossAxisAlignment:
+                          CrossAxisAlignment
+                              .end,
+
+                      children: [
+
+                        Text(
+
+                          item['time']
+                                  ?.toString() ??
+                              '--:--',
+
+                          style:
+                              TextStyle(
+
+                            color:
+                                Colors.grey
+                                    .shade700,
+
+                            fontWeight:
+                                FontWeight.bold,
+
+                            fontSize: 11,
+                          ),
+                        ),
+
+                        const SizedBox(
+                          height: 2,
+                        ),
+
+                        Text(
+
+                          item['date']
+                                  ?.toString() ??
+                              '-- --- ----',
+
+                          style:
+                              TextStyle(
+
+                            color:
+                                Colors.grey
+                                    .shade500,
+
+                            fontSize: 9,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               );
             },
           ),
         ],
       ),
-    );
-  }
-
-  // =====================================================
-  // DESKTOP TILE
-  // =====================================================
-
-  Widget desktopTile(
-    Map<String, dynamic>
-        item,
-  ) {
-
-    return Row(
-      children: [
-
-        Container(
-
-          width: 70,
-
-          height: 70,
-
-          decoration:
-              BoxDecoration(
-
-            color:
-                item['color']
-                    .withOpacity(
-              0.12,
-            ),
-
-            borderRadius:
-                BorderRadius.circular(
-              22,
-            ),
-          ),
-
-          child: Icon(
-
-            item['icon'],
-
-            color:
-                item['color'],
-
-            size: 34,
-          ),
-        ),
-
-        const SizedBox(
-          width: 20,
-        ),
-
-        Expanded(
-          child: Column(
-            crossAxisAlignment:
-                CrossAxisAlignment
-                    .start,
-
-            children: [
-
-              Text(
-
-                item['title'],
-
-                overflow:
-                    TextOverflow
-                        .ellipsis,
-
-                style:
-                    const TextStyle(
-
-                  fontSize: 18,
-
-                  fontWeight:
-                      FontWeight.bold,
-                ),
-              ),
-
-              const SizedBox(
-                height: 8,
-              ),
-
-              Text(
-
-                item[
-                    'description'],
-
-                style:
-                    TextStyle(
-
-                  color:
-                      Colors.grey
-                          .shade700,
-                ),
-              ),
-            ],
-          ),
-        ),
-
-        const SizedBox(
-          width: 16,
-        ),
-
-        Text(
-
-          item['time'],
-
-          style: TextStyle(
-
-            color:
-                Colors.grey
-                    .shade600,
-
-            fontSize: 13,
-          ),
-        ),
-      ],
-    );
-  }
-
-  // =====================================================
-  // MOBILE TILE
-  // =====================================================
-
-  Widget mobileTile(
-    Map<String, dynamic>
-        item,
-  ) {
-
-    return Column(
-      crossAxisAlignment:
-          CrossAxisAlignment
-              .start,
-
-      children: [
-
-        Row(
-          children: [
-
-            Container(
-
-              width: 58,
-
-              height: 58,
-
-              decoration:
-                  BoxDecoration(
-
-                color:
-                    item['color']
-                        .withOpacity(
-                  0.12,
-                ),
-
-                borderRadius:
-                    BorderRadius.circular(
-                  18,
-                ),
-              ),
-
-              child: Icon(
-
-                item['icon'],
-
-                color:
-                    item['color'],
-
-                size: 30,
-              ),
-            ),
-
-            const SizedBox(
-              width: 16,
-            ),
-
-            Expanded(
-              child: Text(
-
-                item['title'],
-
-                overflow:
-                    TextOverflow
-                        .ellipsis,
-
-                style:
-                    const TextStyle(
-
-                  fontWeight:
-                      FontWeight.bold,
-
-                  fontSize: 16,
-                ),
-              ),
-            ),
-          ],
-        ),
-
-        const SizedBox(
-          height: 16,
-        ),
-
-        Text(
-
-          item['description'],
-
-          style: TextStyle(
-
-            color:
-                Colors.grey
-                    .shade700,
-          ),
-        ),
-
-        const SizedBox(
-          height: 14,
-        ),
-
-        Text(
-
-          item['time'],
-
-          style: TextStyle(
-
-            color:
-                Colors.grey
-                    .shade600,
-
-            fontSize: 13,
-          ),
-        ),
-      ],
     );
   }
 }

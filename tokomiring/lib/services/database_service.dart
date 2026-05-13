@@ -1,4 +1,5 @@
 import 'package:firebase_database/firebase_database.dart';
+import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 
 import '../models/order_model.dart';
@@ -139,60 +140,6 @@ class DatabaseService {
   }
 
   // =====================================================
-  // INCREASE SOLD
-  // =====================================================
-
-  Future<void> increaseProductSold({
-
-    required String productId,
-
-    required int quantity,
-
-  }) async {
-
-    try {
-
-      final snapshot =
-          await _database
-              .child('products')
-              .child(productId)
-              .get();
-
-      if (!snapshot.exists ||
-          snapshot.value == null) {
-
-        return;
-      }
-
-      final data =
-          Map<dynamic, dynamic>.from(
-        snapshot.value as Map,
-      );
-
-      final currentSold =
-          data['sold'] ?? 0;
-
-      final updatedSold =
-          currentSold + quantity;
-
-      await _database
-          .child('products')
-          .child(productId)
-          .update({
-
-        'sold':
-            updatedSold,
-      });
-
-    } catch (e) {
-
-      throw Exception(
-        e.toString(),
-      );
-    }
-  }
-
-  // =====================================================
   // GET PRODUCTS
   // =====================================================
 
@@ -239,10 +186,6 @@ class DatabaseService {
         } catch (_) {}
       });
 
-      // ===============================================
-      // SORT NEWEST
-      // ===============================================
-
       products.sort(
         (a, b) =>
             b.createdAt.compareTo(
@@ -280,6 +223,64 @@ class DatabaseService {
   }
 
   // =====================================================
+  // CREATE NOTIFICATION
+  // =====================================================
+
+  Future<void> createNotification({
+
+    required String title,
+
+    required String message,
+
+    required String type,
+
+    required String targetRole,
+
+  }) async {
+
+    final now =
+        DateTime.now().toLocal();
+
+    await _database
+        .child('notifications')
+        .push()
+        .set({
+
+      'title':
+          title,
+
+      'message':
+          message,
+
+      'type':
+          type,
+
+      'targetRole':
+          targetRole,
+
+      'isRead':
+          false,
+
+      'createdAt':
+          now.toIso8601String(),
+
+      'time':
+          DateFormat(
+            'HH:mm:ss',
+          ).format(
+            now,
+          ),
+
+      'date':
+          DateFormat(
+            'dd MMM yyyy',
+          ).format(
+            now,
+          ),
+    });
+  }
+
+  // =====================================================
   // CREATE ORDER
   // =====================================================
 
@@ -292,9 +293,20 @@ class DatabaseService {
       final orderId =
           _uuid.v4();
 
+      final now =
+          DateTime.now();
+
       final newOrder =
           order.copyWith(
-        orderId: orderId,
+
+        orderId:
+            orderId,
+
+        createdAt:
+            now,
+
+        updatedAt:
+            now,
       );
 
       // ===============================================
@@ -359,24 +371,23 @@ class DatabaseService {
       }
 
       // ===============================================
-      // NOTIFICATION
+      // REALTIME NOTIFICATION
       // ===============================================
 
-      await _database
-          .child('notifications')
-          .push()
-          .set({
+      await createNotification(
 
-        'title':
+        title:
             'New Order',
 
-        'message':
+        message:
             '${order.customerName} created a new order',
 
-        'createdAt':
-            DateTime.now()
-                .toIso8601String(),
-      });
+        type:
+            'order',
+
+        targetRole:
+            'admin',
+      );
 
       return orderId;
 
@@ -434,10 +445,6 @@ class DatabaseService {
 
         } catch (_) {}
       });
-
-      // ===============================================
-      // SORT NEWEST
-      // ===============================================
 
       orders.sort(
         (a, b) =>
@@ -507,81 +514,64 @@ class DatabaseService {
         orderSnapshot.value as Map,
       );
 
-      final oldStatus =
-          orderData['status'] ??
-              '';
+      final customerName =
+          orderData['customerName']
+                  ?.toString() ??
+              'Customer';
 
-      await _database
-          .child('orders')
-          .child(orderId)
-          .update({
+      final now =
+          DateTime.now();
+
+      final updates = {
 
         'status':
             status,
 
         'updatedAt':
-            DateTime.now()
-                .toIso8601String(),
-      });
+            now.toIso8601String(),
+      };
 
       // ===============================================
-      // COMPLETED = UPDATE SOLD
+      // COMPLETED TIME
       // ===============================================
 
       if (status
-                  .toLowerCase() ==
-              'completed' &&
-          oldStatus
-                  .toLowerCase() !=
-              'completed') {
+              .toLowerCase() ==
+          'completed') {
 
-        final items =
-            orderData['items'];
-
-        if (items is List) {
-
-          for (final item
-              in items) {
-
-            final itemMap =
-                Map<dynamic,
-                    dynamic>.from(
-              item,
-            );
-
-            await increaseProductSold(
-
-              productId:
-                  itemMap['productId']
-                      .toString(),
-
-              quantity:
-                  itemMap['quantity']
-                      as int,
-            );
-          }
-        }
+        updates['completedAt'] =
+            now.toIso8601String();
       }
 
       // ===============================================
-      // NOTIFICATION
+      // UPDATE ORDER
       // ===============================================
 
       await _database
-          .child('notifications')
-          .push()
-          .set({
+          .child('orders')
+          .child(orderId)
+          .update(
+            updates,
+          );
 
-        'title':
+      // ===============================================
+      // REALTIME NOTIFICATION
+      // ===============================================
+
+      await createNotification(
+
+        title:
             'Order Updated',
 
-        'message':
-            'Order status changed to $status',
+        message:
+            '$customerName order changed to $status',
 
-        'createdAt':
-            DateTime.now()
-                .toIso8601String(),
-      });
+        type:
+            'status',
+
+        targetRole:
+            'admin',
+      );
 
     } catch (e) {
 
@@ -601,6 +591,34 @@ class DatabaseService {
 
     try {
 
+      final orderSnapshot =
+          await _database
+              .child('orders')
+              .child(orderId)
+              .get();
+
+      if (!orderSnapshot.exists ||
+          orderSnapshot.value ==
+              null) {
+
+        throw Exception(
+          'Order not found',
+        );
+      }
+
+      final orderData =
+          Map<dynamic, dynamic>.from(
+        orderSnapshot.value as Map,
+      );
+
+      final customerName =
+          orderData['customerName']
+                  ?.toString() ??
+              'Customer';
+
+      final now =
+          DateTime.now();
+
       await _database
           .child('orders')
           .child(orderId)
@@ -613,9 +631,27 @@ class DatabaseService {
             'Processing Delivery',
 
         'updatedAt':
-            DateTime.now()
-                .toIso8601String(),
+            now.toIso8601String(),
       });
+
+      // ===============================================
+      // REALTIME VALIDATION NOTIFICATION
+      // ===============================================
+
+      await createNotification(
+
+        title:
+            'Order Validated',
+
+        message:
+            '$customerName order validated successfully',
+
+        type:
+            'validation',
+
+        targetRole:
+            'admin',
+      );
 
     } catch (e) {
 
@@ -781,6 +817,29 @@ class DatabaseService {
 
         } catch (_) {}
       });
+
+      notifications.sort(
+        (a, b) {
+
+          final aDate =
+              DateTime.tryParse(
+                    a['createdAt']
+                        .toString(),
+                  ) ??
+                  DateTime.now();
+
+          final bDate =
+              DateTime.tryParse(
+                    b['createdAt']
+                        .toString(),
+                  ) ??
+                  DateTime.now();
+
+          return bDate.compareTo(
+            aDate,
+          );
+        },
+      );
 
       return notifications;
     });

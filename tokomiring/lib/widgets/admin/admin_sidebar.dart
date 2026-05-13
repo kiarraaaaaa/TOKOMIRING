@@ -1,4 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../../providers/auth_provider.dart';
 
 class AdminSidebar
     extends StatefulWidget {
@@ -38,6 +43,33 @@ class _AdminSidebarState
     BuildContext context,
   ) {
 
+    // =================================================
+    // REALTIME AUTH
+    // =================================================
+
+    final authProvider =
+        context.watch<AuthProvider>();
+
+    final currentUser =
+        authProvider.user;
+
+    final adminName =
+
+        currentUser
+                    ?.name
+                    .trim()
+                    .isNotEmpty ==
+                true
+
+            ? currentUser!
+                .name
+
+            : 'Administrator';
+
+    final photoUrl =
+        currentUser?.photoUrl ??
+            '';
+
     final width =
         MediaQuery.of(context)
             .size
@@ -49,16 +81,16 @@ class _AdminSidebarState
     final bool isMobile =
         width < 800;
 
-    double sidebarWidth = 280;
+    double sidebarWidth = 185;
 
     if (collapsed &&
         !isMobile) {
 
-      sidebarWidth = 90;
+      sidebarWidth = 68;
 
     } else if (isTablet) {
 
-      sidebarWidth = 230;
+      sidebarWidth = 165;
     }
 
     return AnimatedContainer(
@@ -100,15 +132,15 @@ class _AdminSidebarState
         child: Column(
           children: [
 
-            // =========================================
+            // =================================================
             // HEADER
-            // =========================================
+            // =================================================
 
             Padding(
 
               padding:
                   const EdgeInsets.all(
-                20,
+                10,
               ),
 
               child: Row(
@@ -116,16 +148,16 @@ class _AdminSidebarState
 
                   Container(
 
-                    width: 54,
+                    width: 36,
 
-                    height: 54,
+                    height: 36,
 
                     decoration:
                         BoxDecoration(
 
                       borderRadius:
                           BorderRadius.circular(
-                        18,
+                        10,
                       ),
 
                       gradient:
@@ -149,6 +181,8 @@ class _AdminSidebarState
 
                       Icons.storefront,
 
+                      size: 17,
+
                       color:
                           Colors.white,
                     ),
@@ -158,7 +192,7 @@ class _AdminSidebarState
                       isMobile) ...[
 
                     const SizedBox(
-                      width: 14,
+                      width: 8,
                     ),
 
                     Expanded(
@@ -186,12 +220,12 @@ class _AdminSidebarState
                               fontWeight:
                                   FontWeight.bold,
 
-                              fontSize: 18,
+                              fontSize: 10,
                             ),
                           ),
 
                           SizedBox(
-                            height: 4,
+                            height: 1,
                           ),
 
                           Text(
@@ -204,7 +238,7 @@ class _AdminSidebarState
                               color:
                                   Colors.white70,
 
-                              fontSize: 12,
+                              fontSize: 8,
                             ),
                           ),
                         ],
@@ -218,7 +252,7 @@ class _AdminSidebarState
 
                       borderRadius:
                           BorderRadius.circular(
-                        14,
+                        8,
                       ),
 
                       onTap: () {
@@ -232,9 +266,9 @@ class _AdminSidebarState
 
                       child: Container(
 
-                        width: 42,
+                        width: 28,
 
-                        height: 42,
+                        height: 28,
 
                         decoration:
                             BoxDecoration(
@@ -247,7 +281,7 @@ class _AdminSidebarState
 
                           borderRadius:
                               BorderRadius.circular(
-                            14,
+                            8,
                           ),
                         ),
 
@@ -259,6 +293,8 @@ class _AdminSidebarState
 
                               : Icons.menu_open,
 
+                          size: 15,
+
                           color:
                               Colors.white,
                         ),
@@ -269,12 +305,12 @@ class _AdminSidebarState
             ),
 
             const SizedBox(
-              height: 10,
+              height: 4,
             ),
 
-            // =========================================
+            // =================================================
             // MENU
-            // =========================================
+            // =================================================
 
             Expanded(
 
@@ -283,7 +319,7 @@ class _AdminSidebarState
 
                 padding:
                     const EdgeInsets.symmetric(
-                  horizontal: 14,
+                  horizontal: 8,
                 ),
 
                 children: [
@@ -335,129 +371,191 @@ class _AdminSidebarState
                         'Notifications',
                     index: 5,
                   ),
+
+                  sidebarItem(
+                    icon:
+                        Icons.person,
+                    title:
+                        'Profile',
+                    index: 6,
+                  ),
                 ],
               ),
             ),
 
-            // =========================================
-            // FOOTER
-            // =========================================
+            // =================================================
+            // FOOTER PROFILE
+            // =================================================
 
             Padding(
 
               padding:
                   const EdgeInsets.all(
-                20,
+                10,
               ),
 
               child: Column(
                 children: [
 
-                  Container(
+                  InkWell(
 
-                    padding:
-                        const EdgeInsets.all(
-                      16,
+                    borderRadius:
+                        BorderRadius.circular(
+                      14,
                     ),
 
-                    decoration:
-                        BoxDecoration(
+                    onTap: () {
 
-                      color:
-                          Colors.white
-                              .withOpacity(
-                        0.06,
+                      widget.onSelected(
+                        6,
+                      );
+                    },
+
+                    child: Container(
+
+                      padding:
+                          const EdgeInsets.all(
+                        10,
                       ),
 
-                      borderRadius:
-                          BorderRadius.circular(
-                        22,
+                      decoration:
+                          BoxDecoration(
+
+                        color:
+                            Colors.white
+                                .withOpacity(
+                          0.06,
+                        ),
+
+                        borderRadius:
+                            BorderRadius.circular(
+                          14,
+                        ),
                       ),
-                    ),
 
-                    child:
+                      child:
 
-                        collapsed &&
-                                !isMobile
+                          collapsed &&
+                                  !isMobile
 
-                            ? const CircleAvatar(
+                              ? buildAvatar(
+                                  photoUrl,
+                                )
 
-                                radius: 24,
+                              : Row(
+                                  children: [
 
-                                child: Icon(
-                                  Icons.person,
+                                    buildAvatar(
+                                      photoUrl,
+                                    ),
+
+                                    const SizedBox(
+                                      width: 8,
+                                    ),
+
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment
+                                                .start,
+
+                                        children: [
+
+                                          Row(
+                                            children: [
+
+                                              Expanded(
+                                                child: Text(
+
+                                                  adminName,
+
+                                                  overflow:
+                                                      TextOverflow
+                                                          .ellipsis,
+
+                                                  style:
+                                                      const TextStyle(
+
+                                                    color:
+                                                        Colors.white,
+
+                                                    fontWeight:
+                                                        FontWeight.bold,
+
+                                                    fontSize: 10.5,
+                                                  ),
+                                                ),
+                                              ),
+
+                                              const SizedBox(
+                                                width:
+                                                    4,
+                                              ),
+
+                                              Container(
+
+                                                width:
+                                                    14,
+
+                                                height:
+                                                    14,
+
+                                                decoration:
+                                                    const BoxDecoration(
+
+                                                  color:
+                                                      Color(
+                                                    0xff3B82F6,
+                                                  ),
+
+                                                  shape:
+                                                      BoxShape.circle,
+                                                ),
+
+                                                child:
+                                                    const Icon(
+
+                                                  Icons.check,
+
+                                                  color:
+                                                      Colors.white,
+
+                                                  size:
+                                                      10,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+
+                                          const SizedBox(
+                                            height:
+                                                1,
+                                          ),
+
+                                          const Text(
+
+                                            'System Manager',
+
+                                            style:
+                                                TextStyle(
+
+                                              color:
+                                                  Colors.white70,
+
+                                              fontSize:
+                                                  8.5,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              )
-
-                            : Row(
-                                children: [
-
-                                  const CircleAvatar(
-                                    radius: 24,
-                                    child: Icon(
-                                      Icons.person,
-                                    ),
-                                  ),
-
-                                  const SizedBox(
-                                    width: 14,
-                                  ),
-
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment
-                                              .start,
-
-                                      children: const [
-
-                                        Text(
-
-                                          'Administrator',
-
-                                          overflow:
-                                              TextOverflow
-                                                  .ellipsis,
-
-                                          style:
-                                              TextStyle(
-
-                                            color:
-                                                Colors.white,
-
-                                            fontWeight:
-                                                FontWeight.bold,
-                                          ),
-                                        ),
-
-                                        SizedBox(
-                                          height:
-                                              4,
-                                        ),
-
-                                        Text(
-
-                                          'System Manager',
-
-                                          style:
-                                              TextStyle(
-
-                                            color:
-                                                Colors.white70,
-
-                                            fontSize:
-                                                12,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
+                    ),
                   ),
 
                   const SizedBox(
-                    height: 16,
+                    height: 10,
                   ),
 
                   logoutButton(
@@ -467,6 +565,101 @@ class _AdminSidebarState
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  // =====================================================
+  // REALTIME AVATAR
+  // =====================================================
+
+  Widget buildAvatar(
+    String base64Photo,
+  ) {
+
+    try {
+
+      if (base64Photo
+          .isNotEmpty) {
+
+        return Container(
+
+          decoration:
+              BoxDecoration(
+
+            shape:
+                BoxShape.circle,
+
+            border: Border.all(
+
+              color:
+                  Colors.white
+                      .withOpacity(
+                0.15,
+              ),
+
+              width: 1.2,
+            ),
+          ),
+
+          child: CircleAvatar(
+
+            radius: 14,
+
+            backgroundImage:
+                MemoryImage(
+
+              base64Decode(
+                base64Photo,
+              ),
+            ),
+          ),
+        );
+      }
+
+    } catch (_) {}
+
+    return Container(
+
+      decoration:
+          BoxDecoration(
+
+        shape:
+            BoxShape.circle,
+
+        border: Border.all(
+
+          color:
+              Colors.white
+                  .withOpacity(
+            0.12,
+          ),
+
+          width: 1.2,
+        ),
+      ),
+
+      child:
+          const CircleAvatar(
+
+        radius: 14,
+
+        backgroundColor:
+            Color(
+          0xffE2E8F0,
+        ),
+
+        child: Icon(
+
+          Icons.person,
+
+          size: 14,
+
+          color:
+              Color(
+            0xff475569,
+          ),
         ),
       ),
     );
@@ -496,14 +689,14 @@ class _AdminSidebarState
 
       padding:
           const EdgeInsets.only(
-        bottom: 12,
+        bottom: 6,
       ),
 
       child: InkWell(
 
         borderRadius:
             BorderRadius.circular(
-          20,
+          14,
         ),
 
         onTap: () {
@@ -524,9 +717,9 @@ class _AdminSidebarState
           padding:
               const EdgeInsets.symmetric(
 
-            horizontal: 18,
+            horizontal: 11,
 
-            vertical: 18,
+            vertical: 11,
           ),
 
           decoration:
@@ -534,7 +727,7 @@ class _AdminSidebarState
 
             borderRadius:
                 BorderRadius.circular(
-              20,
+              14,
             ),
 
             gradient:
@@ -565,6 +758,8 @@ class _AdminSidebarState
 
                 icon,
 
+                size: 17,
+
                 color:
                     Colors.white,
               ),
@@ -572,7 +767,7 @@ class _AdminSidebarState
               if (showText) ...[
 
                 const SizedBox(
-                  width: 18,
+                  width: 10,
                 ),
 
                 Expanded(
@@ -593,7 +788,7 @@ class _AdminSidebarState
                       fontWeight:
                           FontWeight.w600,
 
-                      fontSize: 16,
+                      fontSize: 10.5,
                     ),
                   ),
                 ),
@@ -602,9 +797,9 @@ class _AdminSidebarState
 
                   Container(
 
-                    width: 10,
+                    width: 5,
 
-                    height: 10,
+                    height: 5,
 
                     decoration:
                         const BoxDecoration(
@@ -636,7 +831,7 @@ class _AdminSidebarState
 
       borderRadius:
           BorderRadius.circular(
-        18,
+        12,
       ),
 
       onTap:
@@ -650,9 +845,9 @@ class _AdminSidebarState
         padding:
             const EdgeInsets.symmetric(
 
-          horizontal: 18,
+          horizontal: 12,
 
-          vertical: 18,
+          vertical: 11,
         ),
 
         decoration:
@@ -666,7 +861,7 @@ class _AdminSidebarState
 
           borderRadius:
               BorderRadius.circular(
-            18,
+            12,
           ),
         ),
 
@@ -679,6 +874,8 @@ class _AdminSidebarState
 
                     Icons.logout,
 
+                    size: 15,
+
                     color:
                         Colors.red,
                   )
@@ -690,12 +887,14 @@ class _AdminSidebarState
 
                         Icons.logout,
 
+                        size: 15,
+
                         color:
                             Colors.red,
                       ),
 
                       SizedBox(
-                        width: 14,
+                        width: 8,
                       ),
 
                       Text(
@@ -707,6 +906,8 @@ class _AdminSidebarState
 
                           color:
                               Colors.red,
+
+                          fontSize: 10.5,
 
                           fontWeight:
                               FontWeight.bold,

@@ -1,6 +1,8 @@
 import 'dart:convert';
 
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../../providers/order_provider.dart';
@@ -11,7 +13,6 @@ import '../../models/product_model.dart';
 import '../../core/utils/app_format.dart';
 
 import '../../widgets/admin/admin_dashboard_header.dart';
-import '../../widgets/admin/admin_analytics_card.dart';
 
 class AdminSalesReportScreen extends StatefulWidget {
 
@@ -54,7 +55,7 @@ class _AdminSalesReportScreenState
         context.watch<ProductProvider>();
 
     final products =
-        productProvider.products;
+        productProvider.allProducts;
 
     final orders =
         orderProvider.orders;
@@ -64,6 +65,29 @@ class _AdminSalesReportScreenState
     int totalSold = 0;
 
     int completedOrders = 0;
+
+    // =====================================================
+    // REALTIME SOLD MAP
+    // =====================================================
+
+    final Map<String, int> soldMap = {};
+
+    // =====================================================
+    // DAILY CHART DATA
+    // =====================================================
+
+    final Map<int, double>
+        revenuePerDay = {};
+
+    final Map<int, int>
+        transactionPerDay = {};
+
+    for (int i = 0; i < 7; i++) {
+
+      revenuePerDay[i] = 0;
+
+      transactionPerDay[i] = 0;
+    }
 
     for (final order in orders) {
 
@@ -76,23 +100,56 @@ class _AdminSalesReportScreenState
         totalSold += order.totalItems;
 
         completedOrders++;
+
+        final weekday =
+            order.createdAt.weekday -
+                1;
+
+        revenuePerDay[weekday] =
+
+            (revenuePerDay[weekday] ?? 0) +
+
+                order.totalPrice;
+
+        transactionPerDay[weekday] =
+
+            (transactionPerDay[weekday] ?? 0) +
+
+                1;
+
+        for (final item in order.items) {
+
+          soldMap[item.productId] =
+              (soldMap[item.productId] ?? 0) +
+                  item.quantity;
+        }
       }
     }
 
-    final topProducts =
-        List<ProductModel>.from(
-      products,
-    )..sort(
-            (
-              a,
-              b,
-            ) {
+    // =====================================================
+    // TOP SELLING REALTIME
+    // =====================================================
 
-          return b.sold.compareTo(
-            a.sold,
-          );
-        },
-      );
+    final topProducts =
+        products.map((product) {
+
+      final sold =
+          soldMap[product.id] ?? 0;
+
+      return {
+        'product': product,
+        'sold': sold,
+      };
+
+    }).toList()
+
+      ..sort((a, b) {
+
+        return (b['sold'] as int)
+            .compareTo(
+          a['sold'] as int,
+        );
+      });
 
     return Scaffold(
 
@@ -162,6 +219,10 @@ class _AdminSalesReportScreenState
                 height: 30,
               ),
 
+              // =================================================
+              // ANALYTICS
+              // =================================================
+
               Wrap(
 
                 spacing: 20,
@@ -185,13 +246,12 @@ class _AdminSalesReportScreenState
 
                   analyticsCard(
 
-                    'Completed Orders',
+                    'Transactions',
 
                     completedOrders
                         .toString(),
 
-                    Icons
-                        .check_circle_rounded,
+                    Icons.receipt_long_rounded,
 
                     Colors.blue,
                   ),
@@ -226,6 +286,429 @@ class _AdminSalesReportScreenState
               const SizedBox(
                 height: 40,
               ),
+
+              // =================================================
+              // REVENUE CHART
+              // =================================================
+
+              Container(
+
+                width:
+                    double.infinity,
+
+                padding:
+                    const EdgeInsets.all(
+                  24,
+                ),
+
+                decoration:
+                    BoxDecoration(
+
+                  color:
+                      Colors.white,
+
+                  borderRadius:
+                      BorderRadius.circular(
+                    30,
+                  ),
+                ),
+
+                child: Column(
+
+                  crossAxisAlignment:
+                      CrossAxisAlignment
+                          .start,
+
+                  children: [
+
+                    Row(
+
+                      mainAxisAlignment:
+                          MainAxisAlignment
+                              .spaceBetween,
+
+                      children: [
+
+                        const Text(
+
+                          'Realtime Revenue Chart',
+
+                          style: TextStyle(
+
+                            fontSize: 24,
+
+                            fontWeight:
+                                FontWeight.bold,
+                          ),
+                        ),
+
+                        Container(
+
+                          padding:
+                              const EdgeInsets.symmetric(
+
+                            horizontal: 14,
+
+                            vertical: 8,
+                          ),
+
+                          decoration:
+                              BoxDecoration(
+
+                            color:
+                                Colors.green
+                                    .withOpacity(
+                              0.1,
+                            ),
+
+                            borderRadius:
+                                BorderRadius.circular(
+                              14,
+                            ),
+                          ),
+
+                          child:
+                              const Text(
+                            'LIVE',
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(
+                      height: 40,
+                    ),
+
+                    SizedBox(
+
+                      height: 320,
+
+                      child: LineChart(
+
+                        LineChartData(
+
+                          gridData:
+                              FlGridData(
+                            show: true,
+                          ),
+
+                          borderData:
+                              FlBorderData(
+                            show: false,
+                          ),
+
+                          titlesData:
+                              FlTitlesData(
+
+                            rightTitles:
+                                const AxisTitles(
+
+                              sideTitles:
+                                  SideTitles(
+                                showTitles:
+                                    false,
+                              ),
+                            ),
+
+                            topTitles:
+                                const AxisTitles(
+
+                              sideTitles:
+                                  SideTitles(
+                                showTitles:
+                                    false,
+                              ),
+                            ),
+
+                            bottomTitles:
+                                AxisTitles(
+
+                              sideTitles:
+                                  SideTitles(
+
+                                showTitles:
+                                    true,
+
+                                getTitlesWidget:
+                                    (
+                                      value,
+                                      meta,
+                                    ) {
+
+                                  final days = [
+
+                                    'Mon',
+
+                                    'Tue',
+
+                                    'Wed',
+
+                                    'Thu',
+
+                                    'Fri',
+
+                                    'Sat',
+
+                                    'Sun',
+                                  ];
+
+                                  return Padding(
+
+                                    padding:
+                                        const EdgeInsets.only(
+                                      top: 12,
+                                    ),
+
+                                    child: Text(
+
+                                      days[value
+                                          .toInt()],
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
+
+                          lineBarsData: [
+
+                            LineChartBarData(
+
+                              isCurved:
+                                  true,
+
+                              barWidth: 5,
+
+                              dotData:
+                                  const FlDotData(
+                                show: true,
+                              ),
+
+                              belowBarData:
+                                  BarAreaData(
+                                show: true,
+                              ),
+
+                              spots: List.generate(
+
+                                7,
+
+                                (index) {
+
+                                  return FlSpot(
+
+                                    index
+                                        .toDouble(),
+
+                                    (revenuePerDay[
+                                                    index] ??
+                                                0) /
+                                            1000,
+                                  );
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(
+                height: 40,
+              ),
+
+              // =================================================
+              // TRANSACTION CHART
+              // =================================================
+
+              Container(
+
+                width:
+                    double.infinity,
+
+                padding:
+                    const EdgeInsets.all(
+                  24,
+                ),
+
+                decoration:
+                    BoxDecoration(
+
+                  color:
+                      Colors.white,
+
+                  borderRadius:
+                      BorderRadius.circular(
+                    30,
+                  ),
+                ),
+
+                child: Column(
+
+                  crossAxisAlignment:
+                      CrossAxisAlignment
+                          .start,
+
+                  children: [
+
+                    const Text(
+
+                      'Realtime Transactions',
+
+                      style: TextStyle(
+
+                        fontSize: 24,
+
+                        fontWeight:
+                            FontWeight.bold,
+                      ),
+                    ),
+
+                    const SizedBox(
+                      height: 40,
+                    ),
+
+                    SizedBox(
+
+                      height: 280,
+
+                      child: BarChart(
+
+                        BarChartData(
+
+                          borderData:
+                              FlBorderData(
+                            show: false,
+                          ),
+
+                          gridData:
+                              FlGridData(
+                            show: true,
+                          ),
+
+                          titlesData:
+                              FlTitlesData(
+
+                            rightTitles:
+                                const AxisTitles(
+
+                              sideTitles:
+                                  SideTitles(
+                                showTitles:
+                                    false,
+                              ),
+                            ),
+
+                            topTitles:
+                                const AxisTitles(
+
+                              sideTitles:
+                                  SideTitles(
+                                showTitles:
+                                    false,
+                              ),
+                            ),
+
+                            bottomTitles:
+                                AxisTitles(
+
+                              sideTitles:
+                                  SideTitles(
+
+                                showTitles:
+                                    true,
+
+                                getTitlesWidget:
+                                    (
+                                      value,
+                                      meta,
+                                    ) {
+
+                                  final days = [
+
+                                    'Mon',
+
+                                    'Tue',
+
+                                    'Wed',
+
+                                    'Thu',
+
+                                    'Fri',
+
+                                    'Sat',
+
+                                    'Sun',
+                                  ];
+
+                                  return Padding(
+
+                                    padding:
+                                        const EdgeInsets.only(
+                                      top: 10,
+                                    ),
+
+                                    child: Text(
+
+                                      days[value
+                                          .toInt()],
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
+
+                          barGroups:
+                              List.generate(
+
+                            7,
+
+                            (index) {
+
+                              return BarChartGroupData(
+
+                                x: index,
+
+                                barRods: [
+
+                                  BarChartRodData(
+
+                                    toY:
+                                        transactionPerDay[
+                                                    index]
+                                                ?.toDouble() ??
+                                            0,
+
+                                    width:
+                                        26,
+
+                                    borderRadius:
+                                        BorderRadius.circular(
+                                      8,
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(
+                height: 40,
+              ),
+
+              // =================================================
+              // TOP SELLING
+              // =================================================
 
               Container(
 
@@ -339,11 +822,20 @@ class _AdminSalesReportScreenState
                           .take(5)
                           .map(
                         (
-                          product,
+                          data,
                         ) {
+
+                          final product =
+                              data['product']
+                                  as ProductModel;
+
+                          final sold =
+                              data['sold']
+                                  as int;
 
                           return topProductCard(
                             product,
+                            sold,
                           );
                         },
                       ),
@@ -360,10 +852,6 @@ class _AdminSalesReportScreenState
       ),
     );
   }
-
-  // =====================================================
-  // ANALYTICS CARD
-  // =====================================================
 
   Widget analyticsCard(
 
@@ -467,12 +955,9 @@ class _AdminSalesReportScreenState
     );
   }
 
-  // =====================================================
-  // PRODUCT CARD
-  // =====================================================
-
   Widget topProductCard(
     ProductModel product,
+    int sold,
   ) {
 
     return Container(
@@ -565,7 +1050,7 @@ class _AdminSalesReportScreenState
 
               Text(
 
-                '${product.sold} Sold',
+                '$sold Sold',
 
                 style:
                     const TextStyle(
@@ -595,10 +1080,6 @@ class _AdminSalesReportScreenState
       ),
     );
   }
-
-  // =====================================================
-  // PRODUCT IMAGE
-  // =====================================================
 
   Widget productImage(
     ProductModel product,
@@ -649,10 +1130,6 @@ class _AdminSalesReportScreenState
       return fallbackImage();
     }
   }
-
-  // =====================================================
-  // FALLBACK IMAGE
-  // =====================================================
 
   Widget fallbackImage() {
 
