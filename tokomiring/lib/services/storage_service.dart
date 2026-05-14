@@ -4,8 +4,8 @@ import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
 class StorageService {
-
-  final FirebaseStorage _storage =
+  final FirebaseStorage
+      _storage =
       FirebaseStorage.instance;
 
   // =====================================================
@@ -14,29 +14,21 @@ class StorageService {
 
   Future<PlatformFile?> pickImage()
       async {
-
     try {
-
       final result =
           await FilePicker.platform
               .pickFiles(
-
         type:
             FileType.image,
-
         allowMultiple:
             false,
-
-        withData:
-            true,
-
+        withData: true,
         allowCompression:
             true,
       );
 
       if (result == null ||
           result.files.isEmpty) {
-
         return null;
       }
 
@@ -45,7 +37,6 @@ class StorageService {
 
       if (file.bytes == null ||
           file.bytes!.isEmpty) {
-
         throw Exception(
           'Image bytes not found',
         );
@@ -57,7 +48,6 @@ class StorageService {
               '';
 
       final allowed = [
-
         'jpg',
         'jpeg',
         'png',
@@ -67,7 +57,6 @@ class StorageService {
       if (!allowed.contains(
         extension,
       )) {
-
         throw Exception(
           'Invalid image format',
         );
@@ -78,16 +67,13 @@ class StorageService {
               (1024 * 1024);
 
       if (sizeInMb > 10) {
-
         throw Exception(
           'Image max 10MB',
         );
       }
 
       return file;
-
     } catch (e) {
-
       throw Exception(
         e.toString(),
       );
@@ -99,57 +85,39 @@ class StorageService {
   // =====================================================
 
   Future<String> uploadWebImage({
-
     required Uint8List imageBytes,
-
     required String fileName,
-
   }) async {
-
     try {
-
       if (imageBytes.isEmpty) {
-
         throw Exception(
           'Image is empty',
         );
       }
 
       final safeName =
-          fileName
-              .replaceAll(
-                ' ',
-                '_',
-              )
-              .replaceAll(
-                '/',
-                '_',
-              )
-              .trim();
+          _safeFileName(
+        fileName,
+      );
 
       final ref =
           _storage
               .ref()
               .child(
-
                 'products/$safeName.jpg',
               );
 
       final metadata =
           SettableMetadata(
-
         contentType:
             'image/jpeg',
-
         cacheControl:
             'public,max-age=3600',
       );
 
       final snapshot =
           await ref.putData(
-
         imageBytes,
-
         metadata,
       );
 
@@ -158,9 +126,7 @@ class StorageService {
               .getDownloadURL();
 
       return imageUrl;
-
     } catch (e) {
-
       throw Exception(
         e.toString(),
       );
@@ -173,18 +139,12 @@ class StorageService {
 
   Future<String>
       uploadProductImage({
-
     required PlatformFile file,
-
     required String productId,
-
   }) async {
-
     try {
-
       if (file.bytes == null ||
           file.bytes!.isEmpty) {
-
         throw Exception(
           'Image data empty',
         );
@@ -195,35 +155,28 @@ class StorageService {
           file.bytes!;
 
       final safeId =
-          productId
-              .replaceAll(
-                '/',
-                '_',
-              );
+          _safeFileName(
+        productId,
+      );
 
       final ref =
           _storage
               .ref()
               .child(
-
                 'product_images/$safeId.jpg',
               );
 
       final metadata =
           SettableMetadata(
-
         contentType:
             'image/jpeg',
-
         cacheControl:
             'public,max-age=3600',
       );
 
       final uploadTask =
           ref.putData(
-
         imageData,
-
         metadata,
       );
 
@@ -235,9 +188,7 @@ class StorageService {
               .getDownloadURL();
 
       return downloadUrl;
-
     } catch (e) {
-
       throw Exception(
         e.toString(),
       );
@@ -250,18 +201,12 @@ class StorageService {
 
   Future<String>
       uploadProfileImage({
-
     required PlatformFile file,
-
     required String uid,
-
   }) async {
-
     try {
-
       if (file.bytes == null ||
           file.bytes!.isEmpty) {
-
         throw Exception(
           'Image data empty',
         );
@@ -272,34 +217,28 @@ class StorageService {
           file.bytes!;
 
       final safeUid =
-          uid.replaceAll(
-        '/',
-        '_',
+          _safeFileName(
+        uid,
       );
 
       final ref =
           _storage
               .ref()
               .child(
-
                 'profile_images/$safeUid.jpg',
               );
 
       final metadata =
           SettableMetadata(
-
         contentType:
             'image/jpeg',
-
         cacheControl:
             'public,max-age=3600',
       );
 
       final uploadTask =
           ref.putData(
-
         imageData,
-
         metadata,
       );
 
@@ -311,9 +250,7 @@ class StorageService {
               .getDownloadURL();
 
       return downloadUrl;
-
     } catch (e) {
-
       throw Exception(
         e.toString(),
       );
@@ -326,18 +263,12 @@ class StorageService {
 
   Future<String>
       uploadPaymentProof({
-
     required PlatformFile file,
-
     required String orderId,
-
   }) async {
-
     try {
-
       if (file.bytes == null ||
           file.bytes!.isEmpty) {
-
         throw Exception(
           'Image data empty',
         );
@@ -348,35 +279,28 @@ class StorageService {
           file.bytes!;
 
       final safeId =
-          orderId
-              .replaceAll(
-                '/',
-                '_',
-              );
+          _safeFileName(
+        orderId,
+      );
 
       final ref =
           _storage
               .ref()
               .child(
-
                 'payment_proofs/$safeId.jpg',
               );
 
       final metadata =
           SettableMetadata(
-
         contentType:
             'image/jpeg',
-
         cacheControl:
             'public,max-age=3600',
       );
 
       final uploadTask =
           ref.putData(
-
         imageData,
-
         metadata,
       );
 
@@ -388,9 +312,7 @@ class StorageService {
               .getDownloadURL();
 
       return downloadUrl;
-
     } catch (e) {
-
       throw Exception(
         e.toString(),
       );
@@ -404,18 +326,16 @@ class StorageService {
   Future<void> deleteImage(
     String imageUrl,
   ) async {
-
     try {
-
-      if (imageUrl.isEmpty) {
-
+      if (imageUrl
+          .trim()
+          .isEmpty) {
         return;
       }
 
       if (!imageUrl.startsWith(
         'https://',
       )) {
-
         return;
       }
 
@@ -424,7 +344,6 @@ class StorageService {
             imageUrl,
           )
           .delete();
-
     } catch (_) {}
   }
 
@@ -433,20 +352,13 @@ class StorageService {
   // =====================================================
 
   Future<String> uploadImage({
-
     required PlatformFile file,
-
     required String folderName,
-
     required String fileName,
-
   }) async {
-
     try {
-
       if (file.bytes == null ||
           file.bytes!.isEmpty) {
-
         throw Exception(
           'Image data empty',
         );
@@ -457,50 +369,33 @@ class StorageService {
           file.bytes!;
 
       final safeFolder =
-          folderName
-              .replaceAll(
-                ' ',
-                '_',
-              )
-              .replaceAll(
-                '/',
-                '_',
-              );
+          _safeFileName(
+        folderName,
+      );
 
       final safeFile =
-          fileName
-              .replaceAll(
-                ' ',
-                '_',
-              )
-              .replaceAll(
-                '/',
-                '_',
-              );
+          _safeFileName(
+        fileName,
+      );
 
       final ref =
           _storage
               .ref()
               .child(
-
                 '$safeFolder/$safeFile.jpg',
               );
 
       final metadata =
           SettableMetadata(
-
         contentType:
             'image/jpeg',
-
         cacheControl:
             'public,max-age=3600',
       );
 
       final uploadTask =
           ref.putData(
-
         imageData,
-
         metadata,
       );
 
@@ -512,12 +407,64 @@ class StorageService {
               .getDownloadURL();
 
       return downloadUrl;
-
     } catch (e) {
-
       throw Exception(
         e.toString(),
       );
     }
+  }
+
+  // =====================================================
+  // SAFE FILE NAME
+  // =====================================================
+
+  String _safeFileName(
+    String value,
+  ) {
+    return value
+        .replaceAll(
+          ' ',
+          '_',
+        )
+        .replaceAll(
+          '/',
+          '_',
+        )
+        .replaceAll(
+          '\\',
+          '_',
+        )
+        .trim();
+  }
+
+  // =====================================================
+  // IMAGE URL CHECK
+  // =====================================================
+
+  bool isNetworkImage(
+    String value,
+  ) {
+    return value
+            .trim()
+            .startsWith(
+              'https://',
+            ) ||
+        value
+            .trim()
+            .startsWith(
+              'http://',
+            );
+  }
+
+  // =====================================================
+  // VALID IMAGE CHECK
+  // =====================================================
+
+  bool hasValidImage(
+    String value,
+  ) {
+    return value
+        .trim()
+        .isNotEmpty;
   }
 }

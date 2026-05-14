@@ -1,13 +1,18 @@
+// lib/providers/order_provider.dart
+
 import 'dart:async';
 
 import 'package:flutter/material.dart';
 
 import '../models/order_model.dart';
-
 import '../services/database_service.dart';
 
 class OrderProvider
     extends ChangeNotifier {
+
+  // =====================================================
+  // SERVICES
+  // =====================================================
 
   final DatabaseService
       _databaseService =
@@ -36,10 +41,16 @@ class OrderProvider
   // =====================================================
 
   List<OrderModel> get orders =>
-      _orders;
+
+      List.unmodifiable(
+        _orders,
+      );
 
   bool get isLoading =>
       _isLoading;
+
+  bool get initialized =>
+      _initialized;
 
   String? get errorMessage =>
       _errorMessage;
@@ -72,6 +83,7 @@ class OrderProvider
   // =====================================================
 
   int get totalOrders =>
+
       _orders.length;
 
   // =====================================================
@@ -81,11 +93,27 @@ class OrderProvider
   int get pendingOrders {
 
     return _orders.where(
+
       (order) {
 
-        return order.status
-                .toLowerCase() ==
-            'waiting admin validation';
+        return order.status ==
+            'Waiting Admin Validation';
+      },
+    ).length;
+  }
+
+  // =====================================================
+  // VALIDATED
+  // =====================================================
+
+  int get validatedOrders {
+
+    return _orders.where(
+
+      (order) {
+
+        return order.status ==
+            'Processing Delivery';
       },
     ).length;
   }
@@ -97,11 +125,27 @@ class OrderProvider
   int get completedOrders {
 
     return _orders.where(
+
       (order) {
 
-        return order.status
-                .toLowerCase() ==
-            'completed';
+        return order.status ==
+            'Completed';
+      },
+    ).length;
+  }
+
+  // =====================================================
+  // REJECTED
+  // =====================================================
+
+  int get rejectedOrders {
+
+    return _orders.where(
+
+      (order) {
+
+        return order.status ==
+            'Rejected';
       },
     ).length;
   }
@@ -121,8 +165,12 @@ class OrderProvider
               .toLowerCase() ==
           'completed') {
 
-        total +=
-            order.totalItems;
+        for (final item
+            in order.items) {
+
+          total +=
+              item.quantity;
+        }
       }
     }
 
@@ -150,6 +198,7 @@ class OrderProvider
         ?.cancel();
 
     _orderSubscription =
+
         _databaseService
             .getOrders()
             .listen(
@@ -159,16 +208,12 @@ class OrderProvider
         _orders = data;
 
         _orders.sort(
-          (
-            a,
-            b,
-          ) {
 
-            return b.createdAt
-                .compareTo(
-              a.createdAt,
-            );
-          },
+          (a, b) =>
+
+              b.createdAt.compareTo(
+            a.createdAt,
+          ),
         );
 
         _setLoading(false);
@@ -189,7 +234,7 @@ class OrderProvider
   }
 
   // =====================================================
-  // FORCE REFRESH
+  // REFRESH
   // =====================================================
 
   Future<void>
@@ -206,6 +251,7 @@ class OrderProvider
           ?.cancel();
 
       _orderSubscription =
+
           _databaseService
               .getOrders()
               .listen(
@@ -215,16 +261,13 @@ class OrderProvider
           _orders = data;
 
           _orders.sort(
-            (
-              a,
-              b,
-            ) {
 
-              return b.createdAt
-                  .compareTo(
-                a.createdAt,
-              );
-            },
+            (a, b) =>
+
+                b.createdAt
+                    .compareTo(
+                  a.createdAt,
+                ),
           );
 
           _setLoading(false);
@@ -250,7 +293,8 @@ class OrderProvider
           if (!completer
               .isCompleted) {
 
-            completer.completeError(
+            completer
+                .completeError(
               e,
             );
           }
@@ -323,17 +367,22 @@ class OrderProvider
       _clearError();
 
       await _databaseService
-          .validateOrder(
-        orderId,
+          .updateOrderStatus(
+
+        orderId:
+            orderId,
+
+        status:
+            'Processing Delivery',
       );
 
       final index =
           _orders.indexWhere(
-        (order) {
 
-          return order.orderId ==
-              orderId;
-        },
+        (order) =>
+
+            order.orderId ==
+            orderId,
       );
 
       if (index != -1) {
@@ -341,8 +390,80 @@ class OrderProvider
         _orders[index] =
             _orders[index]
                 .copyWith(
+
           status:
               'Processing Delivery',
+
+          updatedAt:
+              DateTime.now(),
+        );
+      }
+
+      await refreshOrders();
+
+      notifyListeners();
+
+      return true;
+
+    } catch (e) {
+
+      _errorMessage =
+          e.toString();
+
+      notifyListeners();
+
+      return false;
+
+    } finally {
+
+      _setLoading(false);
+    }
+  }
+
+  // =====================================================
+  // REJECT ORDER
+  // =====================================================
+
+  Future<bool> rejectOrder(
+    String orderId,
+  ) async {
+
+    try {
+
+      _setLoading(true);
+
+      _clearError();
+
+      await _databaseService
+          .updateOrderStatus(
+
+        orderId:
+            orderId,
+
+        status:
+            'Rejected',
+      );
+
+      final index =
+          _orders.indexWhere(
+
+        (order) =>
+
+            order.orderId ==
+            orderId,
+      );
+
+      if (index != -1) {
+
+        _orders[index] =
+            _orders[index]
+                .copyWith(
+
+          status:
+              'Rejected',
+
+          updatedAt:
+              DateTime.now(),
         );
       }
 
@@ -388,11 +509,11 @@ class OrderProvider
 
       final index =
           _orders.indexWhere(
-        (order) {
 
-          return order.orderId ==
-              orderId;
-        },
+        (order) =>
+
+            order.orderId ==
+            orderId,
       );
 
       if (index == -1) {
@@ -405,10 +526,6 @@ class OrderProvider
       final oldOrder =
           _orders[index];
 
-      // ===============================================
-      // UPDATE DATABASE
-      // ===============================================
-
       await _databaseService
           .updateOrderStatus(
 
@@ -419,18 +536,15 @@ class OrderProvider
             status,
       );
 
-      // ===============================================
-      // UPDATE LOCAL REALTIME
-      // ===============================================
-
       _orders[index] =
           oldOrder.copyWith(
-        status: status,
-      );
 
-      // ===============================================
-      // REFRESH REALTIME
-      // ===============================================
+        status:
+            status,
+
+        updatedAt:
+            DateTime.now(),
+      );
 
       await refreshOrders();
 
@@ -454,7 +568,7 @@ class OrderProvider
   }
 
   // =====================================================
-  // DELETE
+  // DELETE ORDER
   // =====================================================
 
   Future<bool> deleteOrder(
@@ -468,11 +582,11 @@ class OrderProvider
       _clearError();
 
       _orders.removeWhere(
-        (order) {
 
-          return order.orderId ==
-              orderId;
-        },
+        (order) =>
+
+            order.orderId ==
+            orderId,
       );
 
       notifyListeners();
@@ -505,11 +619,11 @@ class OrderProvider
     try {
 
       return _orders.firstWhere(
-        (order) {
 
-          return order.orderId ==
-              orderId;
-        },
+        (order) =>
+
+            order.orderId ==
+            orderId,
       );
 
     } catch (_) {
@@ -527,13 +641,25 @@ class OrderProvider
     String userId,
   ) {
 
-    return _orders.where(
-      (order) {
+    final orders =
+        _orders.where(
 
-        return order.userId ==
-            userId;
-      },
+      (order) =>
+
+          order.userId ==
+          userId,
     ).toList();
+
+    orders.sort(
+
+      (a, b) =>
+
+          b.createdAt.compareTo(
+        a.createdAt,
+      ),
+    );
+
+    return orders;
   }
 
   // =====================================================
@@ -546,12 +672,13 @@ class OrderProvider
   ) {
 
     return _orders.where(
-      (order) {
 
-        return order.status
-                .toLowerCase() ==
-            status.toLowerCase();
-      },
+      (order) =>
+
+          order.status
+              .toLowerCase() ==
+
+          status.toLowerCase(),
     ).toList();
   }
 
@@ -585,7 +712,8 @@ class OrderProvider
       }
 
       final weekday =
-          order.createdAt.weekday;
+          order.createdAt
+              .weekday;
 
       switch (weekday) {
 
@@ -656,7 +784,8 @@ class OrderProvider
 
   void clearError() {
 
-    _errorMessage = null;
+    _errorMessage =
+        null;
 
     notifyListeners();
   }
@@ -669,14 +798,16 @@ class OrderProvider
     bool value,
   ) {
 
-    _isLoading = value;
+    _isLoading =
+        value;
 
     notifyListeners();
   }
 
   void _clearError() {
 
-    _errorMessage = null;
+    _errorMessage =
+        null;
   }
 
   // =====================================================

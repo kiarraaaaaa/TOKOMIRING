@@ -183,7 +183,7 @@ class _AdminProfileScreenState
         address:
             currentUser.address,
 
-        photoUrl:
+        photoBase64:
             base64Photo ?? '',
       );
 

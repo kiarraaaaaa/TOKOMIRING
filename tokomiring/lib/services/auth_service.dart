@@ -1,4 +1,4 @@
-// lib/services/auth_service.dart
+ // lib/services/auth_service.dart
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -6,12 +6,17 @@ import 'package:firebase_database/firebase_database.dart';
 import '../models/user_model.dart';
 
 class AuthService {
+  // =====================================================
+  // FIREBASE
+  // =====================================================
 
   final FirebaseAuth _auth =
       FirebaseAuth.instance;
 
-  final DatabaseReference _database =
-      FirebaseDatabase.instance.ref();
+  final DatabaseReference
+      _database =
+      FirebaseDatabase.instance
+          .ref();
 
   // =====================================================
   // CURRENT USER
@@ -28,34 +33,37 @@ class AuthService {
       _auth.authStateChanges();
 
   // =====================================================
+  // USER DATA STREAM
+  // =====================================================
+
+  Stream<DatabaseEvent> userStream(
+    String uid,
+  ) {
+    return _database
+        .child('users')
+        .child(uid)
+        .onValue;
+  }
+
+  // =====================================================
   // REGISTER
   // =====================================================
 
   Future<UserModel?> register({
-
     required String name,
-
     required String username,
-
     required String email,
-
     required String password,
-
     String role = 'user',
-
   }) async {
-
     try {
-
       final credential =
           await _auth
               .createUserWithEmailAndPassword(
-
         email:
             email
                 .trim()
                 .toLowerCase(),
-
         password:
             password.trim(),
       );
@@ -64,9 +72,8 @@ class AuthService {
           credential.user;
 
       if (user == null) {
-
         throw Exception(
-          'User not found',
+          'Failed to create user',
         );
       }
 
@@ -74,42 +81,30 @@ class AuthService {
         name.trim(),
       );
 
+      final now =
+          DateTime.now();
+
       final userModel =
           UserModel(
-
         uid:
             user.uid,
-
         name:
             name.trim(),
-
         username:
             username
                 .trim()
                 .toLowerCase(),
-
         email:
             email
                 .trim()
                 .toLowerCase(),
-
         role:
             role,
-
-        photoUrl:
-            '',
-
-        phone:
-            '',
-
-        address:
-            '',
-
-        isActive:
-            true,
-
-        createdAt:
-            DateTime.now(),
+        photoUrl: '',
+        phone: '',
+        address: '',
+        isActive: true,
+        createdAt: now,
       );
 
       await _database
@@ -120,16 +115,12 @@ class AuthService {
           );
 
       return userModel;
-
     } on FirebaseAuthException catch (e) {
-
       throw Exception(
         e.message ??
             'Register failed',
       );
-
     } catch (e) {
-
       throw Exception(
         e.toString(),
       );
@@ -141,24 +132,17 @@ class AuthService {
   // =====================================================
 
   Future<UserModel?> login({
-
     required String email,
-
     required String password,
-
   }) async {
-
     try {
-
       final credential =
           await _auth
               .signInWithEmailAndPassword(
-
         email:
             email
                 .trim()
                 .toLowerCase(),
-
         password:
             password.trim(),
       );
@@ -167,11 +151,12 @@ class AuthService {
           credential.user;
 
       if (user == null) {
-
         throw Exception(
           'User not found',
         );
       }
+
+      await user.reload();
 
       final snapshot =
           await _database
@@ -181,7 +166,6 @@ class AuthService {
 
       if (!snapshot.exists ||
           snapshot.value == null) {
-
         throw Exception(
           'User data not found',
         );
@@ -192,20 +176,32 @@ class AuthService {
         snapshot.value as Map,
       );
 
-      return UserModel.fromMap(
+      final userModel =
+          UserModel.fromMap(
         data,
         user.uid,
       );
 
-    } on FirebaseAuthException catch (e) {
+      // ===============================================
+      // AUTO UPDATE LAST LOGIN
+      // ===============================================
 
+      await _database
+          .child('users')
+          .child(user.uid)
+          .update({
+        'lastLogin':
+            DateTime.now()
+                .millisecondsSinceEpoch,
+      });
+
+      return userModel;
+    } on FirebaseAuthException catch (e) {
       throw Exception(
         e.message ??
             'Login failed',
       );
-
     } catch (e) {
-
       throw Exception(
         e.toString(),
       );
@@ -219,9 +215,7 @@ class AuthService {
   Future<UserModel?> getUserData(
     String uid,
   ) async {
-
     try {
-
       final snapshot =
           await _database
               .child('users')
@@ -230,7 +224,6 @@ class AuthService {
 
       if (!snapshot.exists ||
           snapshot.value == null) {
-
         return null;
       }
 
@@ -243,9 +236,7 @@ class AuthService {
         data,
         uid,
       );
-
     } catch (e) {
-
       throw Exception(
         e.toString(),
       );
@@ -257,11 +248,8 @@ class AuthService {
   // =====================================================
 
   Future<List<UserModel>>
-      getAllUsers()
-      async {
-
+      getAllUsers() async {
     try {
-
       final snapshot =
           await _database
               .child('users')
@@ -269,7 +257,6 @@ class AuthService {
 
       if (!snapshot.exists ||
           snapshot.value == null) {
-
         return [];
       }
 
@@ -285,24 +272,18 @@ class AuthService {
         key,
         value,
       ) {
-
         users.add(
-
           UserModel.fromMap(
-
             Map<dynamic, dynamic>.from(
               value,
             ),
-
             key,
           ),
         );
       });
 
       return users;
-
     } catch (e) {
-
       throw Exception(
         e.toString(),
       );
@@ -316,41 +297,68 @@ class AuthService {
   Future<void> updateUser(
     UserModel user,
   ) async {
-
     try {
-
       await _database
           .child('users')
           .child(user.uid)
           .update({
-
         'name':
-            user.name,
+            user.name.trim(),
 
         'username':
-            user.username,
+            user.username
+                .trim()
+                .toLowerCase(),
 
         'email':
-            user.email,
+            user.email
+                .trim()
+                .toLowerCase(),
 
         'role':
             user.role,
 
         'photoUrl':
-            user.photoUrl,
+            user.photoUrl
+                .trim(),
 
         'phone':
-            user.phone,
+            user.phone.trim(),
 
         'address':
-            user.address,
+            user.address
+                .trim(),
 
         'isActive':
             user.isActive,
+
+        'updatedAt':
+            DateTime.now()
+                .millisecondsSinceEpoch,
       });
 
-    } catch (e) {
+      // ===============================================
+      // FIREBASE AUTH UPDATE
+      // ===============================================
 
+      await _auth.currentUser
+          ?.updateDisplayName(
+        user.name.trim(),
+      );
+
+      if (user.photoUrl
+          .trim()
+          .isNotEmpty) {
+        await _auth.currentUser
+            ?.updatePhotoURL(
+          user.photoUrl
+              .trim(),
+        );
+      }
+
+      await _auth.currentUser
+          ?.reload();
+    } catch (e) {
       throw Exception(
         e.toString(),
       );
@@ -362,32 +370,18 @@ class AuthService {
   // =====================================================
 
   Future<void> updateProfile({
-
     required String uid,
-
     required String name,
-
     required String username,
-
     required String phone,
-
     required String address,
-
     required String photoUrl,
-
   }) async {
-
     try {
-
-      // ===============================================
-      // UPDATE DATABASE
-      // ===============================================
-
       await _database
           .child('users')
           .child(uid)
           .update({
-
         'name':
             name.trim(),
 
@@ -404,40 +398,122 @@ class AuthService {
 
         'photoUrl':
             photoUrl.trim(),
-      });
 
-      // ===============================================
-      // UPDATE FIREBASE AUTH
-      // ===============================================
+        'updatedAt':
+            DateTime.now()
+                .millisecondsSinceEpoch,
+      });
 
       await _auth.currentUser
           ?.updateDisplayName(
         name.trim(),
       );
 
-      // ===============================================
-      // PHOTO REALTIME REFRESH
-      // ===============================================
-
       if (photoUrl
           .trim()
           .isNotEmpty) {
-
         await _auth.currentUser
             ?.updatePhotoURL(
           photoUrl.trim(),
         );
       }
 
-      // ===============================================
-      // FORCE REFRESH
-      // ===============================================
+      await _auth.currentUser
+          ?.reload();
+    } catch (e) {
+      throw Exception(
+        e.toString(),
+      );
+    }
+  }
+
+  // =====================================================
+  // UPDATE ADDRESS
+  // =====================================================
+
+  Future<void> updateAddress({
+    required String uid,
+    required String address,
+  }) async {
+    try {
+      await _database
+          .child('users')
+          .child(uid)
+          .update({
+        'address':
+            address.trim(),
+
+        'updatedAt':
+            DateTime.now()
+                .millisecondsSinceEpoch,
+      });
+    } catch (e) {
+      throw Exception(
+        e.toString(),
+      );
+    }
+  }
+
+  // =====================================================
+  // UPDATE PHONE
+  // =====================================================
+
+  Future<void> updatePhone({
+    required String uid,
+    required String phone,
+  }) async {
+    try {
+      await _database
+          .child('users')
+          .child(uid)
+          .update({
+        'phone':
+            phone.trim(),
+
+        'updatedAt':
+            DateTime.now()
+                .millisecondsSinceEpoch,
+      });
+    } catch (e) {
+      throw Exception(
+        e.toString(),
+      );
+    }
+  }
+
+  // =====================================================
+  // UPDATE PROFILE PHOTO ONLY
+  // =====================================================
+
+  Future<void> updateProfilePhoto({
+    required String uid,
+    required String photoUrl,
+  }) async {
+    try {
+      await _database
+          .child('users')
+          .child(uid)
+          .update({
+        'photoUrl':
+            photoUrl.trim(),
+
+        'updatedAt':
+            DateTime.now()
+                .millisecondsSinceEpoch,
+      });
+
+      if (photoUrl
+          .trim()
+          .isNotEmpty) {
+        await _auth.currentUser
+            ?.updatePhotoURL(
+          photoUrl.trim(),
+        );
+      }
 
       await _auth.currentUser
           ?.reload();
-
     } catch (e) {
-
       throw Exception(
         e.toString(),
       );
@@ -451,20 +527,15 @@ class AuthService {
   Future<void> resetPassword(
     String email,
   ) async {
-
     try {
-
       await _auth
           .sendPasswordResetEmail(
-
         email:
             email
                 .trim()
                 .toLowerCase(),
       );
-
     } on FirebaseAuthException catch (e) {
-
       throw Exception(
         e.message ??
             'Reset password failed',
@@ -478,13 +549,9 @@ class AuthService {
 
   Future<void> logout()
       async {
-
     try {
-
       await _auth.signOut();
-
     } catch (e) {
-
       throw Exception(
         e.toString(),
       );
@@ -498,9 +565,7 @@ class AuthService {
   Future<void> deleteAccount(
     String uid,
   ) async {
-
     try {
-
       await _database
           .child('users')
           .child(uid)
@@ -510,19 +575,14 @@ class AuthService {
           _auth.currentUser;
 
       if (user != null) {
-
         await user.delete();
       }
-
     } on FirebaseAuthException catch (e) {
-
       throw Exception(
         e.message ??
             'Delete account failed',
       );
-
     } catch (e) {
-
       throw Exception(
         e.toString(),
       );
@@ -536,9 +596,7 @@ class AuthService {
   Future<bool> isAdmin(
     String uid,
   ) async {
-
     try {
-
       final snapshot =
           await _database
               .child('users')
@@ -547,7 +605,6 @@ class AuthService {
 
       if (!snapshot.exists ||
           snapshot.value == null) {
-
         return false;
       }
 
@@ -558,9 +615,38 @@ class AuthService {
 
       return data['role'] ==
           'admin';
-
     } catch (_) {
+      return false;
+    }
+  }
 
+  // =====================================================
+  // CHECK MEMBER
+  // =====================================================
+
+  Future<bool> isMember(
+    String uid,
+  ) async {
+    try {
+      final snapshot =
+          await _database
+              .child('users')
+              .child(uid)
+              .get();
+
+      if (!snapshot.exists ||
+          snapshot.value == null) {
+        return false;
+      }
+
+      final data =
+          Map<dynamic, dynamic>.from(
+        snapshot.value as Map,
+      );
+
+      return data['role'] ==
+          'user';
+    } catch (_) {
       return false;
     }
   }
@@ -572,9 +658,7 @@ class AuthService {
   Future<void>
       createDefaultAdmin()
       async {
-
     try {
-
       const adminEmail =
           'admin@tokomiring.com';
 
@@ -588,26 +672,19 @@ class AuthService {
       );
 
       if (methods.isEmpty) {
-
         await register(
-
           name:
               'Administrator',
-
           username:
               'admin',
-
           email:
               adminEmail,
-
           password:
               adminPassword,
-
           role:
               'admin',
         );
       }
-
     } catch (_) {}
   }
 }

@@ -1,3 +1,5 @@
+// lib/services/database_service.dart
+
 import 'package:firebase_database/firebase_database.dart';
 import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
@@ -18,6 +20,25 @@ class DatabaseService {
       const Uuid();
 
   // =====================================================
+  // DATABASE PATHS
+  // =====================================================
+
+  static const String productsPath =
+      'products';
+
+  static const String ordersPath =
+      'orders';
+
+  static const String usersPath =
+      'users';
+
+  static const String notificationsPath =
+      'notifications';
+
+  static const String cartsPath =
+      'carts';
+
+  // =====================================================
   // PRODUCT SECTION
   // =====================================================
 
@@ -29,7 +50,7 @@ class DatabaseService {
 
       final productRef =
           _database
-              .child('products')
+              .child(productsPath)
               .child(product.id);
 
       final snapshot =
@@ -42,8 +63,39 @@ class DatabaseService {
         );
       }
 
-      await productRef.set(
-        product.toMap(),
+      await productRef.set({
+
+        ...product.toMap(),
+
+        'createdAt':
+            DateTime.now()
+                .toIso8601String(),
+
+        'updatedAt':
+            DateTime.now()
+                .toIso8601String(),
+
+        'isAvailable':
+            true,
+      });
+
+      // ===============================================
+      // NOTIFICATION
+      // ===============================================
+
+      await createNotification(
+
+        title:
+            'New Product',
+
+        message:
+            '${product.name} added successfully',
+
+        type:
+            'product',
+
+        targetRole:
+            'user',
       );
 
     } catch (e) {
@@ -65,11 +117,16 @@ class DatabaseService {
     try {
 
       await _database
-          .child('products')
+          .child(productsPath)
           .child(product.id)
-          .update(
-            product.toMap(),
-          );
+          .update({
+
+        ...product.toMap(),
+
+        'updatedAt':
+            DateTime.now()
+                .toIso8601String(),
+      });
 
     } catch (e) {
 
@@ -90,7 +147,7 @@ class DatabaseService {
     try {
 
       await _database
-          .child('products')
+          .child(productsPath)
           .child(productId)
           .remove();
 
@@ -124,11 +181,16 @@ class DatabaseService {
       }
 
       await _database
-          .child('products')
+          .child(productsPath)
           .child(productId)
           .update({
 
-        'stock': stock,
+        'stock':
+            stock,
+
+        'updatedAt':
+            DateTime.now()
+                .toIso8601String(),
       });
 
     } catch (e) {
@@ -147,7 +209,7 @@ class DatabaseService {
       getProducts() {
 
     return _database
-        .child('products')
+        .child(productsPath)
         .onValue
         .map((event) {
 
@@ -171,23 +233,28 @@ class DatabaseService {
 
         try {
 
-          products.add(
+          final product =
+              ProductModel.fromMap(
 
-            ProductModel.fromMap(
-
-              Map<dynamic, dynamic>.from(
-                value,
-              ),
-
-              key,
+            Map<dynamic, dynamic>.from(
+              value,
             ),
+
+            key,
           );
+
+          if (product.stock > 0) {
+
+            products.add(product);
+          }
 
         } catch (_) {}
       });
 
       products.sort(
+
         (a, b) =>
+
             b.createdAt.compareTo(
           a.createdAt,
         ),
@@ -198,7 +265,43 @@ class DatabaseService {
   }
 
   // =====================================================
-  // CATEGORY
+  // SEARCH PRODUCTS
+  // =====================================================
+
+  Stream<List<ProductModel>>
+      searchProducts(
+    String query,
+  ) {
+
+    return getProducts().map(
+
+      (products) {
+
+        return products.where(
+
+          (product) {
+
+            return product.name
+                    .toLowerCase()
+                    .contains(
+
+                      query.toLowerCase(),
+                    ) ||
+
+                product.category
+                    .toLowerCase()
+                    .contains(
+
+                      query.toLowerCase(),
+                    );
+          },
+        ).toList();
+      },
+    );
+  }
+
+  // =====================================================
+  // CATEGORY PRODUCTS
   // =====================================================
 
   Stream<List<ProductModel>>
@@ -223,6 +326,249 @@ class DatabaseService {
   }
 
   // =====================================================
+  // CART SECTION
+  // =====================================================
+
+  Future<void> addToCart({
+
+    required String userId,
+
+    required ProductModel product,
+
+    required int quantity,
+
+  }) async {
+
+    try {
+
+      final cartRef =
+          _database
+              .child(cartsPath)
+              .child(userId)
+              .child(product.id);
+
+      final snapshot =
+          await cartRef.get();
+
+      int currentQty = 0;
+
+      if (snapshot.exists &&
+          snapshot.value != null) {
+
+        final data =
+            Map<dynamic, dynamic>.from(
+          snapshot.value as Map,
+        );
+
+        currentQty =
+            data['quantity'] ?? 0;
+      }
+
+      final updatedQty =
+          currentQty + quantity;
+
+      await cartRef.set({
+
+        'productId':
+            product.id,
+
+        'name':
+            product.name,
+
+        'imageBase64':
+            product.imageBase64,
+
+        'price':
+            product.price,
+
+        'stock':
+            product.stock,
+
+        'quantity':
+            updatedQty,
+
+        'subtotal':
+            updatedQty *
+                product.price,
+
+        'createdAt':
+            DateTime.now()
+                .toIso8601String(),
+      });
+
+    } catch (e) {
+
+      throw Exception(
+        e.toString(),
+      );
+    }
+  }
+
+  // =====================================================
+  // GET CART
+  // =====================================================
+
+  Stream<List<Map<dynamic, dynamic>>>
+      getCart(
+    String userId,
+  ) {
+
+    return _database
+        .child(cartsPath)
+        .child(userId)
+        .onValue
+        .map((event) {
+
+      final data =
+          event.snapshot.value;
+
+      if (data == null) {
+
+        return [];
+      }
+
+      final map =
+          Map<dynamic, dynamic>.from(
+        data as Map,
+      );
+
+      final List<Map<dynamic, dynamic>>
+          items = [];
+
+      map.forEach((key, value) {
+
+        try {
+
+          items.add(
+
+            Map<dynamic, dynamic>.from(
+              value,
+            ),
+          );
+
+        } catch (_) {}
+      });
+
+      return items;
+    });
+  }
+
+  // =====================================================
+  // UPDATE CART QUANTITY
+  // =====================================================
+
+  Future<void>
+      updateCartQuantity({
+
+    required String userId,
+
+    required String productId,
+
+    required int quantity,
+
+  }) async {
+
+    try {
+
+      final cartRef =
+          _database
+              .child(cartsPath)
+              .child(userId)
+              .child(productId);
+
+      if (quantity <= 0) {
+
+        await cartRef.remove();
+
+        return;
+      }
+
+      final snapshot =
+          await cartRef.get();
+
+      if (!snapshot.exists ||
+          snapshot.value == null) {
+
+        return;
+      }
+
+      final data =
+          Map<dynamic, dynamic>.from(
+        snapshot.value as Map,
+      );
+
+      final price =
+          data['price'] ?? 0;
+
+      await cartRef.update({
+
+        'quantity':
+            quantity,
+
+        'subtotal':
+            quantity * price,
+      });
+
+    } catch (e) {
+
+      throw Exception(
+        e.toString(),
+      );
+    }
+  }
+
+  // =====================================================
+  // REMOVE CART ITEM
+  // =====================================================
+
+  Future<void> removeCartItem({
+
+    required String userId,
+
+    required String productId,
+
+  }) async {
+
+    try {
+
+      await _database
+          .child(cartsPath)
+          .child(userId)
+          .child(productId)
+          .remove();
+
+    } catch (e) {
+
+      throw Exception(
+        e.toString(),
+      );
+    }
+  }
+
+  // =====================================================
+  // CLEAR CART
+  // =====================================================
+
+  Future<void> clearCart(
+    String userId,
+  ) async {
+
+    try {
+
+      await _database
+          .child(cartsPath)
+          .child(userId)
+          .remove();
+
+    } catch (e) {
+
+      throw Exception(
+        e.toString(),
+      );
+    }
+  }
+
+  // =====================================================
   // CREATE NOTIFICATION
   // =====================================================
 
@@ -242,7 +588,7 @@ class DatabaseService {
         DateTime.now().toLocal();
 
     await _database
-        .child('notifications')
+        .child(notificationsPath)
         .push()
         .set({
 
@@ -267,16 +613,12 @@ class DatabaseService {
       'time':
           DateFormat(
             'HH:mm:ss',
-          ).format(
-            now,
-          ),
+          ).format(now),
 
       'date':
           DateFormat(
             'dd MMM yyyy',
-          ).format(
-            now,
-          ),
+          ).format(now),
     });
   }
 
@@ -307,6 +649,12 @@ class DatabaseService {
 
         updatedAt:
             now,
+
+        status:
+            'Pending',
+
+        isValidated:
+            false,
       );
 
       // ===============================================
@@ -314,14 +662,14 @@ class DatabaseService {
       // ===============================================
 
       await _database
-          .child('orders')
+          .child(ordersPath)
           .child(orderId)
           .set(
             newOrder.toMap(),
           );
 
       // ===============================================
-      // REDUCE STOCK
+      // UPDATE STOCK
       // ===============================================
 
       for (final item
@@ -329,7 +677,7 @@ class DatabaseService {
 
         final snapshot =
             await _database
-                .child('products')
+                .child(productsPath)
                 .child(
                   item.productId,
                 )
@@ -359,7 +707,7 @@ class DatabaseService {
         }
 
         await _database
-            .child('products')
+            .child(productsPath)
             .child(
               item.productId,
             )
@@ -371,7 +719,15 @@ class DatabaseService {
       }
 
       // ===============================================
-      // REALTIME NOTIFICATION
+      // CLEAR CART
+      // ===============================================
+
+      await clearCart(
+        order.userId,
+      );
+
+      // ===============================================
+      // ADMIN NOTIFICATION
       // ===============================================
 
       await createNotification(
@@ -380,13 +736,32 @@ class DatabaseService {
             'New Order',
 
         message:
-            '${order.customerName} created a new order',
+            '${order.customerName} placed a new order',
 
         type:
             'order',
 
         targetRole:
             'admin',
+      );
+
+      // ===============================================
+      // USER NOTIFICATION
+      // ===============================================
+
+      await createNotification(
+
+        title:
+            'Order Created',
+
+        message:
+            'Your order has been submitted successfully',
+
+        type:
+            'order',
+
+        targetRole:
+            'user',
       );
 
       return orderId;
@@ -407,7 +782,7 @@ class DatabaseService {
       getOrders() {
 
     return _database
-        .child('orders')
+        .child(ordersPath)
         .onValue
         .map((event) {
 
@@ -447,7 +822,9 @@ class DatabaseService {
       });
 
       orders.sort(
+
         (a, b) =>
+
             b.createdAt.compareTo(
           a.createdAt,
         ),
@@ -496,7 +873,7 @@ class DatabaseService {
 
       final orderSnapshot =
           await _database
-              .child('orders')
+              .child(ordersPath)
               .child(orderId)
               .get();
 
@@ -531,10 +908,6 @@ class DatabaseService {
             now.toIso8601String(),
       };
 
-      // ===============================================
-      // COMPLETED TIME
-      // ===============================================
-
       if (status
               .toLowerCase() ==
           'completed') {
@@ -543,25 +916,21 @@ class DatabaseService {
             now.toIso8601String();
       }
 
-      // ===============================================
-      // UPDATE ORDER
-      // ===============================================
-
       await _database
-          .child('orders')
+          .child(ordersPath)
           .child(orderId)
           .update(
             updates,
           );
 
       // ===============================================
-      // REALTIME NOTIFICATION
+      // USER NOTIFICATION
       // ===============================================
 
       await createNotification(
 
         title:
-            'Order Updated',
+            'Order Status Updated',
 
         message:
             '$customerName order changed to $status',
@@ -570,7 +939,7 @@ class DatabaseService {
             'status',
 
         targetRole:
-            'admin',
+            'user',
       );
 
     } catch (e) {
@@ -593,7 +962,7 @@ class DatabaseService {
 
       final orderSnapshot =
           await _database
-              .child('orders')
+              .child(ordersPath)
               .child(orderId)
               .get();
 
@@ -620,7 +989,7 @@ class DatabaseService {
           DateTime.now();
 
       await _database
-          .child('orders')
+          .child(ordersPath)
           .child(orderId)
           .update({
 
@@ -628,14 +997,14 @@ class DatabaseService {
             true,
 
         'status':
-            'Processing Delivery',
+            'Validated',
 
         'updatedAt':
             now.toIso8601String(),
       });
 
       // ===============================================
-      // REALTIME VALIDATION NOTIFICATION
+      // USER NOTIFICATION
       // ===============================================
 
       await createNotification(
@@ -650,7 +1019,7 @@ class DatabaseService {
             'validation',
 
         targetRole:
-            'admin',
+            'user',
       );
 
     } catch (e) {
@@ -662,121 +1031,6 @@ class DatabaseService {
   }
 
   // =====================================================
-  // REPORTS
-  // =====================================================
-
-  Stream<List<OrderModel>>
-      getDailyOrders(
-    DateTime date,
-  ) {
-
-    return getOrders().map(
-
-      (orders) => orders.where(
-
-        (order) {
-
-          return order
-                      .createdAt
-                      .year ==
-                  date.year &&
-
-              order
-                      .createdAt
-                      .month ==
-                  date.month &&
-
-              order
-                      .createdAt
-                      .day ==
-                  date.day;
-        },
-      ).toList(),
-    );
-  }
-
-  Stream<List<OrderModel>>
-      getMonthlyOrders(
-    DateTime date,
-  ) {
-
-    return getOrders().map(
-
-      (orders) => orders.where(
-
-        (order) {
-
-          return order
-                      .createdAt
-                      .year ==
-                  date.year &&
-
-              order
-                      .createdAt
-                      .month ==
-                  date.month;
-        },
-      ).toList(),
-    );
-  }
-
-  Stream<List<OrderModel>>
-      getYearlyOrders(
-    DateTime date,
-  ) {
-
-    return getOrders().map(
-
-      (orders) => orders.where(
-
-        (order) {
-
-          return order
-                  .createdAt
-                  .year ==
-              date.year;
-        },
-      ).toList(),
-    );
-  }
-
-  // =====================================================
-  // REVENUE
-  // =====================================================
-
-  double calculateRevenue(
-    List<OrderModel> orders,
-  ) {
-
-    double total = 0;
-
-    for (final order
-        in orders) {
-
-      if (order.status
-              .toLowerCase() ==
-          'completed') {
-
-        total +=
-            order.totalPrice;
-      }
-    }
-
-    return total;
-  }
-
-  // =====================================================
-  // TOTAL ORDERS
-  // =====================================================
-
-  int calculateTotalOrders(
-    List<OrderModel> orders,
-  ) {
-
-    return orders.length;
-  }
-
-  // =====================================================
   // NOTIFICATIONS
   // =====================================================
 
@@ -784,7 +1038,7 @@ class DatabaseService {
       getNotifications() {
 
     return _database
-        .child('notifications')
+        .child(notificationsPath)
         .onValue
         .map((event) {
 
@@ -819,6 +1073,7 @@ class DatabaseService {
       });
 
       notifications.sort(
+
         (a, b) {
 
           final aDate =
@@ -878,10 +1133,24 @@ class DatabaseService {
 
     return getOrders().map(
 
-      (orders) =>
-          calculateRevenue(
-        orders,
-      ),
+      (orders) {
+
+        double total = 0;
+
+        for (final order
+            in orders) {
+
+          if (order.status
+                  .toLowerCase() ==
+              'completed') {
+
+            total +=
+                order.totalPrice;
+          }
+        }
+
+        return total;
+      },
     );
   }
 
@@ -889,6 +1158,65 @@ class DatabaseService {
       getTotalOrders() {
 
     return getOrders().map(
+      (orders) =>
+          orders.length,
+    );
+  }
+
+  // =====================================================
+  // USER ANALYTICS
+  // =====================================================
+
+  Stream<int>
+      getUserPendingOrders(
+    String userId,
+  ) {
+
+    return getUserOrders(
+      userId,
+    ).map(
+
+      (orders) => orders
+          .where(
+
+            (order) =>
+
+                order.status
+                    .toLowerCase() ==
+
+                'pending',
+          )
+          .length,
+    );
+  }
+
+  Stream<int>
+      getUserValidatedOrders(
+    String userId,
+  ) {
+
+    return getUserOrders(
+      userId,
+    ).map(
+
+      (orders) => orders
+          .where(
+
+            (order) =>
+                order.isValidated,
+          )
+          .length,
+    );
+  }
+
+  Stream<int>
+      getUserTotalOrders(
+    String userId,
+  ) {
+
+    return getUserOrders(
+      userId,
+    ).map(
       (orders) =>
           orders.length,
     );

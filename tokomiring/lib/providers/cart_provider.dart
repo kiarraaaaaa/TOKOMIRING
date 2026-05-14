@@ -1,3 +1,5 @@
+// lib/providers/cart_provider.dart
+
 import 'package:flutter/material.dart';
 
 import '../models/product_model.dart';
@@ -20,7 +22,31 @@ class CartItemModel {
   // =====================================================
 
   double get subtotal =>
-      product.price * quantity;
+
+      product.price *
+          quantity;
+
+  // =====================================================
+  // COPY WITH
+  // =====================================================
+
+  CartItemModel copyWith({
+
+    ProductModel? product,
+
+    int? quantity,
+
+  }) {
+
+    return CartItemModel(
+
+      product:
+          product ?? this.product,
+
+      quantity:
+          quantity ?? this.quantity,
+    );
+  }
 }
 
 class CartProvider
@@ -34,7 +60,10 @@ class CartProvider
       _items = [];
 
   List<CartItemModel> get items =>
-      _items;
+
+      List.unmodifiable(
+        _items,
+      );
 
   // =====================================================
   // TOTAL ITEMS
@@ -44,7 +73,8 @@ class CartProvider
 
     int total = 0;
 
-    for (var item in _items) {
+    for (final item
+        in _items) {
 
       total += item.quantity;
     }
@@ -60,7 +90,8 @@ class CartProvider
 
     double total = 0;
 
-    for (var item in _items) {
+    for (final item
+        in _items) {
 
       total += item.subtotal;
     }
@@ -69,13 +100,23 @@ class CartProvider
   }
 
   // =====================================================
+  // TOTAL UNIQUE PRODUCTS
+  // =====================================================
+
+  int get totalUniqueProducts =>
+
+      _items.length;
+
+  // =====================================================
   // EMPTY CHECK
   // =====================================================
 
   bool get isEmpty =>
+
       _items.isEmpty;
 
   bool get isNotEmpty =>
+
       _items.isNotEmpty;
 
   // =====================================================
@@ -87,16 +128,19 @@ class CartProvider
   ) {
 
     // ===============================================
-    // PRODUCT OUT OF STOCK
+    // OUT OF STOCK
     // ===============================================
 
     if (product.stock <= 0) {
+
       return;
     }
 
     final index =
         _items.indexWhere(
+
       (item) =>
+
           item.product.id ==
           product.id,
     );
@@ -118,28 +162,34 @@ class CartProvider
           product.stock) {
 
         currentItem.quantity++;
+
+        notifyListeners();
       }
+
+      return;
     }
 
     // ===============================================
     // NEW PRODUCT
     // ===============================================
 
-    else {
+    _items.add(
 
-      _items.add(
-        CartItemModel(
-          product: product,
-          quantity: 1,
-        ),
-      );
-    }
+      CartItemModel(
+
+        product:
+            product,
+
+        quantity:
+            1,
+      ),
+    );
 
     notifyListeners();
   }
 
   // =====================================================
-  // REMOVE FROM CART
+  // REMOVE ITEM
   // =====================================================
 
   void removeFromCart(
@@ -147,7 +197,9 @@ class CartProvider
   ) {
 
     _items.removeWhere(
+
       (item) =>
+
           item.product.id ==
           productId,
     );
@@ -165,7 +217,9 @@ class CartProvider
 
     final index =
         _items.indexWhere(
+
       (item) =>
+
           item.product.id ==
           productId,
     );
@@ -200,7 +254,9 @@ class CartProvider
 
     final index =
         _items.indexWhere(
+
       (item) =>
+
           item.product.id ==
           productId,
     );
@@ -213,16 +269,16 @@ class CartProvider
         _items[index];
 
     // ===============================================
-    // MINIMUM QUANTITY
+    // REMOVE IF 1
     // ===============================================
 
-    if (item.quantity > 1) {
+    if (item.quantity <= 1) {
 
-      item.quantity--;
+      _items.removeAt(index);
 
     } else {
 
-      _items.removeAt(index);
+      item.quantity--;
     }
 
     notifyListeners();
@@ -242,7 +298,9 @@ class CartProvider
 
     final index =
         _items.indexWhere(
+
       (item) =>
+
           item.product.id ==
           productId,
     );
@@ -254,9 +312,6 @@ class CartProvider
     final item =
         _items[index];
 
-    final stock =
-        item.product.stock;
-
     // ===============================================
     // REMOVE ITEM
     // ===============================================
@@ -264,25 +319,74 @@ class CartProvider
     if (quantity <= 0) {
 
       _items.removeAt(index);
+
+      notifyListeners();
+
+      return;
     }
 
     // ===============================================
     // LIMIT STOCK
     // ===============================================
 
-    else {
+    if (quantity >
+        item.product.stock) {
 
-      item.quantity =
-          quantity > stock
-              ? stock
-              : quantity;
+      quantity =
+          item.product.stock;
     }
+
+    item.quantity =
+        quantity;
 
     notifyListeners();
   }
 
   // =====================================================
-  // CHECK PRODUCT IN CART
+  // REPLACE PRODUCT
+  // =====================================================
+
+  void replaceProduct({
+
+    required ProductModel product,
+
+  }) {
+
+    final index =
+        _items.indexWhere(
+
+      (item) =>
+
+          item.product.id ==
+          product.id,
+    );
+
+    if (index < 0) {
+      return;
+    }
+
+    final oldQty =
+        _items[index]
+            .quantity;
+
+    _items[index] =
+        CartItemModel(
+
+      product:
+          product,
+
+      quantity:
+          oldQty >
+                  product.stock
+              ? product.stock
+              : oldQty,
+    );
+
+    notifyListeners();
+  }
+
+  // =====================================================
+  // CHECK PRODUCT
   // =====================================================
 
   bool isInCart(
@@ -290,14 +394,16 @@ class CartProvider
   ) {
 
     return _items.any(
+
       (item) =>
+
           item.product.id ==
           productId,
     );
   }
 
   // =====================================================
-  // GET PRODUCT QUANTITY
+  // GET QUANTITY
   // =====================================================
 
   int getQuantity(
@@ -306,7 +412,9 @@ class CartProvider
 
     final index =
         _items.indexWhere(
+
       (item) =>
+
           item.product.id ==
           productId,
     );
@@ -321,6 +429,30 @@ class CartProvider
   }
 
   // =====================================================
+  // GET ITEM
+  // =====================================================
+
+  CartItemModel? getItem(
+    String productId,
+  ) {
+
+    try {
+
+      return _items.firstWhere(
+
+        (item) =>
+
+            item.product.id ==
+            productId,
+      );
+
+    } catch (_) {
+
+      return null;
+    }
+  }
+
+  // =====================================================
   // CLEAR CART
   // =====================================================
 
@@ -332,13 +464,14 @@ class CartProvider
   }
 
   // =====================================================
-  // CART TO MAP
+  // CART MAP
   // =====================================================
 
   List<Map<String, dynamic>>
       toMap() {
 
     return _items.map(
+
       (item) {
 
         return {
@@ -364,5 +497,76 @@ class CartProvider
         };
       },
     ).toList();
+  }
+
+  // =====================================================
+  // CART TOTAL SUBTOTAL
+  // =====================================================
+
+  double calculateSubtotal() {
+
+    double total = 0;
+
+    for (final item
+        in _items) {
+
+      total += item.subtotal;
+    }
+
+    return total;
+  }
+
+  // =====================================================
+  // SHIPPING
+  // =====================================================
+
+  double calculateShipping({
+
+    double shippingCost = 10000,
+
+  }) {
+
+    if (_items.isEmpty) {
+
+      return 0;
+    }
+
+    return shippingCost;
+  }
+
+  // =====================================================
+  // GRAND TOTAL
+  // =====================================================
+
+  double calculateGrandTotal({
+
+    double shippingCost = 10000,
+
+  }) {
+
+    return calculateSubtotal() +
+
+        calculateShipping(
+          shippingCost:
+              shippingCost,
+        );
+  }
+
+  // =====================================================
+  // DEBUG
+  // =====================================================
+
+  @override
+  String toString() {
+
+    return '''
+
+CartProvider(
+  totalItems: $totalItems,
+  totalPrice: $totalPrice,
+  uniqueProducts: $totalUniqueProducts
+)
+
+''';
   }
 }

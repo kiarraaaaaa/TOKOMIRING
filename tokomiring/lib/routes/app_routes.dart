@@ -1,5 +1,5 @@
 // =====================================================
-// FULL FIXED VERSION
+// PREMIUM FULL VERSION
 // lib/routes/app_routes.dart
 // =====================================================
 
@@ -106,6 +106,13 @@ class AppRoutes {
       '/maintenance';
 
   // =====================================================
+  // INITIAL ROUTE
+  // =====================================================
+
+  static const String initialRoute =
+      welcome;
+
+  // =====================================================
   // ROUTE GENERATOR
   // =====================================================
 
@@ -122,23 +129,20 @@ class AppRoutes {
 
       case welcome:
 
-        return MaterialPageRoute(
-          builder: (_) =>
-              const WelcomeScreen(),
+        return _buildRoute(
+          const WelcomeScreen(),
         );
 
       case login:
 
-        return MaterialPageRoute(
-          builder: (_) =>
-              const LoginScreen(),
+        return _buildRoute(
+          const LoginScreen(),
         );
 
       case signup:
 
-        return MaterialPageRoute(
-          builder: (_) =>
-              const SignupScreen(),
+        return _buildRoute(
+          const SignupScreen(),
         );
 
       // =================================================
@@ -147,37 +151,32 @@ class AppRoutes {
 
       case userHome:
 
-        return MaterialPageRoute(
-          builder: (_) =>
-              const UserHomeScreen(),
+        return _buildRoute(
+          const UserHomeScreen(),
         );
 
       case cart:
 
-        return MaterialPageRoute(
-          builder: (_) =>
-              const CartScreen(),
+        return _buildRoute(
+          const CartScreen(),
         );
 
       case checkout:
 
-        return MaterialPageRoute(
-          builder: (_) =>
-              const CheckoutScreen(),
+        return _buildRoute(
+          const CheckoutScreen(),
         );
 
       case userOrders:
 
-        return MaterialPageRoute(
-          builder: (_) =>
-              const UserOrderScreen(),
+        return _buildRoute(
+          const UserOrderScreen(),
         );
 
       case userProfile:
 
-        return MaterialPageRoute(
-          builder: (_) =>
-              const UserProfileScreen(),
+        return _buildRoute(
+          const UserProfileScreen(),
         );
 
       // =================================================
@@ -186,44 +185,38 @@ class AppRoutes {
 
       case adminDashboard:
 
-        return MaterialPageRoute(
-          builder: (_) =>
-              const AdminDashboardScreen(),
+        return _buildRoute(
+          const AdminDashboardScreen(),
         );
 
       case adminProducts:
 
-        return MaterialPageRoute(
-          builder: (_) =>
-              const AdminProductScreen(),
+        return _buildRoute(
+          const AdminProductScreen(),
         );
 
       case adminOrders:
 
-        return MaterialPageRoute(
-          builder: (_) =>
-              const AdminOrderScreen(),
+        return _buildRoute(
+          const AdminOrderScreen(),
         );
 
       case adminReports:
 
-        return MaterialPageRoute(
-          builder: (_) =>
-              const AdminSalesReportScreen(),
+        return _buildRoute(
+          const AdminSalesReportScreen(),
         );
 
       case adminUsers:
 
-        return MaterialPageRoute(
-          builder: (_) =>
-              const AdminUserScreen(),
+        return _buildRoute(
+          const AdminUserScreen(),
         );
 
       case adminNotifications:
 
-        return MaterialPageRoute(
-          builder: (_) =>
-              const AdminNotificationScreen(),
+        return _buildRoute(
+          const AdminNotificationScreen(),
         );
 
       // =================================================
@@ -232,9 +225,8 @@ class AppRoutes {
 
       case maintenance:
 
-        return MaterialPageRoute(
-          builder: (_) =>
-              const MaintenanceScreen(),
+        return _buildRoute(
+          const MaintenanceScreen(),
         );
 
       // =================================================
@@ -243,11 +235,25 @@ class AppRoutes {
 
       default:
 
-        return MaterialPageRoute(
-          builder: (_) =>
-              const NotFoundScreen(),
+        return _buildRoute(
+          const NotFoundScreen(),
         );
     }
+  }
+
+  // =====================================================
+  // ROUTE BUILDER
+  // =====================================================
+
+  static MaterialPageRoute
+      _buildRoute(
+    Widget page,
+  ) {
+
+    return MaterialPageRoute(
+
+      builder: (_) => page,
+    );
   }
 
   // =====================================================
@@ -258,14 +264,19 @@ class AppRoutes {
 
     BuildContext context,
 
-    String routeName,
-  ) {
+    String routeName, {
+
+    Object? arguments,
+  }) {
 
     return Navigator.pushNamed(
 
       context,
 
       routeName,
+
+      arguments:
+          arguments,
     );
   }
 
@@ -278,8 +289,10 @@ class AppRoutes {
 
     BuildContext context,
 
-    String routeName,
-  ) {
+    String routeName, {
+
+    Object? arguments,
+  }) {
 
     return Navigator
         .pushReplacementNamed(
@@ -287,6 +300,9 @@ class AppRoutes {
       context,
 
       routeName,
+
+      arguments:
+          arguments,
     );
   }
 
@@ -299,8 +315,10 @@ class AppRoutes {
 
     BuildContext context,
 
-    String routeName,
-  ) {
+    String routeName, {
+
+    Object? arguments,
+  }) {
 
     return Navigator
         .pushNamedAndRemoveUntil(
@@ -310,6 +328,9 @@ class AppRoutes {
       routeName,
 
       (route) => false,
+
+      arguments:
+          arguments,
     );
   }
 
@@ -324,5 +345,87 @@ class AppRoutes {
     Navigator.pop(
       context,
     );
+  }
+
+  // =====================================================
+  // ROLE REDIRECT
+  // =====================================================
+
+  static Future<void>
+      redirectByRole({
+
+    required BuildContext
+        context,
+
+    required String role,
+  }) async {
+
+    if (role
+            .toLowerCase() ==
+        'admin') {
+
+      await pushAndRemove(
+
+        context,
+
+        adminDashboard,
+      );
+    }
+
+    else {
+
+      await pushAndRemove(
+
+        context,
+
+        userHome,
+      );
+    }
+  }
+
+  // =====================================================
+  // AUTH REDIRECT
+  // =====================================================
+
+  static Future<void>
+      logoutRedirect(
+    BuildContext context,
+  ) async {
+
+    await pushAndRemove(
+
+      context,
+
+      login,
+    );
+  }
+
+  // =====================================================
+  // SAFE NAVIGATION
+  // =====================================================
+
+  static bool canPop(
+    BuildContext context,
+  ) {
+
+    return Navigator.canPop(
+      context,
+    );
+  }
+
+  // =====================================================
+  // MAYBE POP
+  // =====================================================
+
+  static void maybePop(
+    BuildContext context,
+  ) {
+
+    if (canPop(context)) {
+
+      Navigator.maybePop(
+        context,
+      );
+    }
   }
 }

@@ -1,3 +1,5 @@
+// lib/models/product_model.dart
+
 class ProductModel {
 
   final String id;
@@ -8,6 +10,7 @@ class ProductModel {
 
   final String category;
 
+  // TETAP imageBase64
   final String imageBase64;
 
   final double price;
@@ -21,6 +24,9 @@ class ProductModel {
   final int sold;
 
   final DateTime createdAt;
+
+  // TAMBAHAN PREMIUM
+  final DateTime? updatedAt;
 
   ProductModel({
 
@@ -45,6 +51,8 @@ class ProductModel {
     required this.sold,
 
     required this.createdAt,
+
+    this.updatedAt,
   });
 
   // =====================================================
@@ -101,10 +109,6 @@ class ProductModel {
           map['isPopular'] ??
               false,
 
-      // ===============================================
-      // SOLD AUTO SAFE
-      // ===============================================
-
       sold:
           _safeInt(
         map['sold'] ?? 0,
@@ -114,6 +118,18 @@ class ProductModel {
           _safeDate(
         map['createdAt'],
       ),
+
+      // ===============================================
+      // UPDATED AT
+      // ===============================================
+
+      updatedAt:
+          map['updatedAt'] !=
+                  null
+              ? _safeDate(
+                  map['updatedAt'],
+                )
+              : null,
     );
   }
 
@@ -152,21 +168,25 @@ class ProductModel {
       'isPopular':
           isPopular,
 
-      // ===============================================
-      // SOLD REALTIME
-      // ===============================================
-
       'sold':
           sold,
 
       'createdAt':
           createdAt
               .toIso8601String(),
+
+      // ===============================================
+      // UPDATED AT
+      // ===============================================
+
+      'updatedAt':
+          updatedAt
+              ?.toIso8601String(),
     };
   }
 
   // =====================================================
-  // CHECK STOCK
+  // STOCK CHECK
   // =====================================================
 
   bool get inStock {
@@ -180,7 +200,7 @@ class ProductModel {
   }
 
   // =====================================================
-  // FORMAT PRICE
+  // PRICE FORMAT
   // =====================================================
 
   String get formattedPrice {
@@ -215,6 +235,8 @@ class ProductModel {
     int? sold,
 
     DateTime? createdAt,
+
+    DateTime? updatedAt,
 
   }) {
 
@@ -258,17 +280,103 @@ class ProductModel {
       createdAt:
           createdAt ??
               this.createdAt,
+
+      updatedAt:
+          updatedAt ??
+              this.updatedAt,
     );
   }
 
   // =====================================================
-  // REALTIME PRODUCT JSON DEBUG
+  // EQUALITY
+  // =====================================================
+
+  @override
+  bool operator ==(
+    Object other,
+  ) {
+
+    if (identical(
+      this,
+      other,
+    )) {
+
+      return true;
+    }
+
+    return other is ProductModel &&
+
+        other.id == id &&
+
+        other.name == name &&
+
+        other.description ==
+            description &&
+
+        other.category ==
+            category &&
+
+        other.imageBase64 ==
+            imageBase64 &&
+
+        other.price == price &&
+
+        other.stock == stock &&
+
+        other.isAvailable ==
+            isAvailable &&
+
+        other.isPopular ==
+            isPopular &&
+
+        other.sold == sold;
+  }
+
+  // =====================================================
+  // HASHCODE
+  // =====================================================
+
+  @override
+  int get hashCode {
+
+    return id.hashCode ^
+
+        name.hashCode ^
+
+        description.hashCode ^
+
+        category.hashCode ^
+
+        imageBase64.hashCode ^
+
+        price.hashCode ^
+
+        stock.hashCode ^
+
+        isAvailable.hashCode ^
+
+        isPopular.hashCode ^
+
+        sold.hashCode;
+  }
+
+  // =====================================================
+  // DEBUG
   // =====================================================
 
   @override
   String toString() {
 
-    return 'ProductModel(id: $id, name: $name, stock: $stock, sold: $sold)';
+    return '''
+
+ProductModel(
+  id: $id,
+  name: $name,
+  stock: $stock,
+  sold: $sold
+)
+
+''';
   }
 }
 
@@ -326,6 +434,14 @@ DateTime _safeDate(
   }
 
   try {
+
+    if (value is int) {
+
+      return DateTime
+          .fromMillisecondsSinceEpoch(
+        value,
+      );
+    }
 
     return DateTime.parse(
       value.toString(),

@@ -1,18 +1,26 @@
-// lib/models/order_model.dart
+// lib/models/cart_model.dart
 
-class OrderItemModel {
+import 'product_model.dart';
+
+class CartModel {
 
   final String productId;
+
   final String productName;
+
   final String productImage;
 
   final double productPrice;
 
   final int quantity;
 
+  final int stock;
+
   final double subtotal;
 
-  OrderItemModel({
+  final DateTime createdAt;
+
+  CartModel({
 
     required this.productId,
 
@@ -24,38 +32,108 @@ class OrderItemModel {
 
     required this.quantity,
 
+    required this.stock,
+
     required this.subtotal,
+
+    required this.createdAt,
   });
+
+  // =====================================================
+  // FROM PRODUCT
+  // =====================================================
+
+  factory CartModel.fromProduct({
+
+    required ProductModel product,
+
+    int quantity = 1,
+
+  }) {
+
+    return CartModel(
+
+      productId:
+          product.id,
+
+      productName:
+          product.name,
+
+      productImage:
+          product.imageBase64,
+
+      productPrice:
+          product.price,
+
+      quantity:
+          quantity,
+
+      stock:
+          product.stock,
+
+      subtotal:
+          product.price *
+              quantity,
+
+      createdAt:
+          DateTime.now(),
+    );
+  }
 
   // =====================================================
   // FROM MAP
   // =====================================================
 
-  factory OrderItemModel.fromMap(
+  factory CartModel.fromMap(
     Map<dynamic, dynamic> map,
   ) {
 
-    return OrderItemModel(
+    return CartModel(
 
       productId:
-          map['productId'] ?? '',
+          map['productId']
+                  ?.toString() ??
+              '',
 
       productName:
-          map['productName'] ?? '',
+          map['productName']
+                  ?.toString() ??
+              '',
 
       productImage:
-          map['productImage'] ?? '',
+          map['productImage']
+                  ?.toString() ??
+
+              map['imageBase64']
+                      ?.toString() ??
+                  '',
 
       productPrice:
-          (map['productPrice'] ?? 0)
-              .toDouble(),
+          _safeDouble(
+        map['productPrice'] ??
+
+            map['price'],
+      ),
 
       quantity:
-          map['quantity'] ?? 0,
+          _safeInt(
+        map['quantity'],
+      ),
+
+      stock:
+          _safeInt(
+        map['stock'],
+      ),
 
       subtotal:
-          (map['subtotal'] ?? 0)
-              .toDouble(),
+          _safeDouble(
+        map['subtotal'],
+      ),
+
+      createdAt:
+          _safeDate(
+        map['createdAt'],
+      ),
     );
   }
 
@@ -82,357 +160,250 @@ class OrderItemModel {
       'quantity':
           quantity,
 
+      'stock':
+          stock,
+
       'subtotal':
           subtotal,
-    };
-  }
-}
-
-// =======================================================
-// ORDER MODEL
-// =======================================================
-
-class OrderModel {
-
-  final String orderId;
-
-  final String userId;
-
-  final String customerName;
-
-  final String customerPhone;
-
-  final String address;
-
-  final List<OrderItemModel>
-      items;
-
-  final double totalPrice;
-
-  final int totalItems;
-
-  final String paymentMethod;
-
-  final String paymentProof;
-
-  final String status;
-
-  final bool isValidated;
-
-  final DateTime createdAt;
-
-  final DateTime updatedAt;
-
-  OrderModel({
-
-    required this.orderId,
-
-    required this.userId,
-
-    required this.customerName,
-
-    required this.customerPhone,
-
-    required this.address,
-
-    required this.items,
-
-    required this.totalPrice,
-
-    required this.totalItems,
-
-    required this.paymentMethod,
-
-    required this.paymentProof,
-
-    required this.status,
-
-    required this.isValidated,
-
-    required this.createdAt,
-
-    required this.updatedAt,
-  });
-
-  // =====================================================
-  // FROM MAP
-  // =====================================================
-
-  factory OrderModel.fromMap(
-
-    Map<dynamic, dynamic> map,
-
-    String orderId,
-
-  ) {
-
-    List<OrderItemModel>
-        parsedItems = [];
-
-    // ===================================================
-    // SAFE ITEMS PARSE
-    // ===================================================
-
-    if (map['items'] != null) {
-
-      final rawItems =
-          map['items'];
-
-      // ===============================================
-      // IF LIST
-      // ===============================================
-
-      if (rawItems is List) {
-
-        parsedItems = rawItems
-
-            .where(
-              (item) => item != null,
-            )
-
-            .map(
-              (item) {
-
-                return OrderItemModel
-                    .fromMap(
-                  Map<dynamic, dynamic>
-                      .from(item),
-                );
-              },
-            )
-
-            .toList();
-      }
-
-      // ===============================================
-      // IF MAP
-      // ===============================================
-
-      else if (rawItems is Map) {
-
-        parsedItems = rawItems.values
-
-            .map(
-              (item) {
-
-                return OrderItemModel
-                    .fromMap(
-                  Map<dynamic, dynamic>
-                      .from(item),
-                );
-              },
-            )
-
-            .toList();
-      }
-    }
-
-    return OrderModel(
-
-      orderId:
-          orderId,
-
-      userId:
-          map['userId'] ?? '',
-
-      customerName:
-          map['customerName'] ?? '',
-
-      customerPhone:
-          map['customerPhone'] ?? '',
-
-      address:
-          map['address'] ?? '',
-
-      items:
-          parsedItems,
-
-      totalPrice:
-          (map['totalPrice'] ?? 0)
-              .toDouble(),
-
-      totalItems:
-          map['totalItems'] ?? 0,
-
-      paymentMethod:
-          map['paymentMethod'] ??
-              'Cash',
-
-      paymentProof:
-          map['paymentProof'] ?? '',
-
-      status:
-          map['status'] ??
-              'Waiting Admin Validation',
-
-      isValidated:
-          map['isValidated'] ??
-              false,
-
-      createdAt:
-          DateTime.tryParse(
-                map['createdAt']
-                        ?.toString() ??
-                    '',
-              ) ??
-              DateTime.now(),
-
-      updatedAt:
-          DateTime.tryParse(
-                map['updatedAt']
-                        ?.toString() ??
-                    '',
-              ) ??
-              DateTime.now(),
-    );
-  }
-
-  // =====================================================
-  // TO MAP
-  // =====================================================
-
-  Map<String, dynamic> toMap() {
-
-    return {
-
-      'orderId':
-          orderId,
-
-      'userId':
-          userId,
-
-      'customerName':
-          customerName,
-
-      'customerPhone':
-          customerPhone,
-
-      'address':
-          address,
-
-      'items':
-          items
-              .map(
-                (e) => e.toMap(),
-              )
-              .toList(),
-
-      'totalPrice':
-          totalPrice,
-
-      'totalItems':
-          totalItems,
-
-      'paymentMethod':
-          paymentMethod,
-
-      'paymentProof':
-          paymentProof,
-
-      'status':
-          status,
-
-      'isValidated':
-          isValidated,
 
       'createdAt':
           createdAt
               .toIso8601String(),
-
-      'updatedAt':
-          updatedAt
-              .toIso8601String(),
     };
+  }
+
+  // =====================================================
+  // TOTAL PRICE
+  // =====================================================
+
+  double get totalPrice {
+
+    return productPrice *
+        quantity;
+  }
+
+  // =====================================================
+  // STOCK CHECK
+  // =====================================================
+
+  bool get inStock {
+
+    return stock > 0;
+  }
+
+  bool get lowStock {
+
+    return stock <= 5;
+  }
+
+  // =====================================================
+  // FORMAT PRICE
+  // =====================================================
+
+  String get formattedPrice {
+
+    return 'Rp ${productPrice.toStringAsFixed(0)}';
+  }
+
+  String get formattedSubtotal {
+
+    return 'Rp ${subtotal.toStringAsFixed(0)}';
   }
 
   // =====================================================
   // COPY WITH
   // =====================================================
 
-  OrderModel copyWith({
+  CartModel copyWith({
 
-    String? orderId,
+    String? productId,
 
-    String? userId,
+    String? productName,
 
-    String? customerName,
+    String? productImage,
 
-    String? customerPhone,
+    double? productPrice,
 
-    String? address,
+    int? quantity,
 
-    List<OrderItemModel>? items,
+    int? stock,
 
-    double? totalPrice,
-
-    int? totalItems,
-
-    String? paymentMethod,
-
-    String? paymentProof,
-
-    String? status,
-
-    bool? isValidated,
+    double? subtotal,
 
     DateTime? createdAt,
 
-    DateTime? updatedAt,
-
   }) {
 
-    return OrderModel(
+    final updatedPrice =
+        productPrice ??
+            this.productPrice;
 
-      orderId:
-          orderId ?? this.orderId,
+    final updatedQty =
+        quantity ??
+            this.quantity;
 
-      userId:
-          userId ?? this.userId,
+    return CartModel(
 
-      customerName:
-          customerName ??
-              this.customerName,
+      productId:
+          productId ??
+              this.productId,
 
-      customerPhone:
-          customerPhone ??
-              this.customerPhone,
+      productName:
+          productName ??
+              this.productName,
 
-      address:
-          address ?? this.address,
+      productImage:
+          productImage ??
+              this.productImage,
 
-      items:
-          items ?? this.items,
+      productPrice:
+          updatedPrice,
 
-      totalPrice:
-          totalPrice ??
-              this.totalPrice,
+      quantity:
+          updatedQty,
 
-      totalItems:
-          totalItems ??
-              this.totalItems,
+      stock:
+          stock ?? this.stock,
 
-      paymentMethod:
-          paymentMethod ??
-              this.paymentMethod,
+      subtotal:
+          subtotal ??
 
-      paymentProof:
-          paymentProof ??
-              this.paymentProof,
-
-      status:
-          status ?? this.status,
-
-      isValidated:
-          isValidated ??
-              this.isValidated,
+              (updatedPrice *
+                  updatedQty),
 
       createdAt:
           createdAt ??
               this.createdAt,
-
-      updatedAt:
-          updatedAt ??
-              this.updatedAt,
     );
+  }
+
+  // =====================================================
+  // EQUALITY
+  // =====================================================
+
+  @override
+  bool operator ==(
+    Object other,
+  ) {
+
+    if (identical(
+      this,
+      other,
+    )) {
+
+      return true;
+    }
+
+    return other is CartModel &&
+
+        other.productId ==
+            productId &&
+
+        other.quantity ==
+            quantity;
+  }
+
+  // =====================================================
+  // HASHCODE
+  // =====================================================
+
+  @override
+  int get hashCode {
+
+    return productId.hashCode ^
+
+        quantity.hashCode;
+  }
+
+  // =====================================================
+  // DEBUG
+  // =====================================================
+
+  @override
+  String toString() {
+
+    return '''
+
+CartModel(
+  productId: $productId,
+  productName: $productName,
+  quantity: $quantity,
+  subtotal: $subtotal
+)
+
+''';
+  }
+}
+
+// =======================================================
+// SAFE PARSERS
+// =======================================================
+
+double _safeDouble(
+  dynamic value,
+) {
+
+  if (value == null) {
+    return 0;
+  }
+
+  if (value is double) {
+    return value;
+  }
+
+  if (value is int) {
+    return value.toDouble();
+  }
+
+  return double.tryParse(
+        value.toString(),
+      ) ??
+      0;
+}
+
+int _safeInt(
+  dynamic value,
+) {
+
+  if (value == null) {
+    return 0;
+  }
+
+  if (value is int) {
+    return value;
+  }
+
+  return int.tryParse(
+        value.toString(),
+      ) ??
+      0;
+}
+
+DateTime _safeDate(
+  dynamic value,
+) {
+
+  if (value == null) {
+
+    return DateTime.now();
+  }
+
+  try {
+
+    if (value is int) {
+
+      return DateTime
+          .fromMillisecondsSinceEpoch(
+        value,
+      );
+    }
+
+    return DateTime.parse(
+      value.toString(),
+    );
+
+  } catch (_) {
+
+    return DateTime.now();
   }
 }

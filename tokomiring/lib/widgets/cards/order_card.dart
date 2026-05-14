@@ -8,15 +8,11 @@ import '../../core/constants/app_colors.dart';
 import '../../core/utils/app_format.dart';
 
 class OrderCard
-    extends StatelessWidget {
+    extends StatefulWidget {
 
   final OrderModel order;
 
   final VoidCallback? onTap;
-
-  // =====================================================
-  // CONSTRUCTOR
-  // =====================================================
 
   const OrderCard({
 
@@ -27,13 +23,25 @@ class OrderCard
     this.onTap,
   });
 
+  @override
+  State<OrderCard>
+      createState() =>
+          _OrderCardState();
+}
+
+class _OrderCardState
+    extends State<OrderCard> {
+
+  bool hovered = false;
+
   // =====================================================
   // STATUS COLOR
   // =====================================================
 
   Color getStatusColor() {
 
-    switch (order.status) {
+    switch (
+        widget.order.status) {
 
       case 'Waiting Admin Validation':
         return AppColors.warning;
@@ -50,6 +58,9 @@ class OrderCard
       case 'Cancelled':
         return AppColors.danger;
 
+      case 'Rejected':
+        return AppColors.danger;
+
       default:
         return Colors.grey;
     }
@@ -61,7 +72,8 @@ class OrderCard
 
   IconData getStatusIcon() {
 
-    switch (order.status) {
+    switch (
+        widget.order.status) {
 
       case 'Waiting Admin Validation':
         return Icons.access_time_rounded;
@@ -78,10 +90,61 @@ class OrderCard
       case 'Cancelled':
         return Icons.cancel_rounded;
 
+      case 'Rejected':
+        return Icons.close_rounded;
+
       default:
         return Icons.info_rounded;
     }
   }
+
+  // =====================================================
+  // PAYMENT STATUS
+  // =====================================================
+
+  String paymentStatus() {
+
+    if (widget.order
+        .isValidated) {
+
+      return 'Validated';
+    }
+
+    if (widget.order
+            .status ==
+        'Rejected') {
+
+      return 'Rejected';
+    }
+
+    return 'Pending';
+  }
+
+  // =====================================================
+  // PAYMENT COLOR
+  // =====================================================
+
+  Color paymentColor() {
+
+    if (widget.order
+        .isValidated) {
+
+      return AppColors.success;
+    }
+
+    if (widget.order
+            .status ==
+        'Rejected') {
+
+      return AppColors.danger;
+    }
+
+    return AppColors.warning;
+  }
+
+  // =====================================================
+  // BUILD
+  // =====================================================
 
   @override
   Widget build(
@@ -91,79 +154,117 @@ class OrderCard
     final statusColor =
         getStatusColor();
 
-    return Material(
+    return MouseRegion(
 
-      color:
-          Colors.transparent,
+      onEnter: (_) {
 
-      child: InkWell(
+        setState(() {
 
-        borderRadius:
-            BorderRadius.circular(
-          28,
+          hovered = true;
+        });
+      },
+
+      onExit: (_) {
+
+        setState(() {
+
+          hovered = false;
+        });
+      },
+
+      child:
+          AnimatedScale(
+
+        duration:
+            const Duration(
+          milliseconds: 220,
         ),
 
-        onTap:
-            onTap,
+        scale:
+            hovered
+                ? 1.01
+                : 1,
 
-        child: Container(
+        child:
+            Material(
 
-          margin:
-              const EdgeInsets.only(
-            bottom: 18,
-          ),
+          color:
+              Colors.transparent,
 
-          padding:
-              const EdgeInsets.all(
-            22,
-          ),
-
-          decoration:
-              BoxDecoration(
-
-            color:
-                Colors.white,
+          child: InkWell(
 
             borderRadius:
                 BorderRadius.circular(
-              28,
+              30,
             ),
 
-            boxShadow: [
+            onTap:
+                widget.onTap,
 
-              BoxShadow(
+            child:
+                AnimatedContainer(
+
+              duration:
+                  const Duration(
+                milliseconds:
+                    220,
+              ),
+
+              margin:
+                  const EdgeInsets.only(
+                bottom: 20,
+              ),
+
+              padding:
+                  const EdgeInsets.all(
+                22,
+              ),
+
+              decoration:
+                  BoxDecoration(
 
                 color:
-                    Colors.black
-                        .withOpacity(
-                  0.05,
+                    Colors.white,
+
+                borderRadius:
+                    BorderRadius.circular(
+                  30,
                 ),
 
-                blurRadius:
-                    18,
+                boxShadow: [
 
-                offset:
-                    const Offset(
-                  0,
-                  10,
-                ),
+                  BoxShadow(
+
+                    color:
+                        hovered
+
+                            ? Colors.black
+                                .withOpacity(
+                              0.08,
+                            )
+
+                            : Colors.black
+                                .withOpacity(
+                              0.04,
+                            ),
+
+                    blurRadius:
+                        hovered
+                            ? 24
+                            : 16,
+
+                    offset:
+                        Offset(
+                      0,
+                      hovered
+                          ? 14
+                          : 8,
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
 
-          child: Column(
-
-            crossAxisAlignment:
-                CrossAxisAlignment
-                    .start,
-
-            children: [
-
-              // =====================================
-              // TOP SECTION
-              // =====================================
-
-              Row(
+              child: Column(
 
                 crossAxisAlignment:
                     CrossAxisAlignment
@@ -171,344 +272,673 @@ class OrderCard
 
                 children: [
 
-                  // =================================
-                  // ORDER INFO
-                  // =================================
+                  // =========================================
+                  // TOP SECTION
+                  // =========================================
 
-                  Expanded(
+                  Row(
 
-                    child: Column(
+                    crossAxisAlignment:
+                        CrossAxisAlignment
+                            .start,
 
-                      crossAxisAlignment:
-                          CrossAxisAlignment
-                              .start,
+                    children: [
 
-                      children: [
+                      Expanded(
 
-                        Text(
+                        child: Column(
 
-                          'Order #${order.orderId.substring(0, 8)}',
+                          crossAxisAlignment:
+                              CrossAxisAlignment
+                                  .start,
 
-                          maxLines: 1,
+                          children: [
 
-                          overflow:
-                              TextOverflow
-                                  .ellipsis,
+                            Text(
 
-                          style:
-                              const TextStyle(
+                              'Order #${widget.order.orderId.substring(0, 8)}',
 
-                            fontSize: 19,
+                              maxLines: 1,
 
-                            fontWeight:
-                                FontWeight.bold,
-                          ),
+                              overflow:
+                                  TextOverflow
+                                      .ellipsis,
+
+                              style:
+                                  const TextStyle(
+
+                                fontSize:
+                                    20,
+
+                                fontWeight:
+                                    FontWeight.bold,
+                              ),
+                            ),
+
+                            const SizedBox(
+                              height: 6,
+                            ),
+
+                            Text(
+
+                              AppFormat.date(
+                                widget.order
+                                    .createdAt,
+                              ),
+
+                              style:
+                                  TextStyle(
+
+                                color:
+                                    Colors
+                                        .grey
+                                        .shade600,
+
+                                fontSize:
+                                    13,
+                              ),
+                            ),
+                          ],
                         ),
-
-                        const SizedBox(
-                          height: 6,
-                        ),
-
-                        Text(
-
-                          AppFormat.date(
-                            order.createdAt,
-                          ),
-
-                          style:
-                              TextStyle(
-
-                            color:
-                                Colors.grey
-                                    .shade600,
-
-                            fontSize: 13,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(
-                    width: 12,
-                  ),
-
-                  // =================================
-                  // STATUS
-                  // =================================
-
-                  Container(
-
-                    padding:
-                        const EdgeInsets.symmetric(
-
-                      horizontal: 14,
-
-                      vertical: 10,
-                    ),
-
-                    decoration:
-                        BoxDecoration(
-
-                      color:
-                          statusColor
-                              .withOpacity(
-                        0.1,
                       ),
 
-                      borderRadius:
-                          BorderRadius.circular(
-                        16,
+                      const SizedBox(
+                        width: 10,
                       ),
-                    ),
 
-                    child: Row(
+                      AnimatedContainer(
 
-                      mainAxisSize:
-                          MainAxisSize.min,
+                        duration:
+                            const Duration(
+                          milliseconds:
+                              220,
+                        ),
 
-                      children: [
+                        padding:
+                            const EdgeInsets.symmetric(
 
-                        Icon(
+                          horizontal:
+                              14,
 
-                          getStatusIcon(),
+                          vertical:
+                              10,
+                        ),
 
-                          size: 18,
+                        decoration:
+                            BoxDecoration(
 
                           color:
-                              statusColor,
-                        ),
+                              statusColor
+                                  .withOpacity(
+                            0.1,
+                          ),
 
-                        const SizedBox(
-                          width: 8,
-                        ),
-
-                        Text(
-
-                          order.status,
-
-                          style:
-                              TextStyle(
-
-                            color:
-                                statusColor,
-
-                            fontWeight:
-                                FontWeight.bold,
-
-                            fontSize: 13,
+                          borderRadius:
+                              BorderRadius.circular(
+                            18,
                           ),
                         ),
-                      ],
-                    ),
+
+                        child: Row(
+
+                          mainAxisSize:
+                              MainAxisSize.min,
+
+                          children: [
+
+                            Icon(
+
+                              getStatusIcon(),
+
+                              size: 18,
+
+                              color:
+                                  statusColor,
+                            ),
+
+                            const SizedBox(
+                              width: 8,
+                            ),
+
+                            Text(
+
+                              widget
+                                  .order
+                                  .status,
+
+                              style:
+                                  TextStyle(
+
+                                color:
+                                    statusColor,
+
+                                fontWeight:
+                                    FontWeight.bold,
+
+                                fontSize:
+                                    12,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
 
-              const SizedBox(
-                height: 22,
-              ),
+                  const SizedBox(
+                    height: 22,
+                  ),
 
-              // =====================================
-              // CUSTOMER
-              // =====================================
+                  // =========================================
+                  // CUSTOMER
+                  // =========================================
 
-              Row(
+                  Row(
 
-                children: [
+                    children: [
+
+                      Container(
+
+                        width: 52,
+
+                        height: 52,
+
+                        decoration:
+                            BoxDecoration(
+
+                          gradient:
+                              LinearGradient(
+
+                            colors: [
+
+                              AppColors
+                                  .primary
+                                  .withOpacity(
+                                0.15,
+                              ),
+
+                              AppColors
+                                  .primary
+                                  .withOpacity(
+                                0.05,
+                              ),
+                            ],
+                          ),
+
+                          borderRadius:
+                              BorderRadius.circular(
+                            18,
+                          ),
+                        ),
+
+                        child:
+                            const Icon(
+
+                          Icons
+                              .person_rounded,
+
+                          color:
+                              AppColors
+                                  .primary,
+                        ),
+                      ),
+
+                      const SizedBox(
+                        width: 16,
+                      ),
+
+                      Expanded(
+
+                        child: Column(
+
+                          crossAxisAlignment:
+                              CrossAxisAlignment
+                                  .start,
+
+                          children: [
+
+                            Text(
+
+                              widget.order
+                                  .customerName,
+
+                              maxLines: 1,
+
+                              overflow:
+                                  TextOverflow
+                                      .ellipsis,
+
+                              style:
+                                  const TextStyle(
+
+                                fontWeight:
+                                    FontWeight.bold,
+
+                                fontSize:
+                                    16,
+                              ),
+                            ),
+
+                            const SizedBox(
+                              height: 4,
+                            ),
+
+                            Text(
+
+                              '${widget.order.totalItems} items',
+
+                              style:
+                                  TextStyle(
+
+                                color:
+                                    Colors
+                                        .grey
+                                        .shade600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(
+                    height: 24,
+                  ),
+
+                  // =========================================
+                  // PAYMENT STATUS
+                  // =========================================
+
+                  Row(
+
+                    children: [
+
+                      Expanded(
+
+                        child: Container(
+
+                          padding:
+                              const EdgeInsets.all(
+                            16,
+                          ),
+
+                          decoration:
+                              BoxDecoration(
+
+                            color:
+                                paymentColor()
+                                    .withOpacity(
+                              0.1,
+                            ),
+
+                            borderRadius:
+                                BorderRadius.circular(
+                              20,
+                            ),
+                          ),
+
+                          child: Column(
+
+                            crossAxisAlignment:
+                                CrossAxisAlignment
+                                    .start,
+
+                            children: [
+
+                              Row(
+
+                                children: [
+
+                                  Icon(
+
+                                    Icons
+                                        .verified_user_rounded,
+
+                                    size: 18,
+
+                                    color:
+                                        paymentColor(),
+                                  ),
+
+                                  const SizedBox(
+                                    width:
+                                        8,
+                                  ),
+
+                                  Text(
+
+                                    'Validation',
+
+                                    style:
+                                        TextStyle(
+
+                                      color:
+                                          Colors
+                                              .grey
+                                              .shade700,
+
+                                      fontSize:
+                                          13,
+                                    ),
+                                  ),
+                                ],
+                              ),
+
+                              const SizedBox(
+                                height: 10,
+                              ),
+
+                              AnimatedContainer(
+
+                                duration:
+                                    const Duration(
+                                  milliseconds:
+                                      220,
+                                ),
+
+                                padding:
+                                    const EdgeInsets.symmetric(
+
+                                  horizontal:
+                                      14,
+
+                                  vertical:
+                                      8,
+                                ),
+
+                                decoration:
+                                    BoxDecoration(
+
+                                  color:
+                                      paymentColor(),
+
+                                  borderRadius:
+                                      BorderRadius.circular(
+                                    30,
+                                  ),
+                                ),
+
+                                child: Text(
+
+                                  paymentStatus(),
+
+                                  style:
+                                      const TextStyle(
+
+                                    color:
+                                        Colors.white,
+
+                                    fontWeight:
+                                        FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(
+                        width: 16,
+                      ),
+
+                      Expanded(
+
+                        child: Container(
+
+                          padding:
+                              const EdgeInsets.all(
+                            16,
+                          ),
+
+                          decoration:
+                              BoxDecoration(
+
+                            color:
+                                AppColors.success
+                                    .withOpacity(
+                              0.08,
+                            ),
+
+                            borderRadius:
+                                BorderRadius.circular(
+                              20,
+                            ),
+                          ),
+
+                          child: Column(
+
+                            crossAxisAlignment:
+                                CrossAxisAlignment
+                                    .start,
+
+                            children: [
+
+                              Row(
+
+                                children: [
+
+                                  const Icon(
+
+                                    Icons
+                                        .payments_rounded,
+
+                                    size: 18,
+
+                                    color:
+                                        AppColors
+                                            .success,
+                                  ),
+
+                                  const SizedBox(
+                                    width:
+                                        8,
+                                  ),
+
+                                  Text(
+
+                                    'Payment',
+
+                                    style:
+                                        TextStyle(
+
+                                      color:
+                                          Colors
+                                              .grey
+                                              .shade700,
+
+                                      fontSize:
+                                          13,
+                                    ),
+                                  ),
+                                ],
+                              ),
+
+                              const SizedBox(
+                                height: 10,
+                              ),
+
+                              Text(
+
+                                AppFormat.currency(
+                                  widget.order
+                                      .totalPrice,
+                                ),
+
+                                maxLines: 1,
+
+                                overflow:
+                                    TextOverflow
+                                        .ellipsis,
+
+                                style:
+                                    const TextStyle(
+
+                                  fontSize:
+                                      22,
+
+                                  fontWeight:
+                                      FontWeight.bold,
+
+                                  color:
+                                      AppColors
+                                          .success,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(
+                    height: 22,
+                  ),
+
+                  // =========================================
+                  // ORDER DETAIL
+                  // =========================================
 
                   Container(
 
-                    width: 44,
+                    width:
+                        double.infinity,
 
-                    height: 44,
+                    padding:
+                        const EdgeInsets.all(
+                      18,
+                    ),
 
                     decoration:
                         BoxDecoration(
 
                       color:
-                          AppColors.primary
-                              .withOpacity(
-                        0.1,
+                          const Color(
+                        0xffF8FAFC,
                       ),
 
                       borderRadius:
                           BorderRadius.circular(
-                        14,
+                        22,
                       ),
                     ),
 
-                    child: const Icon(
-
-                      Icons.person_rounded,
-
-                      color:
-                          AppColors.primary,
-                    ),
-                  ),
-
-                  const SizedBox(
-                    width: 14,
-                  ),
-
-                  Expanded(
-
                     child: Column(
-
-                      crossAxisAlignment:
-                          CrossAxisAlignment
-                              .start,
 
                       children: [
 
-                        Text(
+                        _buildDetailRow(
 
-                          order.customerName,
+                          'Payment Method',
 
-                          maxLines: 1,
-
-                          overflow:
-                              TextOverflow
-                                  .ellipsis,
-
-                          style:
-                              const TextStyle(
-
-                            fontWeight:
-                                FontWeight.bold,
-
-                            fontSize: 16,
-                          ),
+                          widget.order
+                              .paymentMethod,
                         ),
 
                         const SizedBox(
-                          height: 4,
+                          height: 14,
                         ),
 
-                        Text(
+                        _buildDetailRow(
 
-                          '${order.totalItems} items',
+                          'Phone Number',
 
-                          style:
-                              TextStyle(
+                          widget.order
+                              .customerPhone,
+                        ),
 
-                            color:
-                                Colors.grey
-                                    .shade600,
-                          ),
+                        const SizedBox(
+                          height: 14,
+                        ),
+
+                        _buildDetailRow(
+
+                          'Address',
+
+                          widget.order
+                              .address,
                         ),
                       ],
                     ),
                   ),
                 ],
               ),
-
-              const SizedBox(
-                height: 22,
-              ),
-
-              // =====================================
-              // TOTAL
-              // =====================================
-
-              Container(
-
-                width:
-                    double.infinity,
-
-                padding:
-                    const EdgeInsets.all(
-                  16,
-                ),
-
-                decoration:
-                    BoxDecoration(
-
-                  color:
-                      AppColors.success
-                          .withOpacity(
-                    0.08,
-                  ),
-
-                  borderRadius:
-                      BorderRadius.circular(
-                    18,
-                  ),
-                ),
-
-                child: Row(
-
-                  children: [
-
-                    const Icon(
-
-                      Icons.payments_rounded,
-
-                      color:
-                          AppColors.success,
-                    ),
-
-                    const SizedBox(
-                      width: 12,
-                    ),
-
-                    Expanded(
-
-                      child: Column(
-
-                        crossAxisAlignment:
-                            CrossAxisAlignment
-                                .start,
-
-                        children: [
-
-                          Text(
-
-                            'Total Payment',
-
-                            style:
-                                TextStyle(
-
-                              color:
-                                  Colors.grey
-                                      .shade700,
-
-                              fontSize: 13,
-                            ),
-                          ),
-
-                          const SizedBox(
-                            height: 4,
-                          ),
-
-                          Text(
-
-                            AppFormat.currency(
-                              order.totalPrice,
-                            ),
-
-                            style:
-                                const TextStyle(
-
-                              fontSize: 24,
-
-                              fontWeight:
-                                  FontWeight.bold,
-
-                              color:
-                                  AppColors.success,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       ),
+    );
+  }
+
+  // =====================================================
+  // DETAIL ROW
+  // =====================================================
+
+  Widget _buildDetailRow(
+
+    String title,
+
+    String value,
+  ) {
+
+    return Row(
+
+      crossAxisAlignment:
+          CrossAxisAlignment
+              .start,
+
+      children: [
+
+        Expanded(
+
+          flex: 2,
+
+          child: Text(
+
+            title,
+
+            style: TextStyle(
+
+              color:
+                  Colors
+                      .grey
+                      .shade600,
+
+              fontSize:
+                  13,
+            ),
+          ),
+        ),
+
+        const SizedBox(
+          width: 12,
+        ),
+
+        Expanded(
+
+          flex: 3,
+
+          child: Text(
+
+            value,
+
+            textAlign:
+                TextAlign.right,
+
+            style:
+                const TextStyle(
+
+              fontWeight:
+                  FontWeight.bold,
+
+              fontSize:
+                  14,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

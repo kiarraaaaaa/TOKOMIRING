@@ -1,5 +1,7 @@
 // lib/screens/user/checkout_screen.dart
 
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -26,7 +28,13 @@ class CheckoutScreen
 }
 
 class _CheckoutScreenState
-    extends State<CheckoutScreen> {
+    extends State<CheckoutScreen>
+    with
+        SingleTickerProviderStateMixin {
+
+  // =====================================================
+  // FORM
+  // =====================================================
 
   final GlobalKey<FormState>
       _formKey =
@@ -41,23 +49,63 @@ class _CheckoutScreenState
   final addressController =
       TextEditingController();
 
+  // =====================================================
+  // PAYMENT
+  // =====================================================
+
   String paymentMethod =
       'Cash';
+
+  // =====================================================
+  // ANIMATION
+  // =====================================================
+
+  late AnimationController
+      _animationController;
+
+  late Animation<double>
+      _fadeAnimation;
+
+  // =====================================================
+  // INIT
+  // =====================================================
 
   @override
   void initState() {
 
     super.initState();
 
+    _animationController =
+        AnimationController(
+
+      vsync: this,
+
+      duration:
+          const Duration(
+        milliseconds: 500,
+      ),
+    );
+
+    _fadeAnimation =
+        CurvedAnimation(
+
+      parent:
+          _animationController,
+
+      curve:
+          Curves.easeOut,
+    );
+
+    _animationController
+        .forward();
+
     WidgetsBinding.instance
         .addPostFrameCallback(
       (_) {
 
         final authProvider =
-            Provider.of<AuthProvider>(
-          context,
-          listen: false,
-        );
+            context.read<
+                AuthProvider>();
 
         final user =
             authProvider.user;
@@ -91,22 +139,38 @@ class _CheckoutScreenState
     }
 
     final cartProvider =
-        Provider.of<CartProvider>(
-      context,
-      listen: false,
-    );
+        context.read<
+            CartProvider>();
 
     final authProvider =
-        Provider.of<AuthProvider>(
-      context,
-      listen: false,
-    );
+        context.read<
+            AuthProvider>();
 
     final orderProvider =
-        Provider.of<OrderProvider>(
-      context,
-      listen: false,
+        context.read<
+            OrderProvider>();
+
+    // ===================================================
+    // SAVE USER DATA REALTIME
+    // ===================================================
+
+    await authProvider
+        .updateAddress(
+
+      addressController.text
+          .trim(),
     );
+
+    await authProvider
+        .updatePhone(
+
+      phoneController.text
+          .trim(),
+    );
+
+    // ===================================================
+    // CREATE ORDER
+    // ===================================================
 
     final order =
         OrderModel(
@@ -144,7 +208,8 @@ class _CheckoutScreenState
                 item.product.name,
 
             productImage:
-                item.product.imageBase64,
+                item.product
+                    .imageBase64,
 
             productPrice:
                 item.product.price,
@@ -181,7 +246,14 @@ class _CheckoutScreenState
 
       updatedAt:
           DateTime.now(),
+
+      completedAt:
+          null,
     );
+
+    // ===================================================
+    // CREATE ORDER
+    // ===================================================
 
     final success =
         await orderProvider
@@ -205,12 +277,12 @@ class _CheckoutScreenState
         context,
       ).showSnackBar(
 
-        SnackBar(
+        const SnackBar(
 
           backgroundColor:
               AppColors.success,
 
-          content: const Text(
+          content: Text(
             'Order created successfully',
           ),
         ),
@@ -240,6 +312,7 @@ class _CheckoutScreenState
 
             orderProvider
                     .errorMessage ??
+
                 'Failed to create order',
           ),
         ),
@@ -247,593 +320,1089 @@ class _CheckoutScreenState
     }
   }
 
+  // =====================================================
+  // BUILD
+  // =====================================================
+
   @override
   Widget build(
     BuildContext context,
   ) {
 
     final cartProvider =
-        Provider.of<CartProvider>(
-      context,
-    );
+        context.watch<
+            CartProvider>();
 
     final orderProvider =
-        Provider.of<OrderProvider>(
-      context,
-    );
+        context.watch<
+            OrderProvider>();
+
+    final authProvider =
+        context.watch<
+            AuthProvider>();
+
+    final screenWidth =
+        MediaQuery.of(context)
+            .size
+            .width;
+
+    final isTablet =
+        screenWidth >= 700;
 
     return Scaffold(
 
       backgroundColor:
-          AppColors.background,
+          const Color(
+        0xffF5F7FB,
+      ),
 
       appBar: AppBar(
 
         elevation: 0,
 
         backgroundColor:
-            Colors.white,
+            Colors.transparent,
 
-        foregroundColor:
-            Colors.black,
+        surfaceTintColor:
+            Colors.transparent,
 
-        centerTitle: true,
+        titleSpacing: 20,
 
-        title: const Text(
+        title: const Column(
 
-          'Checkout',
-
-          style: TextStyle(
-            fontWeight:
-                FontWeight.bold,
-          ),
-        ),
-      ),
-
-      body: Form(
-
-        key: _formKey,
-
-        child: Stack(
+          crossAxisAlignment:
+              CrossAxisAlignment
+                  .start,
 
           children: [
 
-            // =============================================
-            // CONTENT
-            // =============================================
+            Text(
 
-            Padding(
+              'Premium Checkout',
 
-              padding:
-                  const EdgeInsets.only(
-                bottom: 160,
-              ),
+              style: TextStyle(
 
-              child: SingleChildScrollView(
+                color:
+                    Colors.black,
 
-                padding:
-                    const EdgeInsets.all(
-                  20,
-                ),
+                fontSize: 24,
 
-                child: Column(
-
-                  crossAxisAlignment:
-                      CrossAxisAlignment.start,
-
-                  children: [
-
-                    // =====================================
-                    // CUSTOMER INFO
-                    // =====================================
-
-                    const Text(
-
-                      'Customer Information',
-
-                      style: TextStyle(
-
-                        fontSize: 22,
-
-                        fontWeight:
-                            FontWeight.bold,
-                      ),
-                    ),
-
-                    const SizedBox(
-                      height: 20,
-                    ),
-
-                    TextFormField(
-
-                      controller:
-                          nameController,
-
-                      decoration:
-                          const InputDecoration(
-
-                        labelText:
-                            'Customer Name',
-
-                        prefixIcon:
-                            Icon(
-                          Icons.person,
-                        ),
-                      ),
-
-                      validator:
-                          (value) {
-
-                        if (value ==
-                                null ||
-                            value
-                                .trim()
-                                .isEmpty) {
-
-                          return 'Name is required';
-                        }
-
-                        return null;
-                      },
-                    ),
-
-                    const SizedBox(
-                      height: 20,
-                    ),
-
-                    TextFormField(
-
-                      controller:
-                          phoneController,
-
-                      keyboardType:
-                          TextInputType
-                              .phone,
-
-                      decoration:
-                          const InputDecoration(
-
-                        labelText:
-                            'Phone Number',
-
-                        prefixIcon:
-                            Icon(
-                          Icons.phone,
-                        ),
-                      ),
-
-                      validator:
-                          (value) {
-
-                        if (value ==
-                                null ||
-                            value
-                                .trim()
-                                .isEmpty) {
-
-                          return 'Phone number is required';
-                        }
-
-                        return null;
-                      },
-                    ),
-
-                    const SizedBox(
-                      height: 20,
-                    ),
-
-                    TextFormField(
-
-                      controller:
-                          addressController,
-
-                      maxLines: 3,
-
-                      decoration:
-                          const InputDecoration(
-
-                        labelText:
-                            'Address',
-
-                        prefixIcon:
-                            Icon(
-                          Icons.location_on,
-                        ),
-                      ),
-
-                      validator:
-                          (value) {
-
-                        if (value ==
-                                null ||
-                            value
-                                .trim()
-                                .isEmpty) {
-
-                          return 'Address is required';
-                        }
-
-                        return null;
-                      },
-                    ),
-
-                    const SizedBox(
-                      height: 30,
-                    ),
-
-                    // =====================================
-                    // PAYMENT
-                    // =====================================
-
-                    const Text(
-
-                      'Payment Method',
-
-                      style: TextStyle(
-
-                        fontSize: 22,
-
-                        fontWeight:
-                            FontWeight.bold,
-                      ),
-                    ),
-
-                    const SizedBox(
-                      height: 20,
-                    ),
-
-                    DropdownButtonFormField<
-                        String>(
-
-                      value:
-                          paymentMethod,
-
-                      decoration:
-                          const InputDecoration(
-
-                        prefixIcon:
-                            Icon(
-                          Icons.payment,
-                        ),
-                      ),
-
-                      items: const [
-
-                        DropdownMenuItem(
-
-                          value:
-                              'Cash',
-
-                          child:
-                              Text(
-                            'Cash',
-                          ),
-                        ),
-
-                        DropdownMenuItem(
-
-                          value:
-                              'Bank Transfer',
-
-                          child:
-                              Text(
-                            'Bank Transfer',
-                          ),
-                        ),
-                      ],
-
-                      onChanged: (
-                        value,
-                      ) {
-
-                        if (value !=
-                            null) {
-
-                          setState(() {
-
-                            paymentMethod =
-                                value;
-                          });
-                        }
-                      },
-                    ),
-
-                    const SizedBox(
-                      height: 30,
-                    ),
-
-                    // =====================================
-                    // ORDER SUMMARY
-                    // =====================================
-
-                    const Text(
-
-                      'Order Summary',
-
-                      style: TextStyle(
-
-                        fontSize: 22,
-
-                        fontWeight:
-                            FontWeight.bold,
-                      ),
-                    ),
-
-                    const SizedBox(
-                      height: 20,
-                    ),
-
-                    Container(
-
-                      padding:
-                          const EdgeInsets.all(
-                        20,
-                      ),
-
-                      decoration:
-                          BoxDecoration(
-
-                        color:
-                            Colors.white,
-
-                        borderRadius:
-                            BorderRadius.circular(
-                          24,
-                        ),
-                      ),
-
-                      child: Column(
-
-                        children: [
-
-                          ...cartProvider
-                              .items
-                              .map(
-                            (item) {
-
-                              return Padding(
-
-                                padding:
-                                    const EdgeInsets.only(
-                                  bottom: 18,
-                                ),
-
-                                child: Row(
-
-                                  children: [
-
-                                    Expanded(
-
-                                      child: Column(
-
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-
-                                        children: [
-
-                                          Text(
-
-                                            item.product.name,
-
-                                            style:
-                                                const TextStyle(
-                                              fontWeight:
-                                                  FontWeight.bold,
-                                            ),
-                                          ),
-
-                                          const SizedBox(
-                                            height:
-                                                4,
-                                          ),
-
-                                          Text(
-                                            '${item.quantity} x ${AppFormat.currency(item.product.price)}',
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-
-                                    Text(
-
-                                      AppFormat.currency(
-                                        item.subtotal,
-                                      ),
-
-                                      style:
-                                          const TextStyle(
-                                        fontWeight:
-                                            FontWeight.bold,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+                fontWeight:
+                    FontWeight.bold,
               ),
             ),
 
-            // =============================================
-            // BOTTOM CHECKOUT
-            // =============================================
+            SizedBox(
+              height: 2,
+            ),
 
-            Positioned(
+            Text(
 
-              left: 20,
+              'Realtime marketplace checkout',
 
-              right: 20,
+              style: TextStyle(
 
-              bottom: 20,
+                color:
+                    Colors.grey,
 
-              child: Container(
+                fontSize: 13,
+              ),
+            ),
+          ],
+        ),
+      ),
+
+      body: FadeTransition(
+
+        opacity:
+            _fadeAnimation,
+
+        child: Form(
+
+          key: _formKey,
+
+          child: Column(
+
+            crossAxisAlignment:
+                CrossAxisAlignment.start,
+
+            children: [
+
+              Padding(
 
                 padding:
-                    const EdgeInsets.all(
-                  22,
+                    const EdgeInsets.only(
+                  bottom: 0,
                 ),
 
-                decoration:
-                    BoxDecoration(
+                child:
+                    SingleChildScrollView(
 
-                  color:
-                      Colors.white,
+                  physics:
+                      const BouncingScrollPhysics(),
 
-                  borderRadius:
-                      BorderRadius.circular(
-                    28,
+                  padding:
+                      const EdgeInsets.all(
+                    20,
                   ),
 
-                  boxShadow: [
+                  child: Column(
 
-                    BoxShadow(
+                    crossAxisAlignment:
+                        CrossAxisAlignment
+                            .start,
 
-                      color:
-                          Colors.black
-                              .withOpacity(
-                        0.08,
-                      ),
+                    children: [
 
-                      blurRadius:
-                          30,
-                    ),
-                  ],
-                ),
+                      // =====================================
+                      // PROFILE CARD
+                      // =====================================
 
-                child: Column(
+                      Container(
 
-                  mainAxisSize:
-                      MainAxisSize.min,
+                        width:
+                            double.infinity,
 
-                  children: [
+                        padding:
+                            const EdgeInsets.all(
+                          20,
+                        ),
 
-                    Row(
+                        decoration:
+                            BoxDecoration(
 
-                      mainAxisAlignment:
-                          MainAxisAlignment
-                              .spaceBetween,
+                          borderRadius:
+                              BorderRadius.circular(
+                            28,
+                          ),
 
-                      children: [
+                          gradient:
+                              const LinearGradient(
 
-                        const Text(
+                            colors: [
 
-                          'Total Price',
+                              Color(
+                                0xff2563EB,
+                              ),
 
-                          style: TextStyle(
-
-                            fontSize: 18,
-
-                            fontWeight:
-                                FontWeight.bold,
+                              Color(
+                                0xff1D4ED8,
+                              ),
+                            ],
                           ),
                         ),
 
-                        Text(
+                        child: Row(
 
-                          AppFormat.currency(
-                            cartProvider
-                                .totalPrice,
-                          ),
+                          children: [
 
-                          style:
-                              const TextStyle(
+                            Container(
 
-                            fontSize: 24,
+                              width: 60,
 
-                            color:
-                                AppColors.primary,
+                              height: 60,
 
-                            fontWeight:
-                                FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
+                              decoration:
+                                  BoxDecoration(
 
-                    const SizedBox(
-                      height: 22,
-                    ),
+                                color:
+                                    Colors
+                                        .white
+                                        .withOpacity(
+                                  0.2,
+                                ),
 
-                    SizedBox(
+                                shape:
+                                    BoxShape.circle,
+                              ),
 
-                      width:
-                          double.infinity,
+                              child:
+                                  authProvider
+                                          .photoUrl
+                                          .isNotEmpty
 
-                      height: 58,
+                                      ? ClipOval(
 
-                      child:
-                          ElevatedButton(
+                                          child:
+                                              Image.memory(
 
-                        style:
-                            ElevatedButton.styleFrom(
+                                            base64Decode(
+                                              authProvider
+                                                  .photoUrl,
+                                            ),
 
-                          backgroundColor:
-                              AppColors.primary,
+                                            fit:
+                                                BoxFit.cover,
+                                          ),
+                                        )
 
-                          foregroundColor:
-                              Colors.white,
+                                      : const Icon(
 
-                          shape:
-                              RoundedRectangleBorder(
+                                          Icons.person,
 
-                            borderRadius:
-                                BorderRadius.circular(
-                              18,
+                                          color:
+                                              Colors
+                                                  .white,
+
+                                          size:
+                                              30,
+                                        ),
                             ),
-                          ),
-                        ),
 
-                        onPressed:
-                            orderProvider
-                                    .isLoading
+                            const SizedBox(
+                              width: 16,
+                            ),
 
-                                ? null
+                            Expanded(
 
-                                : createOrder,
+                              child: Column(
 
-                        child:
-                            orderProvider
-                                    .isLoading
+                                crossAxisAlignment:
+                                    CrossAxisAlignment
+                                        .start,
 
-                                ? const SizedBox(
+                                children: [
 
-                                    width: 24,
+                                  Text(
 
-                                    height: 24,
+                                    authProvider
+                                            .user
+                                            ?.displayName ??
 
-                                    child:
-                                        CircularProgressIndicator(
+                                        'Member',
+
+                                    overflow:
+                                        TextOverflow
+                                            .ellipsis,
+
+                                    style:
+                                        const TextStyle(
 
                                       color:
-                                          Colors.white,
-
-                                      strokeWidth:
-                                          2,
-                                    ),
-                                  )
-
-                                : const Text(
-
-                                    'Create Order',
-
-                                    style: TextStyle(
+                                          Colors
+                                              .white,
 
                                       fontSize:
-                                          18,
+                                          20,
 
                                       fontWeight:
                                           FontWeight.bold,
                                     ),
                                   ),
+
+                                  const SizedBox(
+                                    height:
+                                        4,
+                                  ),
+
+                                  Text(
+
+                                    authProvider
+                                            .email,
+
+                                    overflow:
+                                        TextOverflow
+                                            .ellipsis,
+
+                                    style:
+                                        TextStyle(
+
+                                      color:
+                                          Colors
+                                              .white
+                                              .withOpacity(
+                                        0.9,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+
+                      const SizedBox(
+                        height: 28,
+                      ),
+
+                      const Text(
+
+                        'Shipping Information',
+
+                        style: TextStyle(
+
+                          fontSize: 24,
+
+                          fontWeight:
+                              FontWeight.bold,
+                        ),
+                      ),
+
+                      const SizedBox(
+                        height: 20,
+                      ),
+
+                      _buildInputField(
+
+                        controller:
+                            nameController,
+
+                        label:
+                            'Full Name',
+
+                        icon:
+                            Icons.person,
+                      ),
+
+                      const SizedBox(
+                        height: 18,
+                      ),
+
+                      _buildInputField(
+
+                        controller:
+                            phoneController,
+
+                        label:
+                            'Phone Number',
+
+                        icon:
+                            Icons.phone,
+
+                        keyboardType:
+                            TextInputType
+                                .phone,
+                      ),
+
+                      const SizedBox(
+                        height: 18,
+                      ),
+
+                      _buildInputField(
+
+                        controller:
+                            addressController,
+
+                        label:
+                            'Shipping Address',
+
+                        icon:
+                            Icons.location_on,
+
+                        minLines:
+                            2,
+
+                        maxLines:
+                            3,
+                      ),
+
+                      const SizedBox(
+                        height: 30,
+                      ),
+
+                      const Text(
+
+                        'Payment Method',
+
+                        style: TextStyle(
+
+                          fontSize: 24,
+
+                          fontWeight:
+                              FontWeight.bold,
+                        ),
+                      ),
+
+                      const SizedBox(
+                        height: 20,
+                      ),
+
+                      Wrap(
+
+                        spacing: 16,
+
+                        runSpacing: 16,
+
+                        children: [
+
+                          _buildPaymentCard(
+                            'Cash',
+                            Icons.payments,
+                          ),
+
+                          _buildPaymentCard(
+                            'Bank Transfer',
+                            Icons.account_balance,
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(
+                        height: 30,
+                      ),
+
+                      Container(
+
+                        width:
+                            double.infinity,
+
+                        padding:
+                            const EdgeInsets.all(
+                          18,
+                        ),
+
+                        decoration:
+                            BoxDecoration(
+
+                          color:
+                              Colors.orange
+                                  .withOpacity(
+                            0.08,
+                          ),
+
+                          borderRadius:
+                              BorderRadius.circular(
+                            22,
+                          ),
+                        ),
+
+                        child: Row(
+
+                          crossAxisAlignment:
+                              CrossAxisAlignment
+                                  .start,
+
+                          children: [
+
+                            const Icon(
+
+                              Icons.info_outline,
+
+                              color:
+                                  Colors.orange,
+                            ),
+
+                            const SizedBox(
+                              width: 12,
+                            ),
+
+                            Expanded(
+
+                              child: Text(
+
+                                'Orders will be validated by admin before delivery processing.',
+
+                                style: TextStyle(
+
+                                  color:
+                                      Colors
+                                          .grey
+                                          .shade800,
+
+                                  height:
+                                      1.5,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      const SizedBox(
+                        height: 30,
+                      ),
+
+                      const Text(
+
+                        'Order Summary',
+
+                        style: TextStyle(
+
+                          fontSize: 24,
+
+                          fontWeight:
+                              FontWeight.bold,
+                        ),
+                      ),
+
+                      const SizedBox(
+                        height: 20,
+                      ),
+
+                      Container(
+
+                        width:
+                            double.infinity,
+
+                        padding:
+                            const EdgeInsets.all(
+                          20,
+                        ),
+
+                        decoration:
+                            BoxDecoration(
+
+                          color:
+                              Colors.white,
+
+                          borderRadius:
+                              BorderRadius.circular(
+                            28,
+                          ),
+                        ),
+
+                        child: Column(
+
+                          children: [
+
+                            ...cartProvider
+                                .items
+                                .map(
+                              (item) {
+
+                                return Padding(
+
+                                  padding:
+                                      const EdgeInsets.only(
+                                    bottom:
+                                        18,
+                                  ),
+
+                                  child: Row(
+
+                                    children: [
+
+                                      Container(
+
+                                        width: 60,
+
+                                        height: 60,
+
+                                        decoration:
+                                            BoxDecoration(
+
+                                          borderRadius:
+                                              BorderRadius.circular(
+                                            18,
+                                          ),
+                                        ),
+
+                                        child:
+                                            ClipRRect(
+
+                                          borderRadius:
+                                              BorderRadius.circular(
+                                            18,
+                                          ),
+
+                                          child:
+                                              Image.memory(
+
+                                            base64Decode(
+                                              item.product.imageBase64,
+                                            ),
+
+                                            fit:
+                                                BoxFit.cover,
+                                          ),
+                                        ),
+                                      ),
+
+                                      const SizedBox(
+                                        width:
+                                            14,
+                                      ),
+
+                                      Expanded(
+
+                                        child: Column(
+
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment
+                                                  .start,
+
+                                          children: [
+
+                                            Text(
+
+                                              item.product.name,
+
+                                              maxLines:
+                                                  2,
+
+                                              overflow:
+                                                  TextOverflow
+                                                      .ellipsis,
+
+                                              style:
+                                                  const TextStyle(
+
+                                                fontWeight:
+                                                    FontWeight.bold,
+                                              ),
+                                            ),
+
+                                            const SizedBox(
+                                              height:
+                                                  4,
+                                            ),
+
+                                            Text(
+
+                                              '${item.quantity} x ${AppFormat.currency(item.product.price)}',
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+
+                                      const SizedBox(
+                                        width:
+                                            12,
+                                      ),
+
+                                      Text(
+
+                                        AppFormat.currency(
+                                          item.subtotal,
+                                        ),
+
+                                        style:
+                                            const TextStyle(
+
+                                          fontWeight:
+                                              FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      const SizedBox(
+                        height: 24,
+                      ),
+
+                      Container(
+
+                        width:
+                            double.infinity,
+
+                        padding:
+                            const EdgeInsets.all(
+                          20,
+                        ),
+
+                        decoration:
+                            BoxDecoration(
+
+                          color: Colors.white,
+
+                          borderRadius:
+                              BorderRadius.circular(
+                            24,
+                          ),
+
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black
+                                  .withOpacity(
+                                0.05,
+                              ),
+                              blurRadius:
+                                  20,
+                              offset:
+                                  const Offset(
+                                0,
+                                10,
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        child: Column(
+
+                          children: [
+
+                            _buildPriceRow(
+
+                              title:
+                                  'Subtotal',
+
+                              value:
+                                  AppFormat.currency(
+                                cartProvider
+                                    .totalPrice,
+                              ),
+                            ),
+
+                            const SizedBox(
+                              height: 10,
+                            ),
+
+                            _buildPriceRow(
+
+                              title:
+                                  'Shipping',
+
+                              value:
+                                  'Free',
+                            ),
+
+                            const Padding(
+
+                              padding:
+                                  EdgeInsets.symmetric(
+                                vertical:
+                                    16,
+                              ),
+
+                              child: Divider(),
+                            ),
+
+                            Row(
+
+                              mainAxisAlignment:
+                                  MainAxisAlignment
+                                      .spaceBetween,
+
+                              children: [
+
+                                const Text(
+
+                                  'Grand Total',
+
+                                  style:
+                                      TextStyle(
+
+                                    fontSize:
+                                        18,
+
+                                    fontWeight:
+                                        FontWeight.bold,
+                                  ),
+                                ),
+
+                                Text(
+
+                                  AppFormat.currency(
+                                    cartProvider
+                                        .totalPrice,
+                                  ),
+
+                                  style:
+                                      const TextStyle(
+
+                                    fontSize:
+                                        22,
+
+                                    color:
+                                        AppColors.primary,
+
+                                    fontWeight:
+                                        FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+
+                            const SizedBox(
+                              height: 18,
+                            ),
+
+                            SizedBox(
+
+                              width:
+                                  double.infinity,
+
+                              height: 54,
+
+                              child:
+                                  ElevatedButton(
+
+                                style:
+                                    ElevatedButton.styleFrom(
+
+                                  backgroundColor:
+                                      AppColors.primary,
+
+                                  foregroundColor:
+                                      Colors.white,
+
+                                  elevation:
+                                      0,
+
+                                  shape:
+                                      RoundedRectangleBorder(
+
+                                    borderRadius:
+                                        BorderRadius.circular(
+                                      18,
+                                    ),
+                                  ),
+                                ),
+
+                                onPressed:
+                                    orderProvider
+                                            .isLoading
+
+                                        ? null
+
+                                        : createOrder,
+
+                                child:
+                                    orderProvider
+                                            .isLoading
+
+                                        ? const SizedBox(
+
+                                            width:
+                                                24,
+
+                                            height:
+                                                24,
+
+                                            child:
+                                                CircularProgressIndicator(
+
+                                              color:
+                                                  Colors.white,
+
+                                              strokeWidth:
+                                                  2,
+                                            ),
+                                          )
+
+                                        : const Text(
+
+                                            'Create Order',
+
+                                            style:
+                                                TextStyle(
+
+                                              fontSize:
+                                                  16,
+
+                                              fontWeight:
+                                                  FontWeight.bold,
+                                            ),
+                                          ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // =====================================================
+  // INPUT
+  // =====================================================
+
+  Widget _buildInputField({
+
+    required TextEditingController
+        controller,
+
+    required String label,
+
+    required IconData icon,
+
+    TextInputType?
+        keyboardType,
+
+    int minLines = 1,
+
+    int maxLines = 1,
+
+  }) {
+
+    return TextFormField(
+
+      controller:
+          controller,
+
+      keyboardType:
+          keyboardType,
+
+      minLines:
+          minLines,
+
+      maxLines:
+          maxLines,
+
+      decoration:
+          InputDecoration(
+
+        labelText:
+            label,
+
+        prefixIcon:
+            Icon(icon),
+
+        filled:
+            true,
+
+        fillColor:
+            Colors.white,
+
+        border:
+            OutlineInputBorder(
+
+          borderRadius:
+              BorderRadius.circular(
+            20,
+          ),
+
+          borderSide:
+              BorderSide.none,
+        ),
+      ),
+
+      validator:
+          (value) {
+
+        if (value == null ||
+            value
+                .trim()
+                .isEmpty) {
+
+          return '$label is required';
+        }
+
+        return null;
+      },
+    );
+  }
+
+  // =====================================================
+  // PAYMENT CARD
+  // =====================================================
+
+  Widget _buildPaymentCard(
+    String title,
+    IconData icon,
+  ) {
+
+    final selected =
+        paymentMethod ==
+            title;
+
+    return GestureDetector(
+
+      onTap: () {
+
+        setState(() {
+
+          paymentMethod =
+              title;
+        });
+      },
+
+      child: AnimatedContainer(
+
+        duration:
+            const Duration(
+          milliseconds:
+              250,
+        ),
+
+        width: 170,
+
+        padding:
+            const EdgeInsets.all(
+          18,
+        ),
+
+        decoration:
+            BoxDecoration(
+
+          color:
+              selected
+
+                  ? AppColors.primary
+                      .withOpacity(
+                    0.08,
+                  )
+
+                  : Colors.white,
+
+          borderRadius:
+              BorderRadius.circular(
+            22,
+          ),
+
+          border: Border.all(
+
+            color:
+                selected
+
+                    ? AppColors
+                        .primary
+
+                    : Colors
+                        .grey
+                        .shade200,
+
+            width: 2,
+          ),
+        ),
+
+        child: Column(
+
+          children: [
+
+            Icon(
+
+              icon,
+
+              size: 34,
+
+              color:
+                  selected
+
+                      ? AppColors
+                          .primary
+
+                      : Colors
+                          .grey,
+            ),
+
+            const SizedBox(
+              height: 12,
+            ),
+
+            Text(
+
+              title,
+
+              textAlign:
+                  TextAlign.center,
+
+              style: TextStyle(
+
+                fontWeight:
+                    FontWeight.bold,
+
+                color:
+                    selected
+
+                        ? AppColors
+                            .primary
+
+                        : Colors.black,
               ),
             ),
           ],
@@ -842,8 +1411,48 @@ class _CheckoutScreenState
     );
   }
 
+  // =====================================================
+  // PRICE ROW
+  // =====================================================
+
+  Widget _buildPriceRow({
+
+    required String title,
+
+    required String value,
+
+  }) {
+
+    return Row(
+
+      mainAxisAlignment:
+          MainAxisAlignment
+              .spaceBetween,
+
+      children: [
+
+        Text(title),
+
+        Text(
+
+          value,
+
+          style:
+              const TextStyle(
+
+            fontWeight:
+                FontWeight.bold,
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   void dispose() {
+
+    _animationController
+        .dispose();
 
     nameController.dispose();
 

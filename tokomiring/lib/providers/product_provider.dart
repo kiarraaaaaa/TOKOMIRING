@@ -1,3 +1,5 @@
+// lib/providers/product_provider.dart
+
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -7,6 +9,10 @@ import '../services/database_service.dart';
 
 class ProductProvider
     extends ChangeNotifier {
+
+  // =====================================================
+  // SERVICES
+  // =====================================================
 
   final DatabaseService
       _databaseService =
@@ -28,6 +34,9 @@ class ProductProvider
   bool _initialized =
       false;
 
+  bool _isSearching =
+      false;
+
   String? _errorMessage;
 
   String _selectedCategory =
@@ -42,19 +51,27 @@ class ProductProvider
   // GETTERS
   // =====================================================
 
-  List<ProductModel> get products {
+  List<ProductModel> get products =>
 
-    return _filteredProducts;
-  }
+      List.unmodifiable(
+        _filteredProducts,
+      );
 
   List<ProductModel>
-      get allProducts {
+      get allProducts =>
 
-    return _products;
-  }
+          List.unmodifiable(
+            _products,
+          );
 
   bool get isLoading =>
       _isLoading;
+
+  bool get initialized =>
+      _initialized;
+
+  bool get isSearching =>
+      _isSearching;
 
   String? get errorMessage =>
       _errorMessage;
@@ -87,6 +104,48 @@ class ProductProvider
   ];
 
   // =====================================================
+  // TOTAL PRODUCTS
+  // =====================================================
+
+  int get totalProducts =>
+
+      _products.length;
+
+  // =====================================================
+  // TOTAL STOCK
+  // =====================================================
+
+  int get totalStock {
+
+    int total = 0;
+
+    for (final product
+        in _products) {
+
+      total += product.stock;
+    }
+
+    return total;
+  }
+
+  // =====================================================
+  // TOTAL SOLD
+  // =====================================================
+
+  int get totalSoldItems {
+
+    int total = 0;
+
+    for (final product
+        in _products) {
+
+      total += product.sold;
+    }
+
+    return total;
+  }
+
+  // =====================================================
   // TOP SELLING
   // =====================================================
 
@@ -99,10 +158,8 @@ class ProductProvider
     );
 
     copied.sort(
-      (
-        a,
-        b,
-      ) {
+
+      (a, b) {
 
         return b.sold.compareTo(
           a.sold,
@@ -114,28 +171,56 @@ class ProductProvider
   }
 
   // =====================================================
-  // TOTAL SOLD ITEMS
+  // POPULAR
   // =====================================================
 
-  int get totalSoldItems {
+  List<ProductModel>
+      get popularProducts {
 
-    int total = 0;
+    return _products.where(
 
-    for (var product
-        in _products) {
+      (product) {
 
-      total += product.sold;
-    }
-
-    return total;
+        return product
+            .isPopular;
+      },
+    ).toList();
   }
 
   // =====================================================
-  // TOTAL PRODUCTS
+  // AVAILABLE
   // =====================================================
 
-  int get totalProducts =>
-      _products.length;
+  List<ProductModel>
+      get availableProducts {
+
+    return _products.where(
+
+      (product) {
+
+        return product.stock >
+                0 &&
+            product.isAvailable;
+      },
+    ).toList();
+  }
+
+  // =====================================================
+  // LOW STOCK
+  // =====================================================
+
+  List<ProductModel>
+      get lowStockProducts {
+
+    return _products.where(
+
+      (product) {
+
+        return product.stock <=
+            5;
+      },
+    ).toList();
+  }
 
   // =====================================================
   // INITIALIZE
@@ -151,10 +236,13 @@ class ProductProvider
 
     _setLoading(true);
 
+    _clearError();
+
     _productSubscription
         ?.cancel();
 
     _productSubscription =
+
         _databaseService
             .getProducts()
             .listen(
@@ -164,13 +252,12 @@ class ProductProvider
         _products = data;
 
         _products.sort(
-          (
-            a,
-            b,
-          ) {
 
-            return b.sold.compareTo(
-              a.sold,
+          (a, b) {
+
+            return b.createdAt
+                .compareTo(
+              a.createdAt,
             );
           },
         );
@@ -195,7 +282,7 @@ class ProductProvider
   }
 
   // =====================================================
-  // FORCE REFRESH
+  // REFRESH
   // =====================================================
 
   Future<void>
@@ -212,6 +299,7 @@ class ProductProvider
           ?.cancel();
 
       _productSubscription =
+
           _databaseService
               .getProducts()
               .listen(
@@ -221,13 +309,12 @@ class ProductProvider
           _products = data;
 
           _products.sort(
-            (
-              a,
-              b,
-            ) {
 
-              return b.sold.compareTo(
-                a.sold,
+            (a, b) {
+
+              return b.createdAt
+                  .compareTo(
+                a.createdAt,
               );
             },
           );
@@ -257,7 +344,8 @@ class ProductProvider
           if (!completer
               .isCompleted) {
 
-            completer.completeError(
+            completer
+                .completeError(
               error,
             );
           }
@@ -278,7 +366,7 @@ class ProductProvider
   }
 
   // =====================================================
-  // FILTER
+  // APPLY FILTERS
   // =====================================================
 
   void _applyFilters() {
@@ -289,58 +377,64 @@ class ProductProvider
       _products,
     );
 
+    // ===============================================
+    // CATEGORY
+    // ===============================================
+
     if (_selectedCategory !=
         'All') {
 
       tempProducts = tempProducts
           .where(
-            (
-              product,
-            ) {
 
-              return product
-                      .category
-                      .toLowerCase() ==
-                  _selectedCategory
-                      .toLowerCase();
-            },
-          )
-          .toList();
+        (product) {
+
+          return product
+                  .category
+                  .toLowerCase() ==
+
+              _selectedCategory
+                  .toLowerCase();
+        },
+      ).toList();
     }
 
+    // ===============================================
+    // SEARCH
+    // ===============================================
+
     if (_searchQuery
+        .trim()
         .isNotEmpty) {
+
+      final query =
+          _searchQuery
+              .toLowerCase();
 
       tempProducts = tempProducts
           .where(
-            (
-              product,
-            ) {
 
-              return product.name
-                      .toLowerCase()
-                      .contains(
-                        _searchQuery
-                            .toLowerCase(),
-                      ) ||
+        (product) {
 
-                  product
-                      .description
-                      .toLowerCase()
-                      .contains(
-                        _searchQuery
-                            .toLowerCase(),
-                      ) ||
+          return product.name
+                  .toLowerCase()
+                  .contains(
+                    query,
+                  ) ||
 
-                  product.category
-                      .toLowerCase()
-                      .contains(
-                        _searchQuery
-                            .toLowerCase(),
-                      );
-            },
-          )
-          .toList();
+              product.description
+                  .toLowerCase()
+                  .contains(
+                    query,
+                  ) ||
+
+              product.category
+                  .toLowerCase()
+                  .contains(
+                    query,
+                  );
+        },
+      ).toList();
     }
 
     _filteredProducts =
@@ -357,9 +451,18 @@ class ProductProvider
     String query,
   ) {
 
-    _searchQuery = query;
+    _isSearching =
+        true;
+
+    _searchQuery =
+        query.trim();
 
     _applyFilters();
+
+    _isSearching =
+        false;
+
+    notifyListeners();
   }
 
   // =====================================================
@@ -401,9 +504,8 @@ class ProductProvider
     try {
 
       return _products.firstWhere(
-        (
-          product,
-        ) {
+
+        (product) {
 
           return product.id ==
               productId;
@@ -414,60 +516,6 @@ class ProductProvider
 
       return null;
     }
-  }
-
-  // =====================================================
-  // POPULAR
-  // =====================================================
-
-  List<ProductModel>
-      get popularProducts {
-
-    return _products.where(
-      (
-        product,
-      ) {
-
-        return product.isPopular;
-      },
-    ).toList();
-  }
-
-  // =====================================================
-  // AVAILABLE
-  // =====================================================
-
-  List<ProductModel>
-      get availableProducts {
-
-    return _products.where(
-      (
-        product,
-      ) {
-
-        return product.stock >
-                0 &&
-            product.isAvailable;
-      },
-    ).toList();
-  }
-
-  // =====================================================
-  // LOW STOCK
-  // =====================================================
-
-  List<ProductModel>
-      get lowStockProducts {
-
-    return _products.where(
-      (
-        product,
-      ) {
-
-        return product.stock <=
-            5;
-      },
-    ).toList();
   }
 
   // =====================================================
@@ -482,7 +530,7 @@ class ProductProvider
 
       _setLoading(true);
 
-      _errorMessage = null;
+      _clearError();
 
       await _databaseService
           .addProduct(
@@ -491,9 +539,8 @@ class ProductProvider
 
       final exist =
           _products.any(
-        (
-          p,
-        ) {
+
+        (p) {
 
           return p.id ==
               product.id;
@@ -540,7 +587,7 @@ class ProductProvider
 
       _setLoading(true);
 
-      _errorMessage = null;
+      _clearError();
 
       await _databaseService
           .updateProduct(
@@ -549,9 +596,8 @@ class ProductProvider
 
       final index =
           _products.indexWhere(
-        (
-          p,
-        ) {
+
+        (p) {
 
           return p.id ==
               product.id;
@@ -586,7 +632,7 @@ class ProductProvider
   }
 
   // =====================================================
-  // DELETE
+  // DELETE PRODUCT
   // =====================================================
 
   Future<bool> deleteProduct(
@@ -597,7 +643,7 @@ class ProductProvider
 
       _setLoading(true);
 
-      _errorMessage = null;
+      _clearError();
 
       await _databaseService
           .deleteProduct(
@@ -605,9 +651,8 @@ class ProductProvider
       );
 
       _products.removeWhere(
-        (
-          product,
-        ) {
+
+        (product) {
 
           return product.id ==
               productId;
@@ -655,14 +700,14 @@ class ProductProvider
         productId:
             productId,
 
-        stock: stock,
+        stock:
+            stock,
       );
 
       final index =
           _products.indexWhere(
-        (
-          product,
-        ) {
+
+        (product) {
 
           return product.id ==
               productId;
@@ -696,24 +741,6 @@ class ProductProvider
   }
 
   // =====================================================
-  // REALTIME SOLD FROM ORDERS ONLY
-  // =====================================================
-
-  Future<void> increaseSold({
-
-    required String productId,
-
-    required int quantity,
-
-  }) async {
-
-    // DISABLED
-    // SOLD NOW CALCULATED
-    // FROM COMPLETED ORDERS
-    // IN REALTIME REPORT
-  }
-
-  // =====================================================
   // PRIVATE
   // =====================================================
 
@@ -721,9 +748,16 @@ class ProductProvider
     bool value,
   ) {
 
-    _isLoading = value;
+    _isLoading =
+        value;
 
     notifyListeners();
+  }
+
+  void _clearError() {
+
+    _errorMessage =
+        null;
   }
 
   // =====================================================

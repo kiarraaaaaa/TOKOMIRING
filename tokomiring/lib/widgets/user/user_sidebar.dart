@@ -1,3 +1,5 @@
+// lib/widgets/user/user_sidebar.dart
+
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -5,47 +7,66 @@ import 'package:provider/provider.dart';
 
 import '../../providers/auth_provider.dart';
 
-class AdminSidebar extends StatefulWidget {
-  final int selectedIndex;
-  final Function(int) onSelected;
-  final VoidCallback? onLogout;
+class UserSidebar
+    extends StatefulWidget {
 
-  const AdminSidebar({
+  final int selectedIndex;
+
+  final Function(int)
+      onSelected;
+
+  final VoidCallback?
+      onLogout;
+
+  const UserSidebar({
+
     super.key,
+
     required this.selectedIndex,
+
     required this.onSelected,
+
     this.onLogout,
   });
 
   @override
-  State<AdminSidebar> createState() =>
-      _AdminSidebarState();
+  State<UserSidebar>
+      createState() =>
+          _UserSidebarState();
 }
 
-class _AdminSidebarState
-    extends State<AdminSidebar> {
+class _UserSidebarState
+    extends State<UserSidebar> {
+
   bool collapsed = false;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(
+    BuildContext context,
+  ) {
+
     final authProvider =
-        context.watch<AuthProvider>();
+        context.watch<
+            AuthProvider>();
 
     final currentUser =
         authProvider.user;
 
-    final adminName =
-        (currentUser?.displayName ??
-                '')
-                .trim()
-                .isNotEmpty
-            ? currentUser!
-                .displayName
-            : 'Administrator';
+    final memberName =
+        currentUser?.displayName?.trim().isNotEmpty ==
+                true
+            ? currentUser!.displayName!
+            : currentUser?.name.trim().isNotEmpty ==
+                    true
+                ? currentUser!.name
+                : 'Member';
 
-    final safePhotoUrl =
-        currentUser
-                ?.safePhotoUrl ??
+    final memberRole =
+        currentUser?.roleLabel ??
+            'Member';
+
+    final photoUrl =
+        currentUser?.safePhotoUrl ??
             '';
 
     final width =
@@ -59,149 +80,187 @@ class _AdminSidebarState
     final bool isMobile =
         width < 820;
 
-    double sidebarWidth = 172;
+    double sidebarWidth = 176;
 
     if (collapsed &&
         !isMobile) {
-      sidebarWidth = 66;
+
+      sidebarWidth = 68;
+
     } else if (isTablet) {
-      sidebarWidth = 154;
+
+      sidebarWidth = 156;
     }
 
     return AnimatedContainer(
-      duration: const Duration(
+
+      duration:
+          const Duration(
         milliseconds: 220,
       ),
+
       width: sidebarWidth,
+
       decoration:
           const BoxDecoration(
-        gradient: LinearGradient(
+
+        gradient:
+            LinearGradient(
+
           begin:
               Alignment.topLeft,
-          end: Alignment
-              .bottomRight,
+
+          end:
+              Alignment.bottomRight,
+
           colors: [
-            Color(0xff0F172A),
-            Color(0xff172554),
+
+            Color(
+              0xff0F172A,
+            ),
+
+            Color(
+              0xff172554,
+            ),
           ],
         ),
       ),
+
       child: SafeArea(
+
         child: Column(
           children: [
+
             // =============================================
             // HEADER
             // =============================================
 
             Padding(
+
               padding:
-                  const EdgeInsets
-                      .fromLTRB(
+                  const EdgeInsets.fromLTRB(
                 8,
                 10,
                 8,
                 4,
               ),
+
               child: Row(
                 children: [
+
                   Container(
-                    width: collapsed
-                        ? 34
-                        : 36,
+
+                    width:
+                        collapsed
+                            ? 34
+                            : 36,
+
                     height:
                         collapsed
                             ? 34
                             : 36,
+
                     padding:
-                        const EdgeInsets
-                            .all(
+                        const EdgeInsets.all(
                       4,
                     ),
+
                     decoration:
                         BoxDecoration(
-                      color: Colors
-                          .white
-                          .withOpacity(
+
+                      color:
+                          Colors.white
+                              .withOpacity(
                         0.08,
                       ),
+
                       borderRadius:
-                          BorderRadius
-                              .circular(
+                          BorderRadius.circular(
                         10,
                       ),
                     ),
-                    child: ClipRRect(
+
+                    child:
+                        ClipRRect(
+
                       borderRadius:
-                          BorderRadius
-                              .circular(
+                          BorderRadius.circular(
                         8,
                       ),
+
                       child: Image.asset(
+
                         'assets/images/tokomiring.png',
+
                         fit: BoxFit.cover,
-                        errorBuilder: (
-                          context,
-                          error,
-                          stackTrace,
-                        ) {
-                          return const Icon(
-                            Icons
-                                .store_rounded,
-                            color: Colors
-                                .white,
-                          );
-                        },
                       ),
                     ),
                   ),
 
                   if (!collapsed ||
                       isMobile) ...[
+
                     const SizedBox(
                       width: 7,
                     ),
 
                     Expanded(
+
                       child: Column(
+
                         crossAxisAlignment:
                             CrossAxisAlignment
                                 .start,
+
                         mainAxisSize:
-                            MainAxisSize
-                                .min,
+                            MainAxisSize.min,
+
                         children: const [
+
                           Text(
+
                             'TOKO MIRING',
+
                             overflow:
                                 TextOverflow
                                     .ellipsis,
+
                             maxLines: 1,
+
                             style:
                                 TextStyle(
-                              color: Colors
-                                  .white,
+
+                              color:
+                                  Colors.white,
+
                               fontWeight:
-                                  FontWeight
-                                      .bold,
-                              fontSize:
-                                  10,
+                                  FontWeight.bold,
+
+                              fontSize: 10,
                             ),
                           ),
+
                           SizedBox(
                             height: 1,
                           ),
+
                           Text(
-                            'Admin Panel',
+
+                            'Member Dashboard',
+
                             overflow:
                                 TextOverflow
                                     .ellipsis,
+
                             maxLines: 1,
+
                             style:
                                 TextStyle(
-                              color: Colors
-                                  .white70,
-                              fontSize:
-                                  7.5,
+
+                              color:
+                                  Colors.white70,
+
+                              fontSize: 7.5,
                             ),
                           ),
                         ],
@@ -210,44 +269,56 @@ class _AdminSidebarState
                   ],
 
                   if (!isMobile)
+
                     InkWell(
+
                       borderRadius:
-                          BorderRadius
-                              .circular(
+                          BorderRadius.circular(
                         8,
                       ),
+
                       onTap: () {
+
                         setState(() {
+
                           collapsed =
                               !collapsed;
                         });
                       },
-                      child:
-                          Container(
+
+                      child: Container(
+
                         width: 26,
+
                         height: 26,
+
                         decoration:
                             BoxDecoration(
-                          color: Colors
-                              .white
-                              .withOpacity(
+
+                          color:
+                              Colors.white
+                                  .withOpacity(
                             0.08,
                           ),
+
                           borderRadius:
-                              BorderRadius
-                                  .circular(
+                              BorderRadius.circular(
                             8,
                           ),
                         ),
+
                         child: Icon(
+
                           collapsed
-                              ? Icons
-                                  .menu_rounded
-                              : Icons
-                                  .menu_open_rounded,
+
+                              ? Icons.menu_rounded
+
+                              : Icons.menu_open_rounded,
+
                           size: 14,
-                          color: Colors
-                              .white,
+
+                          color:
+                              Colors.white,
                         ),
                       ),
                     ),
@@ -264,60 +335,71 @@ class _AdminSidebarState
             // =============================================
 
             Expanded(
-              child: ListView(
+
+              child:
+                  ListView(
+
                 physics:
                     const BouncingScrollPhysics(),
+
                 padding:
-                    const EdgeInsets
-                        .symmetric(
+                    const EdgeInsets.symmetric(
                   horizontal: 7,
                 ),
+
                 children: [
+
                   sidebarItem(
-                    icon: Icons
-                        .dashboard_rounded,
+                    icon:
+                        Icons.dashboard_rounded,
                     title:
                         'Dashboard',
                     index: 0,
                   ),
+
                   sidebarItem(
-                    icon: Icons
-                        .inventory_2_rounded,
+                    icon:
+                        Icons.shopping_bag_rounded,
                     title:
-                        'Products',
+                        'Marketplace',
                     index: 1,
                   ),
+
                   sidebarItem(
-                    icon: Icons
-                        .shopping_bag_rounded,
+                    icon:
+                        Icons.shopping_cart_rounded,
                     title:
-                        'Orders',
+                        'Cart',
                     index: 2,
                   ),
+
                   sidebarItem(
-                    icon: Icons
-                        .bar_chart_rounded,
+                    icon:
+                        Icons.receipt_long_rounded,
                     title:
-                        'Reports',
+                        'History',
                     index: 3,
                   ),
+
                   sidebarItem(
-                    icon: Icons
-                        .people_alt_rounded,
+                    icon:
+                        Icons.favorite_rounded,
                     title:
-                        'Users',
+                        'Wishlist',
                     index: 4,
                   ),
+
                   sidebarItem(
-                    icon: Icons
-                        .notifications_rounded,
+                    icon:
+                        Icons.notifications_rounded,
                     title:
                         'Notifications',
                     index: 5,
                   ),
+
                   sidebarItem(
-                    icon: Icons
-                        .person_rounded,
+                    icon:
+                        Icons.person_rounded,
                     title:
                         'Profile',
                     index: 6,
@@ -331,175 +413,156 @@ class _AdminSidebarState
             // =============================================
 
             Padding(
+
               padding:
-                  const EdgeInsets
-                      .fromLTRB(
+                  const EdgeInsets.fromLTRB(
                 8,
                 4,
                 8,
                 8,
               ),
+
               child: Column(
                 children: [
+
                   InkWell(
+
                     borderRadius:
-                        BorderRadius
-                            .circular(
-                      14,
+                        BorderRadius.circular(
+                      12,
                     ),
+
                     onTap: () {
-                      widget
-                          .onSelected(
+
+                      widget.onSelected(
                         6,
                       );
                     },
-                    child:
-                        AnimatedContainer(
-                      duration:
-                          const Duration(
-                        milliseconds:
-                            220,
-                      ),
+
+                    child: Container(
+
                       padding:
-                          const EdgeInsets
-                              .symmetric(
-                        horizontal:
-                            8,
-                        vertical:
-                            10,
+                          const EdgeInsets.symmetric(
+
+                        horizontal: 8,
+
+                        vertical: 8,
                       ),
+
                       decoration:
                           BoxDecoration(
-                        gradient:
-                            LinearGradient(
-                          begin:
-                              Alignment
-                                  .topLeft,
-                          end: Alignment
-                              .bottomRight,
-                          colors: [
+
+                        color:
                             Colors.white
                                 .withOpacity(
-                              0.08,
-                            ),
-                            Colors.white
-                                .withOpacity(
-                              0.03,
-                            ),
-                          ],
+                          0.06,
                         ),
+
                         borderRadius:
-                            BorderRadius
-                                .circular(
-                          14,
-                        ),
-                        border:
-                            Border.all(
-                          color: Colors
-                              .white
-                              .withOpacity(
-                            0.06,
-                          ),
+                            BorderRadius.circular(
+                          12,
                         ),
                       ),
+
                       child:
+
                           collapsed &&
                                   !isMobile
+
                               ? Center(
                                   child:
                                       buildAvatar(
-                                    safePhotoUrl,
+                                    photoUrl,
                                   ),
                                 )
+
                               : Row(
                                   children: [
+
                                     buildAvatar(
-                                      safePhotoUrl,
+                                      photoUrl,
                                     ),
 
                                     const SizedBox(
-                                      width:
-                                          8,
+                                      width: 7,
                                     ),
 
                                     Expanded(
-                                      child:
-                                          Column(
+                                      child: Column(
+
                                         crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                            CrossAxisAlignment
+                                                .start,
+
                                         mainAxisSize:
-                                            MainAxisSize.min,
+                                            MainAxisSize
+                                                .min,
+
                                         children: [
+
                                           Row(
                                             children: [
+
                                               Expanded(
-                                                child:
-                                                    Text(
-                                                  adminName,
+                                                child: Text(
+
+                                                  memberName,
+
                                                   overflow:
-                                                      TextOverflow.ellipsis,
+                                                      TextOverflow
+                                                          .ellipsis,
+
                                                   maxLines:
                                                       1,
+
                                                   style:
                                                       const TextStyle(
+
                                                     color:
                                                         Colors.white,
+
                                                     fontWeight:
                                                         FontWeight.w700,
+
                                                     fontSize:
-                                                        10,
+                                                        9.6,
                                                   ),
                                                 ),
                                               ),
 
                                               const SizedBox(
                                                 width:
-                                                    4,
+                                                    3,
                                               ),
 
-                                              Container(
-                                                width:
-                                                    14,
-                                                height:
-                                                    14,
-                                                decoration:
-                                                    const BoxDecoration(
-                                                  color:
-                                                      Color(
-                                                    0xff3B82F6,
-                                                  ),
-                                                  shape:
-                                                      BoxShape.circle,
-                                                ),
-                                                child:
-                                                    const Icon(
-                                                  Icons.check,
-                                                  size:
-                                                      9,
-                                                  color:
-                                                      Colors.white,
-                                                ),
-                                              ),
+                                              premiumBadge(),
                                             ],
                                           ),
 
                                           const SizedBox(
                                             height:
-                                                2,
+                                                1,
                                           ),
 
                                           const Text(
-                                            'System Manager',
+
+                                            'Premium Member',
+
                                             overflow:
-                                                TextOverflow.ellipsis,
+                                                TextOverflow
+                                                    .ellipsis,
+
                                             maxLines:
                                                 1,
+
                                             style:
                                                 TextStyle(
+
                                               color:
                                                   Colors.white70,
+
                                               fontSize:
-                                                  7.5,
+                                                  7.3,
                                             ),
                                           ),
                                         ],
@@ -526,236 +589,297 @@ class _AdminSidebarState
     );
   }
 
-  Widget buildAvatar(
-    String photo,
-  ) {
-    final hasNetwork =
-        photo.startsWith(
-      'http',
-    );
+  Widget premiumBadge() {
 
-    try {
-      if (photo
-          .trim()
-          .isNotEmpty) {
-        return Stack(
-          clipBehavior:
-              Clip.none,
-          children: [
-            CircleAvatar(
-              radius: 17,
-              backgroundColor:
-                  Colors.white,
-              child:
-                  CircleAvatar(
-                radius: 15.5,
-                backgroundImage:
-                    hasNetwork
-                        ? NetworkImage(
-                            photo,
-                          )
-                        : MemoryImage(
-                            base64Decode(
-                              photo,
-                            ),
-                          ) as ImageProvider,
-              ),
+    return Container(
+
+      width: 14,
+
+      height: 14,
+
+      decoration:
+          BoxDecoration(
+
+        shape:
+            BoxShape.circle,
+
+        gradient:
+            const LinearGradient(
+
+          colors: [
+
+            Color(
+              0xff38BDF8,
             ),
 
-            Positioned(
-              right: -1,
-              bottom: -1,
-              child: Container(
-                width: 13,
-                height: 13,
-                decoration:
-                    BoxDecoration(
-                  color:
-                      const Color(
-                    0xff3B82F6,
-                  ),
-                  shape:
-                      BoxShape.circle,
-                  border:
-                      Border.all(
-                    color:
-                        const Color(
-                      0xff172554,
-                    ),
-                    width: 1.5,
-                  ),
-                ),
-                child:
-                    const Icon(
-                  Icons.check,
-                  size: 8,
-                  color:
-                      Colors.white,
-                ),
-              ),
+            Color(
+              0xff2563EB,
             ),
           ],
+        ),
+
+        border: Border.all(
+
+          color:
+              Colors.white,
+
+          width: 1,
+        ),
+      ),
+
+      child:
+          const Center(
+
+        child: Icon(
+
+          Icons.check,
+
+          size: 8,
+
+          color:
+              Colors.white,
+        ),
+      ),
+    );
+  }
+
+  Widget buildAvatar(
+    String base64Photo, {
+    double radius = 13,
+  }) {
+
+    try {
+
+      if (base64Photo
+          .isNotEmpty) {
+
+        return Container(
+
+          decoration:
+              BoxDecoration(
+
+            shape:
+                BoxShape.circle,
+
+            border: Border.all(
+
+              color:
+                  Colors.white
+                      .withOpacity(
+                0.18,
+              ),
+
+              width: 1,
+            ),
+          ),
+
+          child: CircleAvatar(
+
+            radius: radius,
+
+            backgroundImage:
+                MemoryImage(
+
+              base64Decode(
+                base64Photo,
+              ),
+            ),
+          ),
         );
       }
+
     } catch (_) {}
 
-    return Stack(
-      clipBehavior:
-          Clip.none,
-      children: [
-        const CircleAvatar(
-          radius: 17,
-          backgroundColor:
-              Color(0xffE2E8F0),
-          child: Icon(
-            Icons
-                .person_rounded,
-            size: 16,
-            color:
-                Color(0xff475569),
+    return Container(
+
+      decoration:
+          BoxDecoration(
+
+        shape:
+            BoxShape.circle,
+
+        border: Border.all(
+
+          color:
+              Colors.white
+                  .withOpacity(
+            0.15,
           ),
+
+          width: 1,
+        ),
+      ),
+
+      child:
+          CircleAvatar(
+
+        radius: radius,
+
+        backgroundColor:
+            const Color(
+          0xffE2E8F0,
         ),
 
-        Positioned(
-          right: -1,
-          bottom: -1,
-          child: Container(
-            width: 13,
-            height: 13,
-            decoration:
-                BoxDecoration(
-              color:
-                  const Color(
-                0xff3B82F6,
-              ),
-              shape:
-                  BoxShape.circle,
-              border:
-                  Border.all(
-                color:
-                    const Color(
-                  0xff172554,
-                ),
-                width: 1.5,
-              ),
-            ),
-            child: const Icon(
-              Icons.check,
-              size: 8,
-              color:
-                  Colors.white,
-            ),
+        child: Icon(
+
+          Icons.person_rounded,
+
+          size: 13,
+
+          color:
+              Color(
+            0xff475569,
           ),
         ),
-      ],
+      ),
     );
   }
 
   Widget sidebarItem({
+
     required IconData icon,
+
     required String title,
+
     required int index,
   }) {
+
     final active =
         widget.selectedIndex ==
             index;
 
     return Padding(
+
       padding:
           const EdgeInsets.only(
         bottom: 5,
       ),
+
       child: InkWell(
+
         borderRadius:
             BorderRadius.circular(
           12,
         ),
+
         onTap: () {
+
           widget.onSelected(
             index,
           );
         },
+
         child:
             AnimatedContainer(
+
           duration:
               const Duration(
-            milliseconds:
-                220,
+            milliseconds: 220,
           ),
+
           height:
               collapsed
                   ? 42
                   : 40,
+
           padding:
               EdgeInsets.symmetric(
+
             horizontal:
                 collapsed
                     ? 0
                     : 10,
           ),
+
           decoration:
               BoxDecoration(
+
             borderRadius:
                 BorderRadius.circular(
               12,
             ),
-            gradient: active
-                ? const LinearGradient(
-                    colors: [
-                      Color(
-                        0xff2563EB,
-                      ),
-                      Color(
-                        0xff7C3AED,
-                      ),
-                    ],
-                  )
-                : null,
+
+            gradient:
+
+                active
+
+                    ? const LinearGradient(
+
+                        colors: [
+
+                          Color(
+                            0xff2563EB,
+                          ),
+
+                          Color(
+                            0xff7C3AED,
+                          ),
+                        ],
+                      )
+
+                    : null,
           ),
-          child: collapsed
-              ? Center(
-                  child: Icon(
-                    icon,
-                    size: 16,
-                    color: Colors
-                        .white,
-                  ),
-                )
-              : Row(
-                  children: [
-                    Icon(
-                      icon,
-                      size: 16,
-                      color: Colors
-                          .white,
-                    ),
 
-                    const SizedBox(
-                      width: 9,
-                    ),
+          child:
 
-                    Expanded(
-                      child: Text(
-                        title,
-                        overflow:
-                            TextOverflow
-                                .ellipsis,
-                        maxLines: 1,
-                        style:
-                            const TextStyle(
-                          color:
-                              Colors
-                                  .white,
-                          fontWeight:
-                              FontWeight
-                                  .w600,
-                          fontSize:
-                              10,
-                        ),
+              collapsed
+
+                  ? Center(
+                      child: Icon(
+
+                        icon,
+
+                        size: 16,
+
+                        color:
+                            Colors.white,
                       ),
+                    )
+
+                  : Row(
+                      children: [
+
+                        Icon(
+
+                          icon,
+
+                          size: 16,
+
+                          color:
+                              Colors.white,
+                        ),
+
+                        const SizedBox(
+                          width: 9,
+                        ),
+
+                        Expanded(
+                          child: Text(
+
+                            title,
+
+                            overflow:
+                                TextOverflow
+                                    .ellipsis,
+
+                            maxLines: 1,
+
+                            style:
+                                const TextStyle(
+
+                              color:
+                                  Colors.white,
+
+                              fontWeight:
+                                  FontWeight.w600,
+
+                              fontSize:
+                                  10,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
         ),
       ),
     );
@@ -764,57 +888,80 @@ class _AdminSidebarState
   Widget logoutButton(
     bool isMobile,
   ) {
+
     return InkWell(
+
       borderRadius:
           BorderRadius.circular(
         12,
       ),
+
       onTap:
           widget.onLogout,
+
       child: Container(
-        width: double.infinity,
+
+        width:
+            double.infinity,
+
         height:
             collapsed &&
                     !isMobile
+
                 ? 42
+
                 : 40,
+
         padding:
             EdgeInsets.symmetric(
+
           horizontal:
               collapsed
                   ? 0
                   : 10,
         ),
+
         decoration:
             BoxDecoration(
-          color: Colors.red
-              .withOpacity(
+
+          color:
+              Colors.red
+                  .withOpacity(
             0.08,
           ),
+
           borderRadius:
-              BorderRadius
-                  .circular(
+              BorderRadius.circular(
             12,
           ),
         ),
+
         child:
+
             collapsed &&
                     !isMobile
+
                 ? const Center(
                     child: Icon(
-                      Icons
-                          .logout_rounded,
+
+                      Icons.logout_rounded,
+
                       size: 15,
+
                       color:
                           Colors.red,
                     ),
                   )
+
                 : const Row(
                     children: [
+
                       Icon(
-                        Icons
-                            .logout_rounded,
+
+                        Icons.logout_rounded,
+
                         size: 15,
+
                         color:
                             Colors.red,
                       ),
@@ -825,20 +972,24 @@ class _AdminSidebarState
 
                       Expanded(
                         child: Text(
+
                           'Logout',
+
                           overflow:
                               TextOverflow
                                   .ellipsis,
+
                           style:
                               TextStyle(
+
                             color:
-                                Colors
-                                    .red,
+                                Colors.red,
+
                             fontSize:
                                 10,
+
                             fontWeight:
-                                FontWeight
-                                    .bold,
+                                FontWeight.bold,
                           ),
                         ),
                       ),
