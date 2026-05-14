@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../../providers/order_provider.dart';
@@ -12,17 +11,17 @@ import '../../models/product_model.dart';
 
 import '../../core/utils/app_format.dart';
 
-import '../../widgets/admin/admin_dashboard_header.dart';
-
-class AdminSalesReportScreen extends StatefulWidget {
+class AdminSalesReportScreen
+    extends StatefulWidget {
 
   const AdminSalesReportScreen({
     super.key,
   });
 
   @override
-  State<AdminSalesReportScreen> createState() =>
-      _AdminSalesReportScreenState();
+  State<AdminSalesReportScreen>
+      createState() =>
+          _AdminSalesReportScreenState();
 }
 
 class _AdminSalesReportScreenState
@@ -33,7 +32,8 @@ class _AdminSalesReportScreenState
 
     super.initState();
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) {
 
       context
           .read<OrderProvider>()
@@ -46,7 +46,9 @@ class _AdminSalesReportScreenState
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(
+    BuildContext context,
+  ) {
 
     final orderProvider =
         context.watch<OrderProvider>();
@@ -60,33 +62,33 @@ class _AdminSalesReportScreenState
     final orders =
         orderProvider.orders;
 
+    final width =
+        MediaQuery.of(context)
+            .size
+            .width;
+
+    final mobile =
+        width < 650;
+
+    final tablet =
+        width >= 650 &&
+            width < 1050;
+
     double revenue = 0;
 
     int totalSold = 0;
 
     int completedOrders = 0;
 
-    // =====================================================
-    // REALTIME SOLD MAP
-    // =====================================================
-
-    final Map<String, int> soldMap = {};
-
-    // =====================================================
-    // DAILY CHART DATA
-    // =====================================================
+    final Map<String, int>
+        soldMap = {};
 
     final Map<int, double>
         revenuePerDay = {};
 
-    final Map<int, int>
-        transactionPerDay = {};
-
     for (int i = 0; i < 7; i++) {
 
       revenuePerDay[i] = 0;
-
-      transactionPerDay[i] = 0;
     }
 
     for (final order in orders) {
@@ -107,28 +109,21 @@ class _AdminSalesReportScreenState
 
         revenuePerDay[weekday] =
 
-            (revenuePerDay[weekday] ?? 0) +
+            (revenuePerDay[
+                        weekday] ??
+                    0) +
 
                 order.totalPrice;
-
-        transactionPerDay[weekday] =
-
-            (transactionPerDay[weekday] ?? 0) +
-
-                1;
 
         for (final item in order.items) {
 
           soldMap[item.productId] =
-              (soldMap[item.productId] ?? 0) +
+              (soldMap[item.productId] ??
+                      0) +
                   item.quantity;
         }
       }
     }
-
-    // =====================================================
-    // TOP SELLING REALTIME
-    // =====================================================
 
     final topProducts =
         products.map((product) {
@@ -143,13 +138,27 @@ class _AdminSalesReportScreenState
 
     }).toList()
 
-      ..sort((a, b) {
+          ..sort((a, b) {
 
-        return (b['sold'] as int)
-            .compareTo(
-          a['sold'] as int,
-        );
-      });
+            return (b['sold']
+                    as int)
+                .compareTo(
+              a['sold']
+                  as int,
+            );
+          });
+
+    int analyticsCount = 4;
+
+    if (tablet) {
+
+      analyticsCount = 2;
+    }
+
+    if (mobile) {
+
+      analyticsCount = 1;
+    }
 
     return Scaffold(
 
@@ -160,14 +169,15 @@ class _AdminSalesReportScreenState
 
       body: SafeArea(
 
-        child: SingleChildScrollView(
+        child:
+            SingleChildScrollView(
 
           physics:
               const BouncingScrollPhysics(),
 
           padding:
               const EdgeInsets.all(
-            24,
+            10,
           ),
 
           child: Column(
@@ -178,19 +188,18 @@ class _AdminSalesReportScreenState
 
             children: [
 
-              const AdminDashboardHeader(),
-
-              const SizedBox(
-                height: 30,
-              ),
-
-              const Text(
+              Text(
 
                 'Sales Reports',
 
-                style: TextStyle(
+                style:
+                    TextStyle(
 
-                  fontSize: 34,
+                  fontSize:
+
+                      mobile
+                          ? 20
+                          : 28,
 
                   fontWeight:
                       FontWeight.bold,
@@ -198,16 +207,17 @@ class _AdminSalesReportScreenState
               ),
 
               const SizedBox(
-                height: 10,
+                height: 2,
               ),
 
               Text(
 
-                'Realtime sales analytics',
+                'Realtime revenue analytics',
 
-                style: TextStyle(
+                style:
+                    TextStyle(
 
-                  fontSize: 15,
+                  fontSize: 9,
 
                   color:
                       Colors.grey
@@ -216,80 +226,147 @@ class _AdminSalesReportScreenState
               ),
 
               const SizedBox(
-                height: 30,
+                height: 10,
               ),
 
-              // =================================================
+              // =============================================
               // ANALYTICS
-              // =================================================
+              // =============================================
 
-              Wrap(
+              GridView.builder(
 
-                spacing: 20,
+                shrinkWrap:
+                    true,
 
-                runSpacing: 20,
+                physics:
+                    const NeverScrollableScrollPhysics(),
 
-                children: [
+                itemCount: 4,
 
-                  analyticsCard(
+                gridDelegate:
+                    SliverGridDelegateWithFixedCrossAxisCount(
 
-                    'Revenue',
+                  crossAxisCount:
+                      analyticsCount,
 
-                    AppFormat.currency(
-                      revenue,
-                    ),
+                  crossAxisSpacing:
+                      8,
 
-                    Icons.payments_rounded,
+                  mainAxisSpacing:
+                      8,
 
-                    Colors.green,
-                  ),
+                  childAspectRatio:
 
-                  analyticsCard(
+                      mobile
+                          ? 3.1
+                          : tablet
+                              ? 2.9
+                              : 2.7,
+                ),
 
-                    'Transactions',
+                itemBuilder:
+                    (
+                      context,
+                      index,
+                    ) {
 
-                    completedOrders
-                        .toString(),
+                  final analytics = [
 
-                    Icons.receipt_long_rounded,
+                    {
+                      'title':
+                          'Revenue',
 
-                    Colors.blue,
-                  ),
+                      'value':
+                          AppFormat.currency(
+                        revenue,
+                      ),
 
-                  analyticsCard(
+                      'icon':
+                          Icons
+                              .payments_rounded,
 
-                    'Items Sold',
+                      'color':
+                          Colors.green,
+                    },
 
-                    totalSold
-                        .toString(),
+                    {
+                      'title':
+                          'Transactions',
 
-                    Icons
-                        .shopping_bag_rounded,
+                      'value':
+                          completedOrders
+                              .toString(),
 
-                    Colors.orange,
-                  ),
+                      'icon':
+                          Icons
+                              .receipt_long_rounded,
 
-                  analyticsCard(
+                      'color':
+                          Colors.blue,
+                    },
 
-                    'Products',
+                    {
+                      'title':
+                          'Items Sold',
 
-                    products.length
-                        .toString(),
+                      'value':
+                          totalSold
+                              .toString(),
 
-                    Icons.store_rounded,
+                      'icon':
+                          Icons
+                              .shopping_bag_rounded,
 
-                    Colors.purple,
-                  ),
-                ],
+                      'color':
+                          Colors.orange,
+                    },
+
+                    {
+                      'title':
+                          'Products',
+
+                      'value':
+                          products.length
+                              .toString(),
+
+                      'icon':
+                          Icons
+                              .store_rounded,
+
+                      'color':
+                          Colors.purple,
+                    },
+                  ];
+
+                  final item =
+                      analytics[index];
+
+                  return analyticsCard(
+
+                    item['title']
+                        as String,
+
+                    item['value']
+                        as String,
+
+                    item['icon']
+                        as IconData,
+
+                    item['color']
+                        as Color,
+
+                    mobile,
+                  );
+                },
               ),
 
               const SizedBox(
-                height: 40,
+                height: 10,
               ),
 
-              // =================================================
+              // =============================================
               // REVENUE CHART
-              // =================================================
+              // =============================================
 
               Container(
 
@@ -297,8 +374,10 @@ class _AdminSalesReportScreenState
                     double.infinity,
 
                 padding:
-                    const EdgeInsets.all(
-                  24,
+                    EdgeInsets.all(
+                  mobile
+                      ? 10
+                      : 12,
                 ),
 
                 decoration:
@@ -309,7 +388,7 @@ class _AdminSalesReportScreenState
 
                   borderRadius:
                       BorderRadius.circular(
-                    30,
+                    16,
                   ),
                 ),
 
@@ -323,22 +402,29 @@ class _AdminSalesReportScreenState
 
                     Row(
 
-                      mainAxisAlignment:
-                          MainAxisAlignment
-                              .spaceBetween,
-
                       children: [
 
-                        const Text(
+                        Expanded(
 
-                          'Realtime Revenue Chart',
+                          child: Text(
 
-                          style: TextStyle(
+                            'Realtime Revenue',
 
-                            fontSize: 24,
+                            overflow:
+                                TextOverflow
+                                    .ellipsis,
 
-                            fontWeight:
-                                FontWeight.bold,
+                            style:
+                                TextStyle(
+
+                              fontSize:
+                                  mobile
+                                      ? 13
+                                      : 15,
+
+                              fontWeight:
+                                  FontWeight.bold,
+                            ),
                           ),
                         ),
 
@@ -347,9 +433,11 @@ class _AdminSalesReportScreenState
                           padding:
                               const EdgeInsets.symmetric(
 
-                            horizontal: 14,
+                            horizontal:
+                                8,
 
-                            vertical: 8,
+                            vertical:
+                                4,
                           ),
 
                           decoration:
@@ -363,33 +451,60 @@ class _AdminSalesReportScreenState
 
                             borderRadius:
                                 BorderRadius.circular(
-                              14,
+                              8,
                             ),
                           ),
 
                           child:
-                              const Text(
+                              Text(
+
                             'LIVE',
+
+                            style:
+                                TextStyle(
+                              fontSize:
+                                  mobile
+                                      ? 8
+                                      : 9,
+                            ),
                           ),
                         ),
                       ],
                     ),
 
                     const SizedBox(
-                      height: 40,
+                      height: 10,
                     ),
 
                     SizedBox(
 
-                      height: 320,
+                      height:
+
+                          mobile
+                              ? 170
+                              : tablet
+                                  ? 210
+                                  : 240,
 
                       child: LineChart(
 
                         LineChartData(
 
+                          minY: 0,
+
+                          clipData:
+                              const FlClipData.all(),
+
                           gridData:
                               FlGridData(
+
                             show: true,
+
+                            drawVerticalLine:
+                                false,
+
+                            horizontalInterval:
+                                5,
                           ),
 
                           borderData:
@@ -399,6 +514,42 @@ class _AdminSalesReportScreenState
 
                           titlesData:
                               FlTitlesData(
+
+                            leftTitles:
+                                AxisTitles(
+
+                              sideTitles:
+                                  SideTitles(
+
+                                showTitles:
+                                    true,
+
+                                reservedSize:
+                                    mobile
+                                        ? 26
+                                        : 32,
+
+                                getTitlesWidget:
+                                    (
+                                      value,
+                                      meta,
+                                    ) {
+
+                                  return Text(
+
+                                    '${value.toInt()}k',
+
+                                    style:
+                                        TextStyle(
+                                      fontSize:
+                                          mobile
+                                              ? 7
+                                              : 8,
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
 
                             rightTitles:
                                 const AxisTitles(
@@ -429,6 +580,9 @@ class _AdminSalesReportScreenState
                                 showTitles:
                                     true,
 
+                                reservedSize:
+                                    24,
+
                                 getTitlesWidget:
                                     (
                                       value,
@@ -456,13 +610,21 @@ class _AdminSalesReportScreenState
 
                                     padding:
                                         const EdgeInsets.only(
-                                      top: 12,
+                                      top: 6,
                                     ),
 
                                     child: Text(
 
                                       days[value
                                           .toInt()],
+
+                                      style:
+                                          TextStyle(
+                                        fontSize:
+                                            mobile
+                                                ? 7
+                                                : 8,
+                                      ),
                                     ),
                                   );
                                 },
@@ -477,11 +639,14 @@ class _AdminSalesReportScreenState
                               isCurved:
                                   true,
 
-                              barWidth: 5,
+                              barWidth:
+                                  mobile
+                                      ? 2
+                                      : 3,
 
                               dotData:
                                   const FlDotData(
-                                show: true,
+                                show: false,
                               ),
 
                               belowBarData:
@@ -489,7 +654,8 @@ class _AdminSalesReportScreenState
                                 show: true,
                               ),
 
-                              spots: List.generate(
+                              spots:
+                                  List.generate(
 
                                 7,
 
@@ -517,12 +683,12 @@ class _AdminSalesReportScreenState
               ),
 
               const SizedBox(
-                height: 40,
+                height: 10,
               ),
 
-              // =================================================
-              // TRANSACTION CHART
-              // =================================================
+              // =============================================
+              // TOP PRODUCTS
+              // =============================================
 
               Container(
 
@@ -530,8 +696,10 @@ class _AdminSalesReportScreenState
                     double.infinity,
 
                 padding:
-                    const EdgeInsets.all(
-                  24,
+                    EdgeInsets.all(
+                  mobile
+                      ? 10
+                      : 12,
                 ),
 
                 decoration:
@@ -542,193 +710,7 @@ class _AdminSalesReportScreenState
 
                   borderRadius:
                       BorderRadius.circular(
-                    30,
-                  ),
-                ),
-
-                child: Column(
-
-                  crossAxisAlignment:
-                      CrossAxisAlignment
-                          .start,
-
-                  children: [
-
-                    const Text(
-
-                      'Realtime Transactions',
-
-                      style: TextStyle(
-
-                        fontSize: 24,
-
-                        fontWeight:
-                            FontWeight.bold,
-                      ),
-                    ),
-
-                    const SizedBox(
-                      height: 40,
-                    ),
-
-                    SizedBox(
-
-                      height: 280,
-
-                      child: BarChart(
-
-                        BarChartData(
-
-                          borderData:
-                              FlBorderData(
-                            show: false,
-                          ),
-
-                          gridData:
-                              FlGridData(
-                            show: true,
-                          ),
-
-                          titlesData:
-                              FlTitlesData(
-
-                            rightTitles:
-                                const AxisTitles(
-
-                              sideTitles:
-                                  SideTitles(
-                                showTitles:
-                                    false,
-                              ),
-                            ),
-
-                            topTitles:
-                                const AxisTitles(
-
-                              sideTitles:
-                                  SideTitles(
-                                showTitles:
-                                    false,
-                              ),
-                            ),
-
-                            bottomTitles:
-                                AxisTitles(
-
-                              sideTitles:
-                                  SideTitles(
-
-                                showTitles:
-                                    true,
-
-                                getTitlesWidget:
-                                    (
-                                      value,
-                                      meta,
-                                    ) {
-
-                                  final days = [
-
-                                    'Mon',
-
-                                    'Tue',
-
-                                    'Wed',
-
-                                    'Thu',
-
-                                    'Fri',
-
-                                    'Sat',
-
-                                    'Sun',
-                                  ];
-
-                                  return Padding(
-
-                                    padding:
-                                        const EdgeInsets.only(
-                                      top: 10,
-                                    ),
-
-                                    child: Text(
-
-                                      days[value
-                                          .toInt()],
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                          ),
-
-                          barGroups:
-                              List.generate(
-
-                            7,
-
-                            (index) {
-
-                              return BarChartGroupData(
-
-                                x: index,
-
-                                barRods: [
-
-                                  BarChartRodData(
-
-                                    toY:
-                                        transactionPerDay[
-                                                    index]
-                                                ?.toDouble() ??
-                                            0,
-
-                                    width:
-                                        26,
-
-                                    borderRadius:
-                                        BorderRadius.circular(
-                                      8,
-                                    ),
-                                  ),
-                                ],
-                              );
-                            },
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(
-                height: 40,
-              ),
-
-              // =================================================
-              // TOP SELLING
-              // =================================================
-
-              Container(
-
-                width:
-                    double.infinity,
-
-                padding:
-                    const EdgeInsets.all(
-                  24,
-                ),
-
-                decoration:
-                    BoxDecoration(
-
-                  color:
-                      Colors.white,
-
-                  borderRadius:
-                      BorderRadius.circular(
-                    30,
+                    16,
                   ),
                 ),
 
@@ -742,22 +724,29 @@ class _AdminSalesReportScreenState
 
                     Row(
 
-                      mainAxisAlignment:
-                          MainAxisAlignment
-                              .spaceBetween,
-
                       children: [
 
-                        const Text(
+                        Expanded(
 
-                          'Top Selling Products',
+                          child: Text(
 
-                          style: TextStyle(
+                            'Top Selling Products',
 
-                            fontSize: 24,
+                            overflow:
+                                TextOverflow
+                                    .ellipsis,
 
-                            fontWeight:
-                                FontWeight.bold,
+                            style:
+                                TextStyle(
+
+                              fontSize:
+                                  mobile
+                                      ? 13
+                                      : 15,
+
+                              fontWeight:
+                                  FontWeight.bold,
+                            ),
                           ),
                         ),
 
@@ -766,9 +755,11 @@ class _AdminSalesReportScreenState
                           padding:
                               const EdgeInsets.symmetric(
 
-                            horizontal: 16,
+                            horizontal:
+                                8,
 
-                            vertical: 10,
+                            vertical:
+                                4,
                           ),
 
                           decoration:
@@ -782,20 +773,29 @@ class _AdminSalesReportScreenState
 
                             borderRadius:
                                 BorderRadius.circular(
-                              14,
+                              8,
                             ),
                           ),
 
                           child:
-                              const Text(
-                            'Realtime',
+                              Text(
+
+                            'LIVE',
+
+                            style:
+                                TextStyle(
+                              fontSize:
+                                  mobile
+                                      ? 8
+                                      : 9,
+                            ),
                           ),
                         ),
                       ],
                     ),
 
                     const SizedBox(
-                      height: 24,
+                      height: 10,
                     ),
 
                     if (topProducts
@@ -805,13 +805,20 @@ class _AdminSalesReportScreenState
 
                         padding:
                             EdgeInsets.all(
-                          40,
+                          18,
                         ),
 
                         child: Center(
 
                           child: Text(
+
                             'No products available',
+
+                            style:
+                                TextStyle(
+                              fontSize:
+                                  10,
+                            ),
                           ),
                         ),
                       )
@@ -836,6 +843,7 @@ class _AdminSalesReportScreenState
                           return topProductCard(
                             product,
                             sold,
+                            mobile,
                           );
                         },
                       ),
@@ -844,7 +852,7 @@ class _AdminSalesReportScreenState
               ),
 
               const SizedBox(
-                height: 100,
+                height: 24,
               ),
             ],
           ),
@@ -852,6 +860,10 @@ class _AdminSalesReportScreenState
       ),
     );
   }
+
+  // =====================================================
+  // ANALYTICS CARD
+  // =====================================================
 
   Widget analyticsCard(
 
@@ -862,15 +874,24 @@ class _AdminSalesReportScreenState
     IconData icon,
 
     Color color,
+
+    bool mobile,
   ) {
 
     return Container(
 
-      width: 250,
-
       padding:
-          const EdgeInsets.all(
-        22,
+          EdgeInsets.symmetric(
+
+        horizontal:
+            mobile
+                ? 10
+                : 12,
+
+        vertical:
+            mobile
+                ? 8
+                : 10,
       ),
 
       decoration:
@@ -881,35 +902,37 @@ class _AdminSalesReportScreenState
 
         borderRadius:
             BorderRadius.circular(
-          24,
+          14,
         ),
       ),
 
-      child: Column(
-
-        crossAxisAlignment:
-            CrossAxisAlignment
-                .start,
+      child: Row(
 
         children: [
 
           Container(
 
-            width: 60,
+            width:
+                mobile
+                    ? 34
+                    : 38,
 
-            height: 60,
+            height:
+                mobile
+                    ? 34
+                    : 38,
 
             decoration:
                 BoxDecoration(
 
               color:
                   color.withOpacity(
-                0.1,
+                0.12,
               ),
 
               borderRadius:
                   BorderRadius.circular(
-                18,
+                10,
               ),
             ),
 
@@ -918,58 +941,117 @@ class _AdminSalesReportScreenState
               icon,
 
               color: color,
+
+              size:
+                  mobile
+                      ? 16
+                      : 18,
             ),
           ),
 
           const SizedBox(
-            height: 24,
+            width: 10,
           ),
 
-          Text(
+          Expanded(
 
-            value,
+            child: Column(
 
-            maxLines: 1,
+              mainAxisAlignment:
+                  MainAxisAlignment
+                      .center,
 
-            overflow:
-                TextOverflow
-                    .ellipsis,
+              crossAxisAlignment:
+                  CrossAxisAlignment
+                      .start,
 
-            style:
-                const TextStyle(
+              children: [
 
-              fontSize: 28,
+                FittedBox(
 
-              fontWeight:
-                  FontWeight.bold,
+                  fit:
+                      BoxFit.scaleDown,
+
+                  alignment:
+                      Alignment.centerLeft,
+
+                  child: Text(
+
+                    value,
+
+                    maxLines: 1,
+
+                    style:
+                        TextStyle(
+
+                      fontSize:
+                          mobile
+                              ? 13
+                              : 15,
+
+                      fontWeight:
+                          FontWeight.bold,
+                    ),
+                  ),
+                ),
+
+                const SizedBox(
+                  height: 2,
+                ),
+
+                Text(
+
+                  title,
+
+                  maxLines: 1,
+
+                  overflow:
+                      TextOverflow
+                          .ellipsis,
+
+                  style:
+                      TextStyle(
+
+                    fontSize:
+                        mobile
+                            ? 8
+                            : 9,
+
+                    color:
+                        Colors.grey
+                            .shade700,
+                  ),
+                ),
+              ],
             ),
           ),
-
-          const SizedBox(
-            height: 6,
-          ),
-
-          Text(title),
         ],
       ),
     );
   }
 
+  // =====================================================
+  // TOP PRODUCT CARD
+  // =====================================================
+
   Widget topProductCard(
     ProductModel product,
     int sold,
+    bool mobile,
   ) {
 
     return Container(
 
       margin:
           const EdgeInsets.only(
-        bottom: 18,
+        bottom: 8,
       ),
 
       padding:
-          const EdgeInsets.all(
-        18,
+          EdgeInsets.all(
+        mobile
+            ? 10
+            : 12,
       ),
 
       decoration:
@@ -982,17 +1064,20 @@ class _AdminSalesReportScreenState
 
         borderRadius:
             BorderRadius.circular(
-          22,
+          14,
         ),
       ),
 
       child: Row(
         children: [
 
-          productImage(product),
+          productImage(
+            product,
+            mobile,
+          ),
 
           const SizedBox(
-            width: 20,
+            width: 10,
           ),
 
           Expanded(
@@ -1016,9 +1101,12 @@ class _AdminSalesReportScreenState
                           .ellipsis,
 
                   style:
-                      const TextStyle(
+                      TextStyle(
 
-                    fontSize: 18,
+                    fontSize:
+                        mobile
+                            ? 11
+                            : 12,
 
                     fontWeight:
                         FontWeight.bold,
@@ -1026,18 +1114,33 @@ class _AdminSalesReportScreenState
                 ),
 
                 const SizedBox(
-                  height: 6,
+                  height: 2,
                 ),
 
                 Text(
+
                   product.category,
+
+                  maxLines: 1,
+
+                  overflow:
+                      TextOverflow
+                          .ellipsis,
+
+                  style:
+                      TextStyle(
+                    fontSize:
+                        mobile
+                            ? 8
+                            : 9,
+                  ),
                 ),
               ],
             ),
           ),
 
           const SizedBox(
-            width: 20,
+            width: 8,
           ),
 
           Column(
@@ -1053,9 +1156,12 @@ class _AdminSalesReportScreenState
                 '$sold Sold',
 
                 style:
-                    const TextStyle(
+                    TextStyle(
 
-                  fontSize: 18,
+                  fontSize:
+                      mobile
+                          ? 10
+                          : 11,
 
                   fontWeight:
                       FontWeight.bold,
@@ -1066,12 +1172,33 @@ class _AdminSalesReportScreenState
               ),
 
               const SizedBox(
-                height: 6,
+                height: 2,
               ),
 
-              Text(
-                AppFormat.currency(
-                  product.price,
+              ConstrainedBox(
+
+                constraints:
+                    const BoxConstraints(
+                  maxWidth: 80,
+                ),
+
+                child: Text(
+
+                  AppFormat.currency(
+                    product.price,
+                  ),
+
+                  overflow:
+                      TextOverflow
+                          .ellipsis,
+
+                  style:
+                      TextStyle(
+                    fontSize:
+                        mobile
+                            ? 8
+                            : 9,
+                  ),
                 ),
               ),
             ],
@@ -1081,9 +1208,19 @@ class _AdminSalesReportScreenState
     );
   }
 
+  // =====================================================
+  // PRODUCT IMAGE
+  // =====================================================
+
   Widget productImage(
     ProductModel product,
+    bool mobile,
   ) {
+
+    final size =
+        mobile
+            ? 44.0
+            : 50.0;
 
     try {
 
@@ -1091,14 +1228,16 @@ class _AdminSalesReportScreenState
           .trim()
           .isEmpty) {
 
-        return fallbackImage();
+        return fallbackImage(
+          mobile,
+        );
       }
 
       return ClipRRect(
 
         borderRadius:
             BorderRadius.circular(
-          16,
+          10,
         ),
 
         child: Image.memory(
@@ -1107,9 +1246,9 @@ class _AdminSalesReportScreenState
             product.imageBase64,
           ),
 
-          width: 70,
+          width: size,
 
-          height: 70,
+          height: size,
 
           fit: BoxFit.cover,
 
@@ -1120,24 +1259,39 @@ class _AdminSalesReportScreenState
                 stackTrace,
               ) {
 
-            return fallbackImage();
+            return fallbackImage(
+              mobile,
+            );
           },
         ),
       );
 
     } catch (_) {
 
-      return fallbackImage();
+      return fallbackImage(
+        mobile,
+      );
     }
   }
 
-  Widget fallbackImage() {
+  // =====================================================
+  // FALLBACK IMAGE
+  // =====================================================
+
+  Widget fallbackImage(
+    bool mobile,
+  ) {
+
+    final size =
+        mobile
+            ? 44.0
+            : 50.0;
 
     return Container(
 
-      width: 70,
+      width: size,
 
-      height: 70,
+      height: size,
 
       decoration:
           BoxDecoration(
@@ -1150,17 +1304,22 @@ class _AdminSalesReportScreenState
 
         borderRadius:
             BorderRadius.circular(
-          16,
+          10,
         ),
       ),
 
       child:
-          const Icon(
+          Icon(
 
         Icons.image_rounded,
 
         color:
             Colors.orange,
+
+        size:
+            mobile
+                ? 16
+                : 18,
       ),
     );
   }

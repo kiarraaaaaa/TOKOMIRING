@@ -81,6 +81,11 @@ class _AdminDashboardScreenState
     final products =
         productProvider.allProducts;
 
+    final width =
+        MediaQuery.of(context)
+            .size
+            .width;
+
     double revenue = 0;
 
     int completedOrders = 0;
@@ -107,11 +112,36 @@ class _AdminDashboardScreenState
       }
     }
 
+    int statsCount = 4;
+
+    if (width < 650) {
+
+      statsCount = 1;
+
+    } else if (width < 1050) {
+
+      statsCount = 2;
+    }
+
+    int menuCount = 3;
+
+    if (width < 650) {
+
+      menuCount = 1;
+
+    } else if (width < 1100) {
+
+      menuCount = 2;
+    }
+
     return SingleChildScrollView(
+
+      physics:
+          const BouncingScrollPhysics(),
 
       padding:
           const EdgeInsets.all(
-        16,
+        14,
       ),
 
       child: Column(
@@ -126,17 +156,14 @@ class _AdminDashboardScreenState
 
             'Admin Dashboard',
 
-            style: TextStyle(
+            style:
+                TextStyle(
 
               fontSize:
-                  MediaQuery.of(context)
-                              .size
-                              .width <
-                          700
 
-                      ? 20
-
-                      : 26,
+                  width < 700
+                      ? 22
+                      : 30,
 
               fontWeight:
                   FontWeight.bold,
@@ -144,305 +171,331 @@ class _AdminDashboardScreenState
           ),
 
           const SizedBox(
-            height: 4,
+            height: 3,
           ),
 
           Text(
 
             'Realtime ecommerce analytics.',
 
-            style: TextStyle(
+            style:
+                TextStyle(
 
-              fontSize: 11,
+              fontSize: 10,
 
               color:
-                  Colors.grey.shade600,
+                  Colors.grey
+                      .shade600,
             ),
           ),
 
           const SizedBox(
-            height: 18,
+            height: 14,
           ),
 
           // =================================================
-          // STATS
+          // STATS GRID
           // =================================================
 
-          LayoutBuilder(
+          GridView.builder(
 
-            builder:
+            shrinkWrap:
+                true,
+
+            physics:
+                const NeverScrollableScrollPhysics(),
+
+            itemCount: 4,
+
+            gridDelegate:
+                SliverGridDelegateWithFixedCrossAxisCount(
+
+              crossAxisCount:
+                  statsCount,
+
+              crossAxisSpacing:
+                  10,
+
+              mainAxisSpacing:
+                  10,
+
+              mainAxisExtent:
+                  90,
+            ),
+
+            itemBuilder:
                 (
                   context,
-                  constraints,
+                  index,
                 ) {
 
-              int count = 4;
+              final stats = [
 
-              if (constraints
-                      .maxWidth <
-                  700) {
+                {
+                  'title':
+                      'Revenue',
 
-                count = 1;
+                  'value':
+                      'Rp ${revenue.toStringAsFixed(0)}',
 
-              } else if (constraints
-                      .maxWidth <
-                  1100) {
+                  'icon':
+                      Icons.payments_rounded,
 
-                count = 2;
-              }
+                  'color':
+                      Colors.green,
+                },
 
-              return GridView.count(
+                {
+                  'title':
+                      'Transactions',
 
-                crossAxisCount:
-                    count,
+                  'value':
+                      completedOrders
+                          .toString(),
 
-                shrinkWrap: true,
+                  'icon':
+                      Icons.receipt_long_rounded,
 
-                physics:
-                    const NeverScrollableScrollPhysics(),
+                  'color':
+                      Colors.blue,
+                },
 
-                crossAxisSpacing:
-                    10,
+                {
+                  'title':
+                      'Products',
 
-                mainAxisSpacing:
-                    10,
+                  'value':
+                      products.length
+                          .toString(),
 
-                childAspectRatio:
-                    2.7,
+                  'icon':
+                      Icons.inventory_2_rounded,
 
-                children: [
+                  'color':
+                      Colors.orange,
+                },
 
-                  statsCard(
+                {
+                  'title':
+                      'Pending',
 
-                    title:
-                        'Revenue',
+                  'value':
+                      pendingOrders
+                          .toString(),
 
-                    value:
-                        'Rp ${revenue.toStringAsFixed(0)}',
+                  'icon':
+                      Icons.access_time_rounded,
 
-                    icon:
-                        Icons.payments_rounded,
+                  'color':
+                      Colors.red,
+                },
+              ];
 
-                    color:
-                        Colors.green,
-                  ),
+              final item =
+                  stats[index];
 
-                  statsCard(
+              return statsCard(
 
-                    title:
-                        'Transactions',
+                title:
+                    item['title']
+                        as String,
 
-                    value:
-                        completedOrders
-                            .toString(),
+                value:
+                    item['value']
+                        as String,
 
-                    icon:
-                        Icons.receipt_long_rounded,
+                icon:
+                    item['icon']
+                        as IconData,
 
-                    color:
-                        Colors.blue,
-                  ),
-
-                  statsCard(
-
-                    title:
-                        'Products',
-
-                    value:
-                        products.length
-                            .toString(),
-
-                    icon:
-                        Icons.inventory_2_rounded,
-
-                    color:
-                        Colors.orange,
-                  ),
-
-                  statsCard(
-
-                    title:
-                        'Pending',
-
-                    value:
-                        pendingOrders
-                            .toString(),
-
-                    icon:
-                        Icons.access_time_rounded,
-
-                    color:
-                        Colors.red,
-                  ),
-                ],
+                color:
+                    item['color']
+                        as Color,
               );
             },
           ),
 
           const SizedBox(
-            height: 18,
+            height: 14,
           ),
 
           // =================================================
           // MENU GRID
           // =================================================
 
-          LayoutBuilder(
+          GridView.builder(
 
-            builder:
+            shrinkWrap:
+                true,
+
+            physics:
+                const NeverScrollableScrollPhysics(),
+
+            itemCount: 6,
+
+            gridDelegate:
+                SliverGridDelegateWithFixedCrossAxisCount(
+
+              crossAxisCount:
+                  menuCount,
+
+              crossAxisSpacing:
+                  10,
+
+              mainAxisSpacing:
+                  10,
+
+              mainAxisExtent:
+                  96,
+            ),
+
+            itemBuilder:
                 (
                   context,
-                  constraints,
+                  index,
                 ) {
 
-              int count = 3;
+              final menus = [
 
-              if (constraints
-                      .maxWidth <
-                  700) {
+                {
+                  'title':
+                      'Products',
 
-                count = 1;
+                  'subtitle':
+                      'Manage inventory',
 
-              } else if (constraints
-                      .maxWidth <
-                  1050) {
+                  'icon':
+                      Icons.inventory_2,
 
-                count = 2;
-              }
+                  'color':
+                      Colors.blue,
 
-              return GridView.count(
+                  'page':
+                      1,
+                },
 
-                crossAxisCount:
-                    count,
+                {
+                  'title':
+                      'Orders',
 
-                shrinkWrap: true,
+                  'subtitle':
+                      'Customer orders',
 
-                physics:
-                    const NeverScrollableScrollPhysics(),
+                  'icon':
+                      Icons.shopping_bag,
 
-                crossAxisSpacing:
-                    10,
+                  'color':
+                      Colors.orange,
 
-                mainAxisSpacing:
-                    10,
+                  'page':
+                      2,
+                },
 
-                childAspectRatio:
-                    2.05,
+                {
+                  'title':
+                      'Reports',
 
-                children: [
+                  'subtitle':
+                      'Sales analytics',
 
-                  dashboardCard(
-                    title: 'Products',
-                    subtitle:
-                        'Manage inventory',
-                    icon:
-                        Icons.inventory_2,
-                    color:
-                        Colors.blue,
-                    onTap: () {
+                  'icon':
+                      Icons.bar_chart,
 
-                      setState(() {
+                  'color':
+                      Colors.green,
 
-                        selectedIndex =
-                            1;
-                      });
-                    },
-                  ),
+                  'page':
+                      3,
+                },
 
-                  dashboardCard(
-                    title: 'Orders',
-                    subtitle:
-                        'Customer orders',
-                    icon:
-                        Icons.shopping_bag,
-                    color:
-                        Colors.orange,
-                    onTap: () {
+                {
+                  'title':
+                      'Users',
 
-                      setState(() {
+                  'subtitle':
+                      'Manage users',
 
-                        selectedIndex =
-                            2;
-                      });
-                    },
-                  ),
+                  'icon':
+                      Icons.people,
 
-                  dashboardCard(
-                    title: 'Reports',
-                    subtitle:
-                        'Sales analytics',
-                    icon:
-                        Icons.bar_chart,
-                    color:
-                        Colors.green,
-                    onTap: () {
+                  'color':
+                      Colors.purple,
 
-                      setState(() {
+                  'page':
+                      4,
+                },
 
-                        selectedIndex =
-                            3;
-                      });
-                    },
-                  ),
+                {
+                  'title':
+                      'Notifications',
 
-                  dashboardCard(
-                    title: 'Users',
-                    subtitle:
-                        'Manage users',
-                    icon:
-                        Icons.people,
-                    color:
-                        Colors.purple,
-                    onTap: () {
+                  'subtitle':
+                      'Realtime activity',
 
-                      setState(() {
+                  'icon':
+                      Icons.notifications,
 
-                        selectedIndex =
-                            4;
-                      });
-                    },
-                  ),
+                  'color':
+                      Colors.red,
 
-                  dashboardCard(
-                    title:
-                        'Notifications',
-                    subtitle:
-                        'Realtime activity',
-                    icon:
-                        Icons.notifications,
-                    color:
-                        Colors.red,
-                    onTap: () {
+                  'page':
+                      5,
+                },
 
-                      setState(() {
+                {
+                  'title':
+                      'Profile',
 
-                        selectedIndex =
-                            5;
-                      });
-                    },
-                  ),
+                  'subtitle':
+                      'Manage account',
 
-                  dashboardCard(
-                    title:
-                        'Profile',
-                    subtitle:
-                        'Manage account',
-                    icon:
-                        Icons.person,
-                    color:
-                        Colors.indigo,
-                    onTap: () {
+                  'icon':
+                      Icons.person,
 
-                      setState(() {
+                  'color':
+                      Colors.indigo,
 
-                        selectedIndex =
-                            6;
-                      });
-                    },
-                  ),
-                ],
+                  'page':
+                      6,
+                },
+              ];
+
+              final item =
+                  menus[index];
+
+              return dashboardCard(
+
+                title:
+                    item['title']
+                        as String,
+
+                subtitle:
+                    item['subtitle']
+                        as String,
+
+                icon:
+                    item['icon']
+                        as IconData,
+
+                color:
+                    item['color']
+                        as Color,
+
+                onTap: () {
+
+                  setState(() {
+
+                    selectedIndex =
+                        item['page']
+                            as int;
+                  });
+                },
               );
             },
+          ),
+
+          const SizedBox(
+            height: 60,
           ),
         ],
       ),
@@ -479,7 +532,7 @@ class _AdminDashboardScreenState
 
         borderRadius:
             BorderRadius.circular(
-          18,
+          16,
         ),
 
         boxShadow: [
@@ -492,8 +545,7 @@ class _AdminDashboardScreenState
               0.02,
             ),
 
-            blurRadius:
-                8,
+            blurRadius: 8,
 
             offset:
                 const Offset(
@@ -509,9 +561,9 @@ class _AdminDashboardScreenState
 
           Container(
 
-            width: 42,
+            width: 36,
 
-            height: 42,
+            height: 36,
 
             decoration:
                 BoxDecoration(
@@ -523,7 +575,7 @@ class _AdminDashboardScreenState
 
               borderRadius:
                   BorderRadius.circular(
-                12,
+                10,
               ),
             ),
 
@@ -533,7 +585,7 @@ class _AdminDashboardScreenState
 
               color: color,
 
-              size: 20,
+              size: 17,
             ),
           ),
 
@@ -567,7 +619,7 @@ class _AdminDashboardScreenState
                   style:
                       const TextStyle(
 
-                    fontSize: 18,
+                    fontSize: 14,
 
                     fontWeight:
                         FontWeight.bold,
@@ -575,16 +627,21 @@ class _AdminDashboardScreenState
                 ),
 
                 const SizedBox(
-                  height: 2,
+                  height: 1,
                 ),
 
                 Text(
 
                   title,
 
-                  style: TextStyle(
+                  overflow:
+                      TextOverflow
+                          .ellipsis,
 
-                    fontSize: 10,
+                  style:
+                      TextStyle(
+
+                    fontSize: 9.5,
 
                     color:
                         Colors.grey
@@ -620,7 +677,7 @@ class _AdminDashboardScreenState
 
       borderRadius:
           BorderRadius.circular(
-        18,
+        16,
       ),
 
       onTap: onTap,
@@ -629,7 +686,7 @@ class _AdminDashboardScreenState
 
         padding:
             const EdgeInsets.all(
-          14,
+          12,
         ),
 
         decoration:
@@ -640,7 +697,7 @@ class _AdminDashboardScreenState
 
           borderRadius:
               BorderRadius.circular(
-            18,
+            16,
           ),
 
           boxShadow: [
@@ -670,9 +727,9 @@ class _AdminDashboardScreenState
 
             Container(
 
-              width: 46,
+              width: 40,
 
-              height: 46,
+              height: 40,
 
               decoration:
                   BoxDecoration(
@@ -684,7 +741,7 @@ class _AdminDashboardScreenState
 
                 borderRadius:
                     BorderRadius.circular(
-                  14,
+                  11,
                 ),
               ),
 
@@ -694,12 +751,12 @@ class _AdminDashboardScreenState
 
                 color: color,
 
-                size: 22,
+                size: 18,
               ),
             ),
 
             const SizedBox(
-              width: 12,
+              width: 10,
             ),
 
             Expanded(
@@ -728,7 +785,7 @@ class _AdminDashboardScreenState
                     style:
                         const TextStyle(
 
-                      fontSize: 14,
+                      fontSize: 12,
 
                       fontWeight:
                           FontWeight.bold,
@@ -736,7 +793,7 @@ class _AdminDashboardScreenState
                   ),
 
                   const SizedBox(
-                    height: 2,
+                    height: 1,
                   ),
 
                   Text(
@@ -749,9 +806,10 @@ class _AdminDashboardScreenState
                         TextOverflow
                             .ellipsis,
 
-                    style: TextStyle(
+                    style:
+                        TextStyle(
 
-                      fontSize: 10,
+                      fontSize: 9,
 
                       color:
                           Colors.grey
@@ -766,6 +824,10 @@ class _AdminDashboardScreenState
       ),
     );
   }
+
+  // =====================================================
+  // BUILD
+  // =====================================================
 
   @override
   Widget build(

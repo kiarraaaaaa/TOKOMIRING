@@ -42,14 +42,78 @@ class AdminAnalyticsCard
             .size
             .width;
 
-    final mobile =
+    final bool mobile =
         width < 700;
+
+    final bool tablet =
+        width >= 700 &&
+            width < 1100;
+
+    final double cardPadding =
+
+        mobile
+
+            ? 12
+
+            : tablet
+
+                ? 14
+
+                : 16;
+
+    final double iconBox =
+
+        mobile
+
+            ? 34
+
+            : tablet
+
+                ? 38
+
+                : 42;
+
+    final double iconSize =
+
+        mobile
+
+            ? 16
+
+            : tablet
+
+                ? 18
+
+                : 20;
+
+    final double valueFont =
+
+        mobile
+
+            ? 15
+
+            : tablet
+
+                ? 17
+
+                : 20;
+
+    final double titleFont =
+
+        mobile
+
+            ? 9
+
+            : tablet
+
+                ? 10
+
+                : 11;
 
     return Container(
 
       padding:
           EdgeInsets.all(
-        mobile ? 16 : 18,
+        cardPadding,
       ),
 
       decoration:
@@ -60,7 +124,7 @@ class AdminAnalyticsCard
 
         borderRadius:
             BorderRadius.circular(
-          24,
+          mobile ? 14 : 16,
         ),
 
         boxShadow: [
@@ -70,22 +134,22 @@ class AdminAnalyticsCard
             color:
                 Colors.black
                     .withOpacity(
-              0.03,
+              0.02,
             ),
 
-            blurRadius: 10,
+            blurRadius: 8,
 
             offset:
                 const Offset(
               0,
-              4,
+              3,
             ),
           ),
         ],
       ),
 
-      child:
-          Column(
+      child: Column(
+
         crossAxisAlignment:
             CrossAxisAlignment
                 .start,
@@ -101,15 +165,9 @@ class AdminAnalyticsCard
 
               Container(
 
-                width:
-                    mobile
-                        ? 52
-                        : 60,
+                width: iconBox,
 
-                height:
-                    mobile
-                        ? 52
-                        : 60,
+                height: iconBox,
 
                 decoration:
                     BoxDecoration(
@@ -121,7 +179,9 @@ class AdminAnalyticsCard
 
                   borderRadius:
                       BorderRadius.circular(
-                    16,
+                    mobile
+                        ? 10
+                        : 12,
                   ),
                 ),
 
@@ -131,10 +191,7 @@ class AdminAnalyticsCard
 
                   color: color,
 
-                  size:
-                      mobile
-                          ? 24
-                          : 28,
+                  size: iconSize,
                 ),
               ),
 
@@ -142,81 +199,68 @@ class AdminAnalyticsCard
 
               if (growth != null)
 
-                Container(
+                Flexible(
 
-                  padding:
-                      const EdgeInsets.symmetric(
+                  child: Container(
 
-                    horizontal: 8,
+                    padding:
+                        EdgeInsets.symmetric(
 
-                    vertical: 4,
-                  ),
+                      horizontal:
+                          mobile
+                              ? 6
+                              : 8,
 
-                  decoration:
-                      BoxDecoration(
-
-                    color:
-                        positiveGrowth
-
-                            ? Colors.green
-                                .withOpacity(
-                              0.1,
-                            )
-
-                            : Colors.red
-                                .withOpacity(
-                              0.1,
-                            ),
-
-                    borderRadius:
-                        BorderRadius.circular(
-                      10,
+                      vertical:
+                          mobile
+                              ? 3
+                              : 4,
                     ),
-                  ),
 
-                  child: Row(
+                    decoration:
+                        BoxDecoration(
 
-                    mainAxisSize:
-                        MainAxisSize.min,
+                      color:
 
-                    children: [
+                          positiveGrowth
 
-                      Icon(
+                              ? Colors.green
+                                  .withOpacity(
+                                0.1,
+                              )
 
-                        positiveGrowth
+                              : Colors.red
+                                  .withOpacity(
+                                0.1,
+                              ),
 
-                            ? Icons
-                                .trending_up
-
-                            : Icons
-                                .trending_down,
-
-                        size: 13,
-
-                        color:
-
-                            positiveGrowth
-
-                                ? Colors.green
-
-                                : Colors.red,
+                      borderRadius:
+                          BorderRadius.circular(
+                        8,
                       ),
+                    ),
 
-                      const SizedBox(
-                        width: 3,
-                      ),
+                    child: Row(
 
-                      Text(
+                      mainAxisSize:
+                          MainAxisSize.min,
 
-                        growth!,
+                      children: [
 
-                        style:
-                            TextStyle(
+                        Icon(
 
-                          fontSize: 10,
+                          positiveGrowth
 
-                          fontWeight:
-                              FontWeight.bold,
+                              ? Icons
+                                  .trending_up_rounded
+
+                              : Icons
+                                  .trending_down_rounded,
+
+                          size:
+                              mobile
+                                  ? 10
+                                  : 12,
 
                           color:
 
@@ -226,8 +270,47 @@ class AdminAnalyticsCard
 
                                   : Colors.red,
                         ),
-                      ),
-                    ],
+
+                        const SizedBox(
+                          width: 3,
+                        ),
+
+                        Flexible(
+                          child: Text(
+
+                            growth!,
+
+                            overflow:
+                                TextOverflow
+                                    .ellipsis,
+
+                            maxLines:
+                                1,
+
+                            style:
+                                TextStyle(
+
+                              fontSize:
+
+                                  mobile
+                                      ? 8
+                                      : 9,
+
+                              fontWeight:
+                                  FontWeight.bold,
+
+                              color:
+
+                                  positiveGrowth
+
+                                      ? Colors.green
+
+                                      : Colors.red,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
             ],
@@ -264,10 +347,7 @@ class AdminAnalyticsCard
                     TextStyle(
 
                   fontSize:
-
-                      mobile
-                          ? 24
-                          : 30,
+                      valueFont,
 
                   fontWeight:
                       FontWeight.bold,
@@ -280,7 +360,7 @@ class AdminAnalyticsCard
           ),
 
           const SizedBox(
-            height: 6,
+            height: 2,
           ),
 
           // =====================================
@@ -301,9 +381,7 @@ class AdminAnalyticsCard
                 TextStyle(
 
               fontSize:
-                  mobile
-                      ? 12
-                      : 14,
+                  titleFont,
 
               color:
                   Colors.grey
@@ -314,29 +392,42 @@ class AdminAnalyticsCard
             ),
           ),
 
-          const SizedBox(
-            height: 10,
+          SizedBox(
+            height:
+                mobile
+                    ? 6
+                    : 8,
           ),
 
           // =====================================
-          // BAR
+          // BOTTOM BAR
           // =====================================
 
           Container(
 
-            height: 5,
+            height:
+                mobile
+                    ? 4
+                    : 5,
 
             width:
+
                 mobile
-                    ? 70
-                    : 90,
+
+                    ? 55
+
+                    : tablet
+
+                        ? 70
+
+                        : 85,
 
             decoration:
                 BoxDecoration(
 
               color:
                   color.withOpacity(
-                0.25,
+                0.22,
               ),
 
               borderRadius:

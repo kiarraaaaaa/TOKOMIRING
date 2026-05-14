@@ -1,3 +1,8 @@
+// =====================================================
+// FINAL RESPONSIVE FIX STABLE
+// lib/screens/admin/admin_order_screen.dart
+// =====================================================
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -81,13 +86,19 @@ class _AdminOrderScreenState
 
             borderRadius:
                 BorderRadius.circular(
-              24,
+              16,
             ),
           ),
 
           title:
               const Text(
+
             'Update Status',
+
+            style:
+                TextStyle(
+              fontSize: 16,
+            ),
           ),
 
           content:
@@ -99,59 +110,79 @@ class _AdminOrderScreenState
                   setState,
                 ) {
 
-              return SingleChildScrollView(
+              return SizedBox(
 
-                child: Column(
+                width: 320,
 
-                  mainAxisSize:
-                      MainAxisSize.min,
+                child:
+                    SingleChildScrollView(
 
-                  children:
+                  child: Column(
 
-                      statuses
-                          .where(
-                            (
-                              e,
-                            ) {
+                    mainAxisSize:
+                        MainAxisSize.min,
 
-                              return e !=
-                                  'All';
-                            },
-                          )
-                          .map(
-                            (
-                              status,
-                            ) {
+                    children:
 
-                        return RadioListTile<
-                            String>(
-
-                          value:
-                              status,
-
-                          groupValue:
-                              selectedStatus,
-
-                          title:
-                              Text(
-                            status,
-                          ),
-
-                          onChanged:
+                        statuses
+                            .where(
                               (
-                                value,
+                                e,
                               ) {
 
-                            setState(() {
+                                return e !=
+                                    'All';
+                              },
+                            )
+                            .map(
+                              (
+                                status,
+                              ) {
 
-                              selectedStatus =
-                                  value!;
-                            });
-                          },
-                        );
-                      },
-                          )
-                          .toList(),
+                          return RadioListTile<
+                              String>(
+
+                            dense: true,
+
+                            visualDensity:
+                                VisualDensity.compact,
+
+                            contentPadding:
+                                EdgeInsets.zero,
+
+                            value:
+                                status,
+
+                            groupValue:
+                                selectedStatus,
+
+                            title:
+                                Text(
+
+                              status,
+
+                              style:
+                                  const TextStyle(
+                                fontSize: 11,
+                              ),
+                            ),
+
+                            onChanged:
+                                (
+                                  value,
+                                ) {
+
+                              setState(() {
+
+                                selectedStatus =
+                                    value!;
+                              });
+                            },
+                          );
+                        },
+                            )
+                            .toList(),
+                  ),
                 ),
               );
             },
@@ -182,6 +213,21 @@ class _AdminOrderScreenState
 
                 backgroundColor:
                     Colors.blue,
+
+                minimumSize:
+                    const Size(
+                  90,
+                  40,
+                ),
+
+                shape:
+                    RoundedRectangleBorder(
+
+                  borderRadius:
+                      BorderRadius.circular(
+                    10,
+                  ),
+                ),
               ),
 
               onPressed:
@@ -190,10 +236,6 @@ class _AdminOrderScreenState
                 final orderProvider =
                     context.read<
                         OrderProvider>();
-
-                // =====================================
-                // UPDATE ORDER STATUS REALTIME
-                // =====================================
 
                 await orderProvider
                     .updateOrderStatus(
@@ -205,10 +247,6 @@ class _AdminOrderScreenState
                       selectedStatus,
                 );
 
-                // =====================================
-                // REFRESH ORDERS REALTIME
-                // =====================================
-
                 await orderProvider
                     .initializeOrders();
 
@@ -219,47 +257,24 @@ class _AdminOrderScreenState
                 Navigator.pop(
                   context,
                 );
-
-                ScaffoldMessenger.of(
-                  context,
-                ).showSnackBar(
-
-                  SnackBar(
-
-                    backgroundColor:
-                        Colors.green,
-
-                    behavior:
-                        SnackBarBehavior
-                            .floating,
-
-                    shape:
-                        RoundedRectangleBorder(
-
-                      borderRadius:
-                          BorderRadius.circular(
-                        16,
-                      ),
-                    ),
-
-                    content:
-                        Text(
-
-                      'Order updated to $selectedStatus',
-                    ),
-                  ),
-                );
               },
 
               child:
-                  const Text(
+                  const FittedBox(
 
-                'Update',
+                child: Text(
 
-                style:
-                    TextStyle(
-                  color:
-                      Colors.white,
+                  'Update',
+
+                  style:
+                      TextStyle(
+
+                    color:
+                        Colors.white,
+
+                    fontSize:
+                        11,
+                  ),
                 ),
               ),
             ),
@@ -306,15 +321,23 @@ class _AdminOrderScreenState
             .size
             .width;
 
+    final mobile =
+        width < 650;
+
+    final tablet =
+        width >= 650 &&
+            width < 1050;
+
     int analyticsCount = 4;
 
-    if (width < 700) {
-
-      analyticsCount = 1;
-
-    } else if (width < 1100) {
+    if (tablet) {
 
       analyticsCount = 2;
+    }
+
+    if (mobile) {
+
+      analyticsCount = 1;
     }
 
     return Scaffold(
@@ -325,228 +348,103 @@ class _AdminOrderScreenState
       ),
 
       body:
-          SingleChildScrollView(
-
-        physics:
-            const BouncingScrollPhysics(),
-
-        padding:
-            const EdgeInsets.all(
-          24,
-        ),
+          SafeArea(
 
         child:
-            Column(
+            SingleChildScrollView(
 
-          crossAxisAlignment:
-              CrossAxisAlignment
-                  .start,
+          physics:
+              const BouncingScrollPhysics(),
 
-          children: [
+          padding:
+              const EdgeInsets.all(
+            10,
+          ),
 
-            Text(
+          child:
+              Column(
 
-              'Order Management',
+            crossAxisAlignment:
+                CrossAxisAlignment
+                    .start,
 
-              style:
-                  TextStyle(
+            children: [
 
-                fontSize:
-                    width < 700
-                        ? 28
-                        : 42,
+              Text(
 
-                fontWeight:
-                    FontWeight.bold,
-              ),
-            ),
+                'Order Management',
 
-            const SizedBox(
-              height: 10,
-            ),
+                style:
+                    TextStyle(
 
-            Text(
+                  fontSize:
 
-              'Monitor and manage customer orders.',
+                      mobile
+                          ? 21
+                          : 29,
 
-              style:
-                  TextStyle(
-
-                fontSize: 15,
-
-                color:
-                    Colors.grey
-                        .shade600,
-              ),
-            ),
-
-            const SizedBox(
-              height: 30,
-            ),
-
-            GridView.builder(
-
-              shrinkWrap:
-                  true,
-
-              physics:
-                  const NeverScrollableScrollPhysics(),
-
-              itemCount: 4,
-
-              gridDelegate:
-                  SliverGridDelegateWithFixedCrossAxisCount(
-
-                crossAxisCount:
-                    analyticsCount,
-
-                crossAxisSpacing:
-                    20,
-
-                mainAxisSpacing:
-                    20,
-
-                mainAxisExtent:
-                    190,
+                  fontWeight:
+                      FontWeight.bold,
+                ),
               ),
 
-              itemBuilder:
-                  (
-                    context,
-                    index,
-                  ) {
+              const SizedBox(
+                height: 3,
+              ),
 
-                final analytics = [
+              Text(
 
-                  {
-                    'title':
-                        'Waiting',
+                'Monitor and manage customer orders.',
 
-                    'value':
-                        allOrders
-                            .where(
-                      (
-                        e,
-                      ) {
+                style:
+                    TextStyle(
 
-                        return e.status ==
-                            'Waiting Admin Validation';
-                      },
-                    ).length,
+                  fontSize: 9,
 
-                    'icon':
-                        Icons.pending,
+                  color:
+                      Colors.grey
+                          .shade600,
+                ),
+              ),
 
-                    'color':
-                        Colors.orange,
-                  },
+              const SizedBox(
+                height: 10,
+              ),
 
-                  {
-                    'title':
-                        'Processing',
+              // =====================================================
+              // ANALYTICS
+              // =====================================================
 
-                    'value':
-                        allOrders
-                            .where(
-                      (
-                        e,
-                      ) {
+              GridView.builder(
 
-                        return e.status ==
-                            'Processing Delivery';
-                      },
-                    ).length,
+                shrinkWrap:
+                    true,
 
-                    'icon':
-                        Icons.local_shipping,
+                physics:
+                    const NeverScrollableScrollPhysics(),
 
-                    'color':
-                        Colors.blue,
-                  },
+                itemCount: 4,
 
-                  {
-                    'title':
-                        'Delivery',
+                gridDelegate:
+                    SliverGridDelegateWithFixedCrossAxisCount(
 
-                    'value':
-                        allOrders
-                            .where(
-                      (
-                        e,
-                      ) {
+                  crossAxisCount:
+                      analyticsCount,
 
-                        return e.status ==
-                            'Package On Delivery';
-                      },
-                    ).length,
+                  crossAxisSpacing:
+                      8,
 
-                    'icon':
-                        Icons.delivery_dining,
+                  mainAxisSpacing:
+                      8,
 
-                    'color':
-                        Colors.purple,
-                  },
+                  childAspectRatio:
 
-                  {
-                    'title':
-                        'Completed',
-
-                    'value':
-                        allOrders
-                            .where(
-                      (
-                        e,
-                      ) {
-
-                        return e.status ==
-                            'Completed';
-                      },
-                    ).length,
-
-                    'icon':
-                        Icons.check_circle,
-
-                    'color':
-                        Colors.green,
-                  },
-                ];
-
-                final item =
-                    analytics[index];
-
-                return analyticsCard(
-
-                  item['title']
-                      as String,
-
-                  item['value']
-                      as int,
-
-                  item['icon']
-                      as IconData,
-
-                  item['color']
-                      as Color,
-                );
-              },
-            ),
-
-            const SizedBox(
-              height: 30,
-            ),
-
-            SizedBox(
-
-              height: 56,
-
-              child:
-                  ListView.builder(
-
-                scrollDirection:
-                    Axis.horizontal,
-
-                itemCount:
-                    statuses.length,
+                      mobile
+                          ? 3.2
+                          : tablet
+                              ? 2.8
+                              : 2.6,
+                ),
 
                 itemBuilder:
                     (
@@ -554,26 +452,152 @@ class _AdminOrderScreenState
                       index,
                     ) {
 
-                  final status =
-                      statuses[index];
+                  final analytics = [
 
-                  final active =
-                      selectedFilter ==
-                          status;
+                    {
+                      'title':
+                          'Waiting',
 
-                  return Padding(
+                      'value':
+                          allOrders
+                              .where(
+                        (
+                          e,
+                        ) {
 
-                    padding:
-                        const EdgeInsets.only(
-                      right: 12,
-                    ),
+                          return e.status ==
+                              'Waiting Admin Validation';
+                        },
+                      ).length,
 
-                    child:
-                        InkWell(
+                      'icon':
+                          Icons.pending,
+
+                      'color':
+                          Colors.orange,
+                    },
+
+                    {
+                      'title':
+                          'Processing',
+
+                      'value':
+                          allOrders
+                              .where(
+                        (
+                          e,
+                        ) {
+
+                          return e.status ==
+                              'Processing Delivery';
+                        },
+                      ).length,
+
+                      'icon':
+                          Icons.local_shipping,
+
+                      'color':
+                          Colors.blue,
+                    },
+
+                    {
+                      'title':
+                          'Delivery',
+
+                      'value':
+                          allOrders
+                              .where(
+                        (
+                          e,
+                        ) {
+
+                          return e.status ==
+                              'Package On Delivery';
+                        },
+                      ).length,
+
+                      'icon':
+                          Icons.delivery_dining,
+
+                      'color':
+                          Colors.purple,
+                    },
+
+                    {
+                      'title':
+                          'Completed',
+
+                      'value':
+                          allOrders
+                              .where(
+                        (
+                          e,
+                        ) {
+
+                          return e.status ==
+                              'Completed';
+                        },
+                      ).length,
+
+                      'icon':
+                          Icons.check_circle,
+
+                      'color':
+                          Colors.green,
+                    },
+                  ];
+
+                  final item =
+                      analytics[index];
+
+                  return analyticsCard(
+
+                    item['title']
+                        as String,
+
+                    item['value']
+                        as int,
+
+                    item['icon']
+                        as IconData,
+
+                    item['color']
+                        as Color,
+
+                    mobile,
+                  );
+                },
+              ),
+
+              const SizedBox(
+                height: 10,
+              ),
+
+              // =====================================================
+              // FILTER CHIP
+              // =====================================================
+
+              Wrap(
+
+                spacing: 8,
+
+                runSpacing: 8,
+
+                children:
+                    statuses.map(
+                  (
+                    status,
+                  ) {
+
+                    final active =
+                        selectedFilter ==
+                            status;
+
+                    return InkWell(
 
                       borderRadius:
                           BorderRadius.circular(
-                        16,
+                        10,
                       ),
 
                       onTap: () {
@@ -595,13 +619,21 @@ class _AdminOrderScreenState
                         ),
 
                         padding:
-                            const EdgeInsets.symmetric(
+                            EdgeInsets.symmetric(
 
                           horizontal:
-                              20,
+
+                              mobile
+                                  ? 10
+                                  : 12,
 
                           vertical:
-                              14,
+                              8,
+                        ),
+
+                        constraints:
+                            const BoxConstraints(
+                          minHeight: 36,
                         ),
 
                         decoration:
@@ -617,134 +649,153 @@ class _AdminOrderScreenState
 
                           borderRadius:
                               BorderRadius.circular(
-                            16,
+                            10,
                           ),
                         ),
 
-                        child: Center(
+                        child:
+                            Text(
 
-                          child: Text(
+                          status,
 
-                            status,
+                          textAlign:
+                              TextAlign.center,
 
-                            style:
-                                TextStyle(
+                          style:
+                              TextStyle(
 
-                              color:
+                            fontSize:
 
-                                  active
+                                mobile
+                                    ? 9
+                                    : 10,
 
-                                      ? Colors.white
+                            color:
 
-                                      : Colors.black,
+                                active
 
-                              fontWeight:
-                                  FontWeight.bold,
-                            ),
+                                    ? Colors.white
+
+                                    : Colors.black,
+
+                            fontWeight:
+                                FontWeight.w600,
                           ),
                         ),
                       ),
+                    );
+                  },
+                ).toList(),
+              ),
+
+              const SizedBox(
+                height: 10,
+              ),
+
+              // =====================================================
+              // ORDER LIST
+              // =====================================================
+
+              if (filteredOrders
+                  .isEmpty)
+
+                Container(
+
+                  width:
+                      double.infinity,
+
+                  padding:
+                      const EdgeInsets.all(
+                    22,
+                  ),
+
+                  decoration:
+                      BoxDecoration(
+
+                    color:
+                        Colors.white,
+
+                    borderRadius:
+                        BorderRadius.circular(
+                      16,
                     ),
-                  );
-                },
-              ),
-            ),
-
-            const SizedBox(
-              height: 30,
-            ),
-
-            if (filteredOrders
-                .isEmpty)
-
-              Container(
-
-                width:
-                    double.infinity,
-
-                padding:
-                    const EdgeInsets.all(
-                  40,
-                ),
-
-                decoration:
-                    BoxDecoration(
-
-                  color:
-                      Colors.white,
-
-                  borderRadius:
-                      BorderRadius.circular(
-                    28,
                   ),
-                ),
 
-                child:
-                    const Center(
+                  child:
+                      const Center(
 
-                  child: Text(
-                    'No orders found',
+                    child: Text(
+
+                      'No orders found',
+
+                      style:
+                          TextStyle(
+                        fontSize: 11,
+                      ),
+                    ),
                   ),
+                )
+
+              else
+
+                ListView.builder(
+
+                  shrinkWrap:
+                      true,
+
+                  physics:
+                      const NeverScrollableScrollPhysics(),
+
+                  itemCount:
+                      filteredOrders.length,
+
+                  itemBuilder:
+                      (
+                        context,
+                        index,
+                      ) {
+
+                    return orderCard(
+
+                      filteredOrders[
+                          index],
+
+                      mobile,
+                    );
+                  },
                 ),
-              )
 
-            else
-
-              ListView.builder(
-
-                shrinkWrap:
-                    true,
-
-                physics:
-                    const NeverScrollableScrollPhysics(),
-
-                itemCount:
-                    filteredOrders.length,
-
-                itemBuilder:
-                    (
-                      context,
-                      index,
-                    ) {
-
-                  return orderCard(
-                    filteredOrders[
-                        index],
-                  );
-                },
+              const SizedBox(
+                height: 24,
               ),
-
-            const SizedBox(
-              height: 100,
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
 
+  // =====================================================
+  // ORDER CARD
+  // =====================================================
+
   Widget orderCard(
     OrderModel order,
+    bool mobile,
   ) {
-
-    final width =
-        MediaQuery.of(context)
-            .size
-            .width;
-
-    final mobile =
-        width < 850;
 
     return Container(
 
       margin:
           const EdgeInsets.only(
-        bottom: 20,
+        bottom: 10,
       ),
 
       padding:
-          const EdgeInsets.all(
-        24,
+          EdgeInsets.all(
+        mobile
+            ? 12
+            : 14,
       ),
 
       decoration:
@@ -755,7 +806,7 @@ class _AdminOrderScreenState
 
         borderRadius:
             BorderRadius.circular(
-          28,
+          16,
         ),
       ),
 
@@ -775,10 +826,16 @@ class _AdminOrderScreenState
 
                       order.customerName,
 
+                      maxLines: 1,
+
+                      overflow:
+                          TextOverflow
+                              .ellipsis,
+
                       style:
                           const TextStyle(
 
-                        fontSize: 20,
+                        fontSize: 13,
 
                         fontWeight:
                             FontWeight.bold,
@@ -786,31 +843,43 @@ class _AdminOrderScreenState
                     ),
 
                     const SizedBox(
-                      height: 10,
+                      height: 4,
                     ),
 
                     SelectableText(
+
                       'Order #${order.orderId}',
+
+                      style:
+                          const TextStyle(
+                        fontSize: 9.5,
+                      ),
+                    ),
+
+                    const SizedBox(
+                      height: 6,
+                    ),
+
+                    Wrap(
+
+                      spacing: 6,
+
+                      runSpacing: 6,
+
+                      children: [
+
+                        statusChip(
+                          order.status,
+                        ),
+
+                        priceChip(
+                          'Rp ${order.totalPrice.toStringAsFixed(0)}',
+                        ),
+                      ],
                     ),
 
                     const SizedBox(
                       height: 10,
-                    ),
-
-                    Text(
-                      order.status,
-                    ),
-
-                    const SizedBox(
-                      height: 10,
-                    ),
-
-                    Text(
-                      'Rp ${order.totalPrice.toStringAsFixed(0)}',
-                    ),
-
-                    const SizedBox(
-                      height: 20,
                     ),
 
                     ...order.items.map(
@@ -822,16 +891,22 @@ class _AdminOrderScreenState
 
                           padding:
                               const EdgeInsets.only(
-                            bottom: 8,
+                            bottom: 3,
                           ),
 
                           child: Text(
 
                             '${item.productName} x${item.quantity}',
 
+                            maxLines: 1,
+
+                            overflow:
+                                TextOverflow
+                                    .ellipsis,
+
                             style:
                                 const TextStyle(
-                              fontSize: 14,
+                              fontSize: 9.5,
                             ),
                           ),
                         );
@@ -839,7 +914,7 @@ class _AdminOrderScreenState
                     ),
 
                     const SizedBox(
-                      height: 20,
+                      height: 12,
                     ),
 
                     SizedBox(
@@ -848,7 +923,7 @@ class _AdminOrderScreenState
                           double.infinity,
 
                       height:
-                          52,
+                          38,
 
                       child:
                           ElevatedButton(
@@ -858,6 +933,15 @@ class _AdminOrderScreenState
 
                           backgroundColor:
                               Colors.blue,
+
+                          shape:
+                              RoundedRectangleBorder(
+
+                            borderRadius:
+                                BorderRadius.circular(
+                              10,
+                            ),
+                          ),
                         ),
 
                         onPressed:
@@ -870,14 +954,21 @@ class _AdminOrderScreenState
                         },
 
                         child:
-                            const Text(
+                            const FittedBox(
 
-                          'Update Status',
+                          child: Text(
 
-                          style:
-                              TextStyle(
-                            color:
-                                Colors.white,
+                            'Update Status',
+
+                            style:
+                                TextStyle(
+
+                              fontSize:
+                                  10,
+
+                              color:
+                                  Colors.white,
+                            ),
                           ),
                         ),
                       ),
@@ -886,6 +977,11 @@ class _AdminOrderScreenState
                 )
 
               : Row(
+
+                  crossAxisAlignment:
+                      CrossAxisAlignment
+                          .start,
+
                   children: [
 
                     Expanded(
@@ -904,10 +1000,16 @@ class _AdminOrderScreenState
 
                             order.customerName,
 
+                            maxLines: 1,
+
+                            overflow:
+                                TextOverflow
+                                    .ellipsis,
+
                             style:
                                 const TextStyle(
 
-                              fontSize: 20,
+                              fontSize: 13,
 
                               fontWeight:
                                   FontWeight.bold,
@@ -915,15 +1017,21 @@ class _AdminOrderScreenState
                           ),
 
                           const SizedBox(
-                            height: 8,
+                            height: 3,
                           ),
 
                           SelectableText(
+
                             'Order #${order.orderId}',
+
+                            style:
+                                const TextStyle(
+                              fontSize: 9.5,
+                            ),
                           ),
 
                           const SizedBox(
-                            height: 10,
+                            height: 6,
                           ),
 
                           ...order.items.map(
@@ -935,12 +1043,24 @@ class _AdminOrderScreenState
 
                                 padding:
                                     const EdgeInsets.only(
-                                  bottom: 6,
+                                  bottom: 2,
                                 ),
 
                                 child: Text(
 
                                   '${item.productName} x${item.quantity}',
+
+                                  overflow:
+                                      TextOverflow
+                                          .ellipsis,
+
+                                  maxLines: 1,
+
+                                  style:
+                                      const TextStyle(
+                                    fontSize:
+                                        9.5,
+                                  ),
                                 ),
                               );
                             },
@@ -949,29 +1069,45 @@ class _AdminOrderScreenState
                       ),
                     ),
 
-                    Expanded(
-                      flex: 2,
+                    const SizedBox(
+                      width: 10,
+                    ),
+
+                    Flexible(
 
                       child:
-                          Text(
-                        order.status,
+                          Column(
+
+                        crossAxisAlignment:
+                            CrossAxisAlignment
+                                .start,
+
+                        children: [
+
+                          statusChip(
+                            order.status,
+                          ),
+
+                          const SizedBox(
+                            height: 6,
+                          ),
+
+                          priceChip(
+                            'Rp ${order.totalPrice.toStringAsFixed(0)}',
+                          ),
+                        ],
                       ),
                     ),
 
-                    Expanded(
-                      flex: 2,
-
-                      child:
-                          Text(
-                        'Rp ${order.totalPrice.toStringAsFixed(0)}',
-                      ),
+                    const SizedBox(
+                      width: 10,
                     ),
 
                     SizedBox(
 
-                      width: 140,
+                      width: 110,
 
-                      height: 48,
+                      height: 38,
 
                       child:
                           ElevatedButton(
@@ -981,6 +1117,20 @@ class _AdminOrderScreenState
 
                           backgroundColor:
                               Colors.blue,
+
+                          padding:
+                              const EdgeInsets.symmetric(
+                            horizontal: 8,
+                          ),
+
+                          shape:
+                              RoundedRectangleBorder(
+
+                            borderRadius:
+                                BorderRadius.circular(
+                              10,
+                            ),
+                          ),
                         ),
 
                         onPressed:
@@ -993,14 +1143,21 @@ class _AdminOrderScreenState
                         },
 
                         child:
-                            const Text(
+                            const FittedBox(
 
-                          'Update',
+                          child: Text(
 
-                          style:
-                              TextStyle(
-                            color:
-                                Colors.white,
+                            'Update Status',
+
+                            style:
+                                TextStyle(
+
+                              fontSize:
+                                  9.5,
+
+                              color:
+                                  Colors.white,
+                            ),
                           ),
                         ),
                       ),
@@ -1009,6 +1166,120 @@ class _AdminOrderScreenState
                 ),
     );
   }
+
+  // =====================================================
+  // STATUS CHIP
+  // =====================================================
+
+  Widget statusChip(
+    String status,
+  ) {
+
+    return Container(
+
+      padding:
+          const EdgeInsets.symmetric(
+
+        horizontal: 10,
+
+        vertical: 6,
+      ),
+
+      decoration:
+          BoxDecoration(
+
+        color:
+            Colors.blue
+                .withOpacity(
+          0.1,
+        ),
+
+        borderRadius:
+            BorderRadius.circular(
+          8,
+        ),
+      ),
+
+      child:
+          Text(
+
+        status,
+
+        style:
+            const TextStyle(
+
+          fontSize: 9,
+
+          color:
+              Colors.blue,
+
+          fontWeight:
+              FontWeight.w600,
+        ),
+      ),
+    );
+  }
+
+  // =====================================================
+  // PRICE CHIP
+  // =====================================================
+
+  Widget priceChip(
+    String text,
+  ) {
+
+    return Container(
+
+      padding:
+          const EdgeInsets.symmetric(
+
+        horizontal: 10,
+
+        vertical: 6,
+      ),
+
+      decoration:
+          BoxDecoration(
+
+        color:
+            Colors.green
+                .withOpacity(
+          0.1,
+        ),
+
+        borderRadius:
+            BorderRadius.circular(
+          8,
+        ),
+      ),
+
+      child:
+          Text(
+
+        text,
+
+        overflow:
+            TextOverflow
+                .ellipsis,
+
+        style:
+            const TextStyle(
+
+          fontSize: 9,
+
+          color:
+              Colors.green,
+
+          fontWeight:
+              FontWeight.w600,
+        ),
+      ),
+    );
+  }
+
+  // =====================================================
+  // ANALYTICS CARD
+  // =====================================================
 
   Widget analyticsCard(
 
@@ -1019,13 +1290,24 @@ class _AdminOrderScreenState
     IconData icon,
 
     Color color,
+
+    bool mobile,
   ) {
 
     return Container(
 
       padding:
-          const EdgeInsets.all(
-        22,
+          EdgeInsets.symmetric(
+
+        horizontal:
+            mobile
+                ? 10
+                : 12,
+
+        vertical:
+            mobile
+                ? 8
+                : 10,
       ),
 
       decoration:
@@ -1036,24 +1318,26 @@ class _AdminOrderScreenState
 
         borderRadius:
             BorderRadius.circular(
-          28,
+          16,
         ),
       ),
 
       child:
-          Column(
-
-        crossAxisAlignment:
-            CrossAxisAlignment
-                .start,
+          Row(
 
         children: [
 
           Container(
 
-            width: 60,
+            width:
+                mobile
+                    ? 34
+                    : 38,
 
-            height: 60,
+            height:
+                mobile
+                    ? 34
+                    : 38,
 
             decoration:
                 BoxDecoration(
@@ -1065,7 +1349,7 @@ class _AdminOrderScreenState
 
               borderRadius:
                   BorderRadius.circular(
-                18,
+                10,
               ),
             ),
 
@@ -1075,31 +1359,90 @@ class _AdminOrderScreenState
 
               color: color,
 
-              size: 30,
-            ),
-          ),
-
-          const Spacer(),
-
-          Text(
-
-            '$value',
-
-            style:
-                const TextStyle(
-
-              fontSize: 32,
-
-              fontWeight:
-                  FontWeight.bold,
+              size:
+                  mobile
+                      ? 16
+                      : 18,
             ),
           ),
 
           const SizedBox(
-            height: 6,
+            width: 10,
           ),
 
-          Text(title),
+          Expanded(
+
+            child:
+                Column(
+
+              mainAxisAlignment:
+                  MainAxisAlignment
+                      .center,
+
+              crossAxisAlignment:
+                  CrossAxisAlignment
+                      .start,
+
+              children: [
+
+                FittedBox(
+
+                  fit:
+                      BoxFit.scaleDown,
+
+                  alignment:
+                      Alignment.centerLeft,
+
+                  child: Text(
+
+                    '$value',
+
+                    maxLines: 1,
+
+                    style:
+                        TextStyle(
+
+                      fontSize:
+                          mobile
+                              ? 14
+                              : 16,
+
+                      fontWeight:
+                          FontWeight.bold,
+                    ),
+                  ),
+                ),
+
+                const SizedBox(
+                  height: 2,
+                ),
+
+                Text(
+
+                  title,
+
+                  maxLines: 1,
+
+                  overflow:
+                      TextOverflow
+                          .ellipsis,
+
+                  style:
+                      TextStyle(
+
+                    fontSize:
+                        mobile
+                            ? 8
+                            : 9,
+
+                    color:
+                        Colors.grey
+                            .shade700,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );

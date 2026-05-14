@@ -17,10 +17,6 @@ class DashboardCard
 
   final VoidCallback? onTap;
 
-  // =====================================================
-  // CONSTRUCTOR
-  // =====================================================
-
   const DashboardCard({
 
     super.key,
@@ -43,6 +39,90 @@ class DashboardCard
     BuildContext context,
   ) {
 
+    final width =
+        MediaQuery.of(context)
+            .size
+            .width;
+
+    final bool mobile =
+        width < 700;
+
+    final bool tablet =
+        width >= 700 &&
+            width < 1100;
+
+    final double cardPadding =
+
+        mobile
+
+            ? 12
+
+            : tablet
+
+                ? 14
+
+                : 18;
+
+    final double iconBox =
+
+        mobile
+
+            ? 40
+
+            : tablet
+
+                ? 48
+
+                : 56;
+
+    final double iconSize =
+
+        mobile
+
+            ? 18
+
+            : tablet
+
+                ? 22
+
+                : 26;
+
+    final double titleFont =
+
+        mobile
+
+            ? 9.5
+
+            : tablet
+
+                ? 10.5
+
+                : 12;
+
+    final double valueFont =
+
+        mobile
+
+            ? 15
+
+            : tablet
+
+                ? 18
+
+                : 22;
+
+    final double subtitleFont =
+
+        mobile
+
+            ? 8.5
+
+            : tablet
+
+                ? 9.5
+
+                : 10.5;
+
     return Material(
 
       color:
@@ -52,7 +132,7 @@ class DashboardCard
 
         borderRadius:
             BorderRadius.circular(
-          28,
+          mobile ? 14 : 18,
         ),
 
         onTap:
@@ -61,8 +141,8 @@ class DashboardCard
         child: Container(
 
           padding:
-              const EdgeInsets.all(
-            22,
+              EdgeInsets.all(
+            cardPadding,
           ),
 
           decoration:
@@ -73,7 +153,7 @@ class DashboardCard
 
             borderRadius:
                 BorderRadius.circular(
-              28,
+              mobile ? 14 : 18,
             ),
 
             boxShadow: [
@@ -83,16 +163,15 @@ class DashboardCard
                 color:
                     Colors.black
                         .withOpacity(
-                  0.05,
+                  0.02,
                 ),
 
-                blurRadius:
-                    20,
+                blurRadius: 10,
 
                 offset:
                     const Offset(
                   0,
-                  10,
+                  4,
                 ),
               ),
             ],
@@ -108,9 +187,9 @@ class DashboardCard
 
               Container(
 
-                width: 68,
+                width: iconBox,
 
-                height: 68,
+                height: iconBox,
 
                 decoration:
                     BoxDecoration(
@@ -123,22 +202,20 @@ class DashboardCard
                       color,
 
                       color.withOpacity(
-                        0.75,
+                        0.78,
                       ),
                     ],
 
                     begin:
-                        Alignment
-                            .topLeft,
+                        Alignment.topLeft,
 
                     end:
-                        Alignment
-                            .bottomRight,
+                        Alignment.bottomRight,
                   ),
 
                   borderRadius:
                       BorderRadius.circular(
-                    22,
+                    mobile ? 12 : 15,
                   ),
 
                   boxShadow: [
@@ -147,16 +224,15 @@ class DashboardCard
 
                       color:
                           color.withOpacity(
-                        0.25,
+                        0.16,
                       ),
 
-                      blurRadius:
-                          18,
+                      blurRadius: 10,
 
                       offset:
                           const Offset(
                         0,
-                        8,
+                        4,
                       ),
                     ),
                   ],
@@ -166,15 +242,21 @@ class DashboardCard
 
                   icon,
 
-                  size: 32,
+                  size: iconSize,
 
                   color:
                       Colors.white,
                 ),
               ),
 
-              const SizedBox(
-                width: 20,
+              SizedBox(
+                width:
+
+                    mobile
+
+                        ? 10
+
+                        : 14,
               ),
 
               // =====================================
@@ -185,13 +267,13 @@ class DashboardCard
 
                 child: Column(
 
-                  crossAxisAlignment:
-                      CrossAxisAlignment
-                          .start,
-
                   mainAxisAlignment:
                       MainAxisAlignment
                           .center,
+
+                  crossAxisAlignment:
+                      CrossAxisAlignment
+                          .start,
 
                   children: [
 
@@ -203,32 +285,6 @@ class DashboardCard
 
                       title,
 
-                      style:
-                          TextStyle(
-
-                        color:
-                            Colors.grey
-                                .shade600,
-
-                        fontSize: 14,
-
-                        fontWeight:
-                            FontWeight.w500,
-                      ),
-                    ),
-
-                    const SizedBox(
-                      height: 8,
-                    ),
-
-                    // =================================
-                    // VALUE
-                    // =================================
-
-                    Text(
-
-                      value,
-
                       maxLines: 1,
 
                       overflow:
@@ -236,14 +292,65 @@ class DashboardCard
                               .ellipsis,
 
                       style:
-                          const TextStyle(
+                          TextStyle(
 
-                        fontSize: 30,
+                        color:
+                            Colors.grey
+                                .shade600,
+
+                        fontSize:
+                            titleFont,
 
                         fontWeight:
-                            FontWeight.bold,
+                            FontWeight.w600,
+                      ),
+                    ),
 
-                        height: 1,
+                    SizedBox(
+                      height:
+
+                          mobile
+                              ? 3
+                              : 5,
+                    ),
+
+                    // =================================
+                    // VALUE
+                    // =================================
+
+                    Flexible(
+
+                      child:
+                          FittedBox(
+
+                        fit:
+                            BoxFit.scaleDown,
+
+                        alignment:
+                            Alignment.centerLeft,
+
+                        child: Text(
+
+                          value,
+
+                          maxLines: 1,
+
+                          overflow:
+                              TextOverflow
+                                  .ellipsis,
+
+                          style:
+                              TextStyle(
+
+                            fontSize:
+                                valueFont,
+
+                            fontWeight:
+                                FontWeight.bold,
+
+                            height: 1,
+                          ),
+                        ),
                       ),
                     ),
 
@@ -254,8 +361,12 @@ class DashboardCard
                     if (subtitle !=
                         null) ...[
 
-                      const SizedBox(
-                        height: 8,
+                      SizedBox(
+                        height:
+
+                            mobile
+                                ? 3
+                                : 5,
                       ),
 
                       Text(
@@ -275,7 +386,11 @@ class DashboardCard
                               Colors.grey
                                   .shade500,
 
-                          fontSize: 13,
+                          fontSize:
+                              subtitleFont,
+
+                          fontWeight:
+                              FontWeight.w500,
                         ),
                       ),
                     ],

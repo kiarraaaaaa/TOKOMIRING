@@ -1,27 +1,17 @@
 // =====================================================
-// FULL FIX FINAL
+// FINAL RESPONSIVE VERSION
 // lib/screens/admin/admin_product_screen.dart
-// FIX:
-// ✅ CATEGORY SELECTED BUTTON
-// ✅ FOOD / DRINKS / SNACKS / ELECTRONICS
-// ✅ DROPDOWN CATEGORY
-// ✅ IMAGE PICKER
-// ✅ BASE64 IMAGE
-// ✅ EDIT PRODUCT
-// ✅ DELETE PRODUCT
 // =====================================================
 
 import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../providers/product_provider.dart';
 import '../../models/product_model.dart';
-
 import '../../core/utils/app_format.dart';
 
 class AdminProductScreen
@@ -236,7 +226,7 @@ class _AdminProductScreenState
 
                 borderRadius:
                     BorderRadius.circular(
-                  24,
+                  18,
                 ),
               ),
 
@@ -245,13 +235,13 @@ class _AdminProductScreenState
 
                 padding:
                     const EdgeInsets.all(
-                  24,
+                  18,
                 ),
 
                 child:
                     SizedBox(
 
-                  width: 450,
+                  width: 390,
 
                   child: Column(
                     mainAxisSize:
@@ -270,7 +260,7 @@ class _AdminProductScreenState
                         style:
                             const TextStyle(
 
-                          fontSize: 24,
+                          fontSize: 18,
 
                           fontWeight:
                               FontWeight.bold,
@@ -278,18 +268,14 @@ class _AdminProductScreenState
                       ),
 
                       const SizedBox(
-                        height: 24,
+                        height: 16,
                       ),
-
-                      // =================================
-                      // IMAGE
-                      // =================================
 
                       InkWell(
 
                         borderRadius:
                             BorderRadius.circular(
-                          20,
+                          16,
                         ),
 
                         onTap: () async {
@@ -314,7 +300,7 @@ class _AdminProductScreenState
                           width:
                               double.infinity,
 
-                          height: 220,
+                          height: 140,
 
                           decoration:
                               BoxDecoration(
@@ -325,7 +311,7 @@ class _AdminProductScreenState
 
                             borderRadius:
                                 BorderRadius.circular(
-                              20,
+                              16,
                             ),
                           ),
 
@@ -338,7 +324,7 @@ class _AdminProductScreenState
 
                                       borderRadius:
                                           BorderRadius.circular(
-                                        20,
+                                        16,
                                       ),
 
                                       child: Image.memory(
@@ -362,9 +348,9 @@ class _AdminProductScreenState
                                         Icon(
 
                                           Icons
-                                              .add_photo_alternate,
+                                              .add_photo_alternate_rounded,
 
-                                          size: 60,
+                                          size: 34,
 
                                           color:
                                               Colors.grey
@@ -373,15 +359,18 @@ class _AdminProductScreenState
 
                                         const SizedBox(
                                           height:
-                                              12,
+                                              6,
                                         ),
 
                                         Text(
 
-                                          'Click to upload image',
+                                          'Upload product image',
 
                                           style:
                                               TextStyle(
+
+                                            fontSize:
+                                                10.5,
 
                                             color:
                                                 Colors.grey
@@ -394,12 +383,17 @@ class _AdminProductScreenState
                       ),
 
                       const SizedBox(
-                        height: 24,
+                        height: 16,
                       ),
 
                       TextField(
                         controller:
                             nameController,
+
+                        style:
+                            const TextStyle(
+                          fontSize: 11.5,
+                        ),
 
                         decoration:
                             const InputDecoration(
@@ -409,16 +403,12 @@ class _AdminProductScreenState
                       ),
 
                       const SizedBox(
-                        height: 16,
+                        height: 10,
                       ),
-
-                      // =================================
-                      // CATEGORY DROPDOWN
-                      // =================================
 
                       DropdownButtonFormField<String>(
 
-                        value:
+                        initialValue:
                             selectedCategory,
 
                         decoration:
@@ -429,7 +419,7 @@ class _AdminProductScreenState
 
                         borderRadius:
                             BorderRadius.circular(
-                          18,
+                          14,
                         ),
 
                         items:
@@ -446,6 +436,11 @@ class _AdminProductScreenState
                               child:
                                   Text(
                                 category,
+                                style:
+                                    const TextStyle(
+                                  fontSize:
+                                      11.5,
+                                ),
                               ),
                             );
                           },
@@ -470,7 +465,7 @@ class _AdminProductScreenState
                       ),
 
                       const SizedBox(
-                        height: 16,
+                        height: 10,
                       ),
 
                       TextField(
@@ -481,6 +476,11 @@ class _AdminProductScreenState
                         keyboardType:
                             TextInputType.number,
 
+                        style:
+                            const TextStyle(
+                          fontSize: 11.5,
+                        ),
+
                         decoration:
                             const InputDecoration(
                           labelText:
@@ -489,7 +489,7 @@ class _AdminProductScreenState
                       ),
 
                       const SizedBox(
-                        height: 16,
+                        height: 10,
                       ),
 
                       TextField(
@@ -500,6 +500,11 @@ class _AdminProductScreenState
                         keyboardType:
                             TextInputType.number,
 
+                        style:
+                            const TextStyle(
+                          fontSize: 11.5,
+                        ),
+
                         decoration:
                             const InputDecoration(
                           labelText:
@@ -508,7 +513,7 @@ class _AdminProductScreenState
                       ),
 
                       const SizedBox(
-                        height: 28,
+                        height: 18,
                       ),
 
                       SizedBox(
@@ -516,7 +521,7 @@ class _AdminProductScreenState
                         width:
                             double.infinity,
 
-                        height: 52,
+                        height: 42,
 
                         child:
                             ElevatedButton(
@@ -526,6 +531,15 @@ class _AdminProductScreenState
 
                             backgroundColor:
                                 Colors.blue,
+
+                            shape:
+                                RoundedRectangleBorder(
+
+                              borderRadius:
+                                  BorderRadius.circular(
+                                12,
+                              ),
+                            ),
                           ),
 
                           onPressed:
@@ -619,8 +633,12 @@ class _AdminProductScreenState
 
                             style:
                                 const TextStyle(
+
                               color:
                                   Colors.white,
+
+                              fontSize:
+                                  11,
                             ),
                           ),
                         ),
@@ -666,11 +684,11 @@ class _AdminProductScreenState
 
       crossAxisCount = 1;
 
-    } else if (width < 1100) {
+    } else if (width < 1000) {
 
       crossAxisCount = 2;
 
-    } else if (width < 1500) {
+    } else if (width < 1350) {
 
       crossAxisCount = 3;
     }
@@ -685,9 +703,12 @@ class _AdminProductScreenState
       child:
           SingleChildScrollView(
 
+        physics:
+            const BouncingScrollPhysics(),
+
         padding:
             const EdgeInsets.all(
-          24,
+          16,
         ),
 
         child:
@@ -700,9 +721,9 @@ class _AdminProductScreenState
 
             Wrap(
 
-              spacing: 20,
+              spacing: 12,
 
-              runSpacing: 20,
+              runSpacing: 12,
 
               alignment:
                   WrapAlignment
@@ -731,8 +752,8 @@ class _AdminProductScreenState
                         fontSize:
 
                             width < 700
-                                ? 28
-                                : 40,
+                                ? 23
+                                : 30,
 
                         fontWeight:
                             FontWeight.bold,
@@ -740,7 +761,7 @@ class _AdminProductScreenState
                     ),
 
                     const SizedBox(
-                      height: 8,
+                      height: 3,
                     ),
 
                     Text(
@@ -749,6 +770,8 @@ class _AdminProductScreenState
 
                       style:
                           TextStyle(
+
+                        fontSize: 10.5,
 
                         color:
                             Colors.grey
@@ -760,7 +783,7 @@ class _AdminProductScreenState
 
                 SizedBox(
 
-                  height: 48,
+                  height: 38,
 
                   child:
                       ElevatedButton.icon(
@@ -770,6 +793,20 @@ class _AdminProductScreenState
 
                       backgroundColor:
                           Colors.blue,
+
+                      padding:
+                          const EdgeInsets.symmetric(
+                        horizontal: 16,
+                      ),
+
+                      shape:
+                          RoundedRectangleBorder(
+
+                        borderRadius:
+                            BorderRadius.circular(
+                          11,
+                        ),
+                      ),
                     ),
 
                     onPressed: () {
@@ -780,6 +817,7 @@ class _AdminProductScreenState
                     icon:
                         const Icon(
                       Icons.add,
+                      size: 14,
                       color:
                           Colors.white,
                     ),
@@ -791,6 +829,9 @@ class _AdminProductScreenState
 
                       style:
                           TextStyle(
+
+                        fontSize: 10.5,
+
                         color:
                             Colors.white,
                       ),
@@ -801,14 +842,14 @@ class _AdminProductScreenState
             ),
 
             const SizedBox(
-              height: 24,
+              height: 16,
             ),
 
             Container(
 
               constraints:
                   const BoxConstraints(
-                maxWidth: 450,
+                maxWidth: 320,
               ),
 
               decoration:
@@ -819,7 +860,7 @@ class _AdminProductScreenState
 
                 borderRadius:
                     BorderRadius.circular(
-                  18,
+                  12,
                 ),
               ),
 
@@ -828,6 +869,11 @@ class _AdminProductScreenState
 
                 controller:
                     _searchController,
+
+                style:
+                    const TextStyle(
+                  fontSize: 11,
+                ),
 
                 onChanged:
                     (
@@ -847,9 +893,15 @@ class _AdminProductScreenState
                   hintText:
                       'Search product...',
 
+                  hintStyle:
+                      const TextStyle(
+                    fontSize: 10.5,
+                  ),
+
                   prefixIcon:
                       const Icon(
                     Icons.search,
+                    size: 17,
                   ),
 
                   border:
@@ -857,7 +909,7 @@ class _AdminProductScreenState
 
                     borderRadius:
                         BorderRadius.circular(
-                      18,
+                      12,
                     ),
 
                     borderSide:
@@ -868,7 +920,7 @@ class _AdminProductScreenState
             ),
 
             const SizedBox(
-              height: 28,
+              height: 18,
             ),
 
             GridView.builder(
@@ -888,13 +940,13 @@ class _AdminProductScreenState
                     crossAxisCount,
 
                 crossAxisSpacing:
-                    18,
+                    12,
 
                 mainAxisSpacing:
-                    18,
+                    12,
 
                 mainAxisExtent:
-                    500,
+                    255,
               ),
 
               itemBuilder:
@@ -910,13 +962,17 @@ class _AdminProductScreenState
             ),
 
             const SizedBox(
-              height: 100,
+              height: 70,
             ),
           ],
         ),
       ),
     );
   }
+
+  // =====================================================
+  // PRODUCT CARD
+  // =====================================================
 
   Widget productCard(
     ProductModel product,
@@ -932,7 +988,7 @@ class _AdminProductScreenState
 
         borderRadius:
             BorderRadius.circular(
-          24,
+          16,
         ),
       ),
 
@@ -946,7 +1002,7 @@ class _AdminProductScreenState
 
           SizedBox(
 
-            height: 200,
+            height: 90,
 
             width:
                 double.infinity,
@@ -958,7 +1014,7 @@ class _AdminProductScreenState
                   const BorderRadius.vertical(
                 top:
                     Radius.circular(
-                  24,
+                  16,
                 ),
               ),
 
@@ -999,7 +1055,7 @@ class _AdminProductScreenState
 
               padding:
                   const EdgeInsets.all(
-                16,
+                10,
               ),
 
               child:
@@ -1023,7 +1079,7 @@ class _AdminProductScreenState
                     style:
                         const TextStyle(
 
-                      fontSize: 18,
+                      fontSize: 12.5,
 
                       fontWeight:
                           FontWeight.bold,
@@ -1031,15 +1087,26 @@ class _AdminProductScreenState
                   ),
 
                   const SizedBox(
-                    height: 6,
+                    height: 2,
                   ),
 
                   Text(
+
                     product.category,
+
+                    style:
+                        TextStyle(
+
+                      fontSize: 9.5,
+
+                      color:
+                          Colors.grey
+                              .shade600,
+                    ),
                   ),
 
                   const SizedBox(
-                    height: 12,
+                    height: 6,
                   ),
 
                   Text(
@@ -1051,7 +1118,7 @@ class _AdminProductScreenState
                     style:
                         const TextStyle(
 
-                      fontSize: 20,
+                      fontSize: 13,
 
                       fontWeight:
                           FontWeight.bold,
@@ -1062,7 +1129,7 @@ class _AdminProductScreenState
                   ),
 
                   const SizedBox(
-                    height: 14,
+                    height: 6,
                   ),
 
                   Container(
@@ -1073,7 +1140,7 @@ class _AdminProductScreenState
                     padding:
                         const EdgeInsets.symmetric(
 
-                      vertical: 10,
+                      vertical: 5,
                     ),
 
                     decoration:
@@ -1082,12 +1149,12 @@ class _AdminProductScreenState
                       color:
                           Colors.green
                               .withOpacity(
-                        0.1,
+                        0.08,
                       ),
 
                       borderRadius:
                           BorderRadius.circular(
-                        12,
+                        8,
                       ),
                     ),
 
@@ -1103,7 +1170,10 @@ class _AdminProductScreenState
                           const TextStyle(
 
                         fontWeight:
-                            FontWeight.bold,
+                            FontWeight.w600,
+
+                        fontSize:
+                            9.5,
 
                         color:
                             Colors.green,
@@ -1121,16 +1191,28 @@ class _AdminProductScreenState
                         child:
                             SizedBox(
 
-                          height: 42,
+                          height: 30,
 
                           child:
-                              ElevatedButton(
+                              ElevatedButton.icon(
 
                             style:
                                 ElevatedButton.styleFrom(
 
                               backgroundColor:
                                   Colors.blue,
+
+                              padding:
+                                  EdgeInsets.zero,
+
+                              shape:
+                                  RoundedRectangleBorder(
+
+                                borderRadius:
+                                    BorderRadius.circular(
+                                  9,
+                                ),
+                              ),
                             ),
 
                             onPressed:
@@ -1142,13 +1224,28 @@ class _AdminProductScreenState
                               );
                             },
 
-                            child:
+                            icon:
+                                const Icon(
+
+                              Icons.edit_rounded,
+
+                              size: 11,
+
+                              color:
+                                  Colors.white,
+                            ),
+
+                            label:
                                 const Text(
 
                               'Edit',
 
                               style:
                                   TextStyle(
+
+                                fontSize:
+                                    9.5,
+
                                 color:
                                     Colors.white,
                               ),
@@ -1158,7 +1255,7 @@ class _AdminProductScreenState
                       ),
 
                       const SizedBox(
-                        width: 10,
+                        width: 6,
                       ),
 
                       Expanded(
@@ -1166,16 +1263,28 @@ class _AdminProductScreenState
                         child:
                             SizedBox(
 
-                          height: 42,
+                          height: 30,
 
                           child:
-                              ElevatedButton(
+                              ElevatedButton.icon(
 
                             style:
                                 ElevatedButton.styleFrom(
 
                               backgroundColor:
                                   Colors.red,
+
+                              padding:
+                                  EdgeInsets.zero,
+
+                              shape:
+                                  RoundedRectangleBorder(
+
+                                borderRadius:
+                                    BorderRadius.circular(
+                                  9,
+                                ),
+                              ),
                             ),
 
                             onPressed:
@@ -1186,13 +1295,28 @@ class _AdminProductScreenState
                               );
                             },
 
-                            child:
+                            icon:
+                                const Icon(
+
+                              Icons.delete_rounded,
+
+                              size: 11,
+
+                              color:
+                                  Colors.white,
+                            ),
+
+                            label:
                                 const Text(
 
                               'Delete',
 
                               style:
                                   TextStyle(
+
+                                fontSize:
+                                    9.5,
+
                                 color:
                                     Colors.white,
                               ),
@@ -1211,6 +1335,10 @@ class _AdminProductScreenState
     );
   }
 
+  // =====================================================
+  // FALLBACK IMAGE
+  // =====================================================
+
   Widget fallbackImage() {
 
     return Container(
@@ -1225,9 +1353,9 @@ class _AdminProductScreenState
         child: Icon(
 
           Icons
-              .image_not_supported,
+              .image_not_supported_rounded,
 
-          size: 60,
+          size: 28,
 
           color:
               Colors.grey

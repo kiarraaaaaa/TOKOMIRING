@@ -43,10 +43,6 @@ class _AdminSidebarState
     BuildContext context,
   ) {
 
-    // =================================================
-    // REALTIME AUTH
-    // =================================================
-
     final authProvider =
         context.watch<AuthProvider>();
 
@@ -56,18 +52,19 @@ class _AdminSidebarState
     final adminName =
 
         currentUser
-                    ?.name
+                    ?.displayName
                     .trim()
                     .isNotEmpty ==
                 true
 
             ? currentUser!
-                .name
+                .displayName
 
             : 'Administrator';
 
     final photoUrl =
-        currentUser?.photoUrl ??
+        currentUser
+                ?.safePhotoUrl ??
             '';
 
     final width =
@@ -79,25 +76,25 @@ class _AdminSidebarState
         width < 1200;
 
     final bool isMobile =
-        width < 800;
+        width < 820;
 
-    double sidebarWidth = 185;
+    double sidebarWidth = 172;
 
     if (collapsed &&
         !isMobile) {
 
-      sidebarWidth = 68;
+      sidebarWidth = 66;
 
     } else if (isTablet) {
 
-      sidebarWidth = 165;
+      sidebarWidth = 154;
     }
 
     return AnimatedContainer(
 
       duration:
           const Duration(
-        milliseconds: 250,
+        milliseconds: 220,
       ),
 
       width: sidebarWidth,
@@ -121,7 +118,7 @@ class _AdminSidebarState
             ),
 
             Color(
-              0xff1E293B,
+              0xff172554,
             ),
           ],
         ),
@@ -132,15 +129,18 @@ class _AdminSidebarState
         child: Column(
           children: [
 
-            // =================================================
+            // =============================================
             // HEADER
-            // =================================================
+            // =============================================
 
             Padding(
 
               padding:
-                  const EdgeInsets.all(
+                  const EdgeInsets.fromLTRB(
+                8,
                 10,
+                8,
+                4,
               ),
 
               child: Row(
@@ -148,43 +148,50 @@ class _AdminSidebarState
 
                   Container(
 
-                    width: 36,
+                    width:
+                        collapsed
+                            ? 34
+                            : 36,
 
-                    height: 36,
+                    height:
+                        collapsed
+                            ? 34
+                            : 36,
+
+                    padding:
+                        const EdgeInsets.all(
+                      4,
+                    ),
 
                     decoration:
                         BoxDecoration(
+
+                      color:
+                          Colors.white
+                              .withOpacity(
+                        0.08,
+                      ),
 
                       borderRadius:
                           BorderRadius.circular(
                         10,
                       ),
-
-                      gradient:
-                          const LinearGradient(
-
-                        colors: [
-
-                          Color(
-                            0xff2563EB,
-                          ),
-
-                          Color(
-                            0xff7C3AED,
-                          ),
-                        ],
-                      ),
                     ),
 
                     child:
-                        const Icon(
+                        ClipRRect(
 
-                      Icons.storefront,
+                      borderRadius:
+                          BorderRadius.circular(
+                        8,
+                      ),
 
-                      size: 17,
+                      child: Image.asset(
 
-                      color:
-                          Colors.white,
+                        'assets/images/tokomiring.png',
+
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
 
@@ -192,14 +199,19 @@ class _AdminSidebarState
                       isMobile) ...[
 
                     const SizedBox(
-                      width: 8,
+                      width: 7,
                     ),
 
                     Expanded(
+
                       child: Column(
+
                         crossAxisAlignment:
                             CrossAxisAlignment
                                 .start,
+
+                        mainAxisSize:
+                            MainAxisSize.min,
 
                         children: const [
 
@@ -210,6 +222,8 @@ class _AdminSidebarState
                             overflow:
                                 TextOverflow
                                     .ellipsis,
+
+                            maxLines: 1,
 
                             style:
                                 TextStyle(
@@ -232,13 +246,19 @@ class _AdminSidebarState
 
                             'Admin Panel',
 
+                            overflow:
+                                TextOverflow
+                                    .ellipsis,
+
+                            maxLines: 1,
+
                             style:
                                 TextStyle(
 
                               color:
                                   Colors.white70,
 
-                              fontSize: 8,
+                              fontSize: 7.5,
                             ),
                           ),
                         ],
@@ -266,9 +286,9 @@ class _AdminSidebarState
 
                       child: Container(
 
-                        width: 28,
+                        width: 26,
 
-                        height: 28,
+                        height: 26,
 
                         decoration:
                             BoxDecoration(
@@ -289,11 +309,11 @@ class _AdminSidebarState
 
                           collapsed
 
-                              ? Icons.menu
+                              ? Icons.menu_rounded
 
-                              : Icons.menu_open,
+                              : Icons.menu_open_rounded,
 
-                          size: 15,
+                          size: 14,
 
                           color:
                               Colors.white,
@@ -308,25 +328,28 @@ class _AdminSidebarState
               height: 4,
             ),
 
-            // =================================================
+            // =============================================
             // MENU
-            // =================================================
+            // =============================================
 
             Expanded(
 
               child:
                   ListView(
 
+                physics:
+                    const BouncingScrollPhysics(),
+
                 padding:
                     const EdgeInsets.symmetric(
-                  horizontal: 8,
+                  horizontal: 7,
                 ),
 
                 children: [
 
                   sidebarItem(
                     icon:
-                        Icons.dashboard,
+                        Icons.dashboard_rounded,
                     title:
                         'Dashboard',
                     index: 0,
@@ -334,7 +357,7 @@ class _AdminSidebarState
 
                   sidebarItem(
                     icon:
-                        Icons.inventory_2,
+                        Icons.inventory_2_rounded,
                     title:
                         'Products',
                     index: 1,
@@ -342,7 +365,7 @@ class _AdminSidebarState
 
                   sidebarItem(
                     icon:
-                        Icons.shopping_bag,
+                        Icons.shopping_bag_rounded,
                     title:
                         'Orders',
                     index: 2,
@@ -350,7 +373,7 @@ class _AdminSidebarState
 
                   sidebarItem(
                     icon:
-                        Icons.bar_chart,
+                        Icons.bar_chart_rounded,
                     title:
                         'Reports',
                     index: 3,
@@ -358,7 +381,7 @@ class _AdminSidebarState
 
                   sidebarItem(
                     icon:
-                        Icons.people,
+                        Icons.people_alt_rounded,
                     title:
                         'Users',
                     index: 4,
@@ -366,7 +389,7 @@ class _AdminSidebarState
 
                   sidebarItem(
                     icon:
-                        Icons.notifications,
+                        Icons.notifications_rounded,
                     title:
                         'Notifications',
                     index: 5,
@@ -374,7 +397,7 @@ class _AdminSidebarState
 
                   sidebarItem(
                     icon:
-                        Icons.person,
+                        Icons.person_rounded,
                     title:
                         'Profile',
                     index: 6,
@@ -383,15 +406,18 @@ class _AdminSidebarState
               ),
             ),
 
-            // =================================================
-            // FOOTER PROFILE
-            // =================================================
+            // =============================================
+            // PROFILE
+            // =============================================
 
             Padding(
 
               padding:
-                  const EdgeInsets.all(
-                10,
+                  const EdgeInsets.fromLTRB(
+                8,
+                4,
+                8,
+                8,
               ),
 
               child: Column(
@@ -401,7 +427,7 @@ class _AdminSidebarState
 
                     borderRadius:
                         BorderRadius.circular(
-                      14,
+                      12,
                     ),
 
                     onTap: () {
@@ -414,8 +440,11 @@ class _AdminSidebarState
                     child: Container(
 
                       padding:
-                          const EdgeInsets.all(
-                        10,
+                          const EdgeInsets.symmetric(
+
+                        horizontal: 8,
+
+                        vertical: 8,
                       ),
 
                       decoration:
@@ -429,7 +458,7 @@ class _AdminSidebarState
 
                         borderRadius:
                             BorderRadius.circular(
-                          14,
+                          12,
                         ),
                       ),
 
@@ -438,8 +467,11 @@ class _AdminSidebarState
                           collapsed &&
                                   !isMobile
 
-                              ? buildAvatar(
-                                  photoUrl,
+                              ? Center(
+                                  child:
+                                      buildAvatar(
+                                    photoUrl,
+                                  ),
                                 )
 
                               : Row(
@@ -450,14 +482,19 @@ class _AdminSidebarState
                                     ),
 
                                     const SizedBox(
-                                      width: 8,
+                                      width: 7,
                                     ),
 
                                     Expanded(
                                       child: Column(
+
                                         crossAxisAlignment:
                                             CrossAxisAlignment
                                                 .start,
+
+                                        mainAxisSize:
+                                            MainAxisSize
+                                                .min,
 
                                         children: [
 
@@ -473,6 +510,9 @@ class _AdminSidebarState
                                                       TextOverflow
                                                           .ellipsis,
 
+                                                  maxLines:
+                                                      1,
+
                                                   style:
                                                       const TextStyle(
 
@@ -480,50 +520,20 @@ class _AdminSidebarState
                                                         Colors.white,
 
                                                     fontWeight:
-                                                        FontWeight.bold,
+                                                        FontWeight.w700,
 
-                                                    fontSize: 10.5,
+                                                    fontSize:
+                                                        9.6,
                                                   ),
                                                 ),
                                               ),
 
                                               const SizedBox(
                                                 width:
-                                                    4,
+                                                    3,
                                               ),
 
-                                              Container(
-
-                                                width:
-                                                    14,
-
-                                                height:
-                                                    14,
-
-                                                decoration:
-                                                    const BoxDecoration(
-
-                                                  color:
-                                                      Color(
-                                                    0xff3B82F6,
-                                                  ),
-
-                                                  shape:
-                                                      BoxShape.circle,
-                                                ),
-
-                                                child:
-                                                    const Icon(
-
-                                                  Icons.check,
-
-                                                  color:
-                                                      Colors.white,
-
-                                                  size:
-                                                      10,
-                                                ),
-                                              ),
+                                              premiumBadge(),
                                             ],
                                           ),
 
@@ -536,6 +546,13 @@ class _AdminSidebarState
 
                                             'System Manager',
 
+                                            overflow:
+                                                TextOverflow
+                                                    .ellipsis,
+
+                                            maxLines:
+                                                1,
+
                                             style:
                                                 TextStyle(
 
@@ -543,7 +560,7 @@ class _AdminSidebarState
                                                   Colors.white70,
 
                                               fontSize:
-                                                  8.5,
+                                                  7.3,
                                             ),
                                           ),
                                         ],
@@ -555,7 +572,7 @@ class _AdminSidebarState
                   ),
 
                   const SizedBox(
-                    height: 10,
+                    height: 8,
                   ),
 
                   logoutButton(
@@ -570,9 +587,81 @@ class _AdminSidebarState
     );
   }
 
-  // =====================================================
-  // REALTIME AVATAR
-  // =====================================================
+  // =============================================
+  // PREMIUM BADGE
+  // =============================================
+
+  Widget premiumBadge() {
+
+    return Container(
+
+      width: 14,
+
+      height: 14,
+
+      decoration:
+          BoxDecoration(
+
+        shape:
+            BoxShape.circle,
+
+        gradient:
+            const LinearGradient(
+
+          colors: [
+
+            Color(
+              0xff38BDF8,
+            ),
+
+            Color(
+              0xff2563EB,
+            ),
+          ],
+        ),
+
+        border: Border.all(
+
+          color:
+              Colors.white,
+
+          width: 1,
+        ),
+
+        boxShadow: [
+
+          BoxShadow(
+
+            color:
+                Colors.blue
+                    .withOpacity(
+              0.35,
+            ),
+
+            blurRadius: 5,
+          ),
+        ],
+      ),
+
+      child:
+          const Center(
+
+        child: Icon(
+
+          Icons.check,
+
+          size: 8,
+
+          color:
+              Colors.white,
+        ),
+      ),
+    );
+  }
+
+  // =============================================
+  // AVATAR
+  // =============================================
 
   Widget buildAvatar(
     String base64Photo,
@@ -596,16 +685,16 @@ class _AdminSidebarState
               color:
                   Colors.white
                       .withOpacity(
-                0.15,
+                0.18,
               ),
 
-              width: 1.2,
+              width: 1,
             ),
           ),
 
           child: CircleAvatar(
 
-            radius: 14,
+            radius: 13,
 
             backgroundImage:
                 MemoryImage(
@@ -633,17 +722,17 @@ class _AdminSidebarState
           color:
               Colors.white
                   .withOpacity(
-            0.12,
+            0.15,
           ),
 
-          width: 1.2,
+          width: 1,
         ),
       ),
 
       child:
           const CircleAvatar(
 
-        radius: 14,
+        radius: 13,
 
         backgroundColor:
             Color(
@@ -652,9 +741,9 @@ class _AdminSidebarState
 
         child: Icon(
 
-          Icons.person,
+          Icons.person_rounded,
 
-          size: 14,
+          size: 13,
 
           color:
               Color(
@@ -665,9 +754,9 @@ class _AdminSidebarState
     );
   }
 
-  // =====================================================
-  // ITEM
-  // =====================================================
+  // =============================================
+  // MENU ITEM
+  // =============================================
 
   Widget sidebarItem({
 
@@ -682,21 +771,18 @@ class _AdminSidebarState
         widget.selectedIndex ==
             index;
 
-    final showText =
-        !collapsed;
-
     return Padding(
 
       padding:
           const EdgeInsets.only(
-        bottom: 6,
+        bottom: 5,
       ),
 
       child: InkWell(
 
         borderRadius:
             BorderRadius.circular(
-          14,
+          12,
         ),
 
         onTap: () {
@@ -711,15 +797,21 @@ class _AdminSidebarState
 
           duration:
               const Duration(
-            milliseconds: 250,
+            milliseconds: 220,
           ),
 
+          height:
+              collapsed
+                  ? 42
+                  : 40,
+
           padding:
-              const EdgeInsets.symmetric(
+              EdgeInsets.symmetric(
 
-            horizontal: 11,
-
-            vertical: 11,
+            horizontal:
+                collapsed
+                    ? 0
+                    : 10,
           ),
 
           decoration:
@@ -727,7 +819,7 @@ class _AdminSidebarState
 
             borderRadius:
                 BorderRadius.circular(
-              14,
+              12,
             ),
 
             gradient:
@@ -751,77 +843,93 @@ class _AdminSidebarState
                     : null,
           ),
 
-          child: Row(
-            children: [
+          child:
 
-              Icon(
+              collapsed
 
-                icon,
+                  ? Center(
+                      child: Icon(
 
-                size: 17,
+                        icon,
 
-                color:
-                    Colors.white,
-              ),
+                        size: 16,
 
-              if (showText) ...[
+                        color:
+                            Colors.white,
+                      ),
+                    )
 
-                const SizedBox(
-                  width: 10,
-                ),
+                  : Row(
+                      children: [
 
-                Expanded(
-                  child: Text(
+                        Icon(
 
-                    title,
+                          icon,
 
-                    overflow:
-                        TextOverflow
-                            .ellipsis,
+                          size: 16,
 
-                    style:
-                        const TextStyle(
+                          color:
+                              Colors.white,
+                        ),
 
-                      color:
-                          Colors.white,
+                        const SizedBox(
+                          width: 9,
+                        ),
 
-                      fontWeight:
-                          FontWeight.w600,
+                        Expanded(
+                          child: Text(
 
-                      fontSize: 10.5,
+                            title,
+
+                            overflow:
+                                TextOverflow
+                                    .ellipsis,
+
+                            maxLines: 1,
+
+                            style:
+                                const TextStyle(
+
+                              color:
+                                  Colors.white,
+
+                              fontWeight:
+                                  FontWeight.w600,
+
+                              fontSize:
+                                  10,
+                            ),
+                          ),
+                        ),
+
+                        if (active)
+
+                          Container(
+
+                            width: 4,
+
+                            height: 4,
+
+                            decoration:
+                                const BoxDecoration(
+
+                              color:
+                                  Colors.white,
+
+                              shape:
+                                  BoxShape.circle,
+                            ),
+                          ),
+                      ],
                     ),
-                  ),
-                ),
-
-                if (active)
-
-                  Container(
-
-                    width: 5,
-
-                    height: 5,
-
-                    decoration:
-                        const BoxDecoration(
-
-                      color:
-                          Colors.white,
-
-                      shape:
-                          BoxShape.circle,
-                    ),
-                  ),
-              ],
-            ],
-          ),
         ),
       ),
     );
   }
 
-  // =====================================================
+  // =============================================
   // LOGOUT
-  // =====================================================
+  // =============================================
 
   Widget logoutButton(
     bool isMobile,
@@ -842,12 +950,21 @@ class _AdminSidebarState
         width:
             double.infinity,
 
+        height:
+            collapsed &&
+                    !isMobile
+
+                ? 42
+
+                : 40,
+
         padding:
-            const EdgeInsets.symmetric(
+            EdgeInsets.symmetric(
 
-          horizontal: 12,
-
-          vertical: 11,
+          horizontal:
+              collapsed
+                  ? 0
+                  : 10,
         ),
 
         decoration:
@@ -870,14 +987,16 @@ class _AdminSidebarState
             collapsed &&
                     !isMobile
 
-                ? const Icon(
+                ? const Center(
+                    child: Icon(
 
-                    Icons.logout,
+                      Icons.logout_rounded,
 
-                    size: 15,
+                      size: 15,
 
-                    color:
-                        Colors.red,
+                      color:
+                          Colors.red,
+                    ),
                   )
 
                 : const Row(
@@ -885,7 +1004,7 @@ class _AdminSidebarState
 
                       Icon(
 
-                        Icons.logout,
+                        Icons.logout_rounded,
 
                         size: 15,
 
@@ -897,20 +1016,27 @@ class _AdminSidebarState
                         width: 8,
                       ),
 
-                      Text(
+                      Expanded(
+                        child: Text(
 
-                        'Logout',
+                          'Logout',
 
-                        style:
-                            TextStyle(
+                          overflow:
+                              TextOverflow
+                                  .ellipsis,
 
-                          color:
-                              Colors.red,
+                          style:
+                              TextStyle(
 
-                          fontSize: 10.5,
+                            color:
+                                Colors.red,
 
-                          fontWeight:
-                              FontWeight.bold,
+                            fontSize:
+                                10,
+
+                            fontWeight:
+                                FontWeight.bold,
+                          ),
                         ),
                       ),
                     ],

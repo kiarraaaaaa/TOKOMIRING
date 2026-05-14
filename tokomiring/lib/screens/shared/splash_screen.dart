@@ -1,5 +1,3 @@
-// lib/screens/shared/splash_screen.dart
-
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -44,6 +42,7 @@ class _SplashScreenState
       async {
 
     await Future.delayed(
+
       const Duration(
         seconds: 3,
       ),
@@ -83,7 +82,7 @@ class _SplashScreenState
           MaterialPageRoute(
 
             builder: (_) =>
-                 AdminDashboardScreen(),
+                const AdminDashboardScreen(),
           ),
         );
       }
@@ -131,11 +130,28 @@ class _SplashScreenState
     BuildContext context,
   ) {
 
+    final width =
+        MediaQuery.of(context)
+            .size
+            .width;
+
+    final height =
+        MediaQuery.of(context)
+            .size
+            .height;
+
+    final bool mobile =
+        width < 700;
+
     return Scaffold(
 
       body: Container(
 
-        width: double.infinity,
+        width:
+            double.infinity,
+
+        height:
+            double.infinity,
 
         decoration:
             const BoxDecoration(
@@ -145,9 +161,13 @@ class _SplashScreenState
 
             colors: [
 
-              Color(0xff2563EB),
+              Color(
+                0xff2563EB,
+              ),
 
-              Color(0xff7C3AED),
+              Color(
+                0xff7C3AED,
+              ),
             ],
 
             begin:
@@ -160,153 +180,251 @@ class _SplashScreenState
 
         child: SafeArea(
 
-          child: Column(
+          child:
+              Center(
 
-            mainAxisAlignment:
-                MainAxisAlignment.center,
+            child:
+                SingleChildScrollView(
 
-            children: [
+              physics:
+                  const BouncingScrollPhysics(),
 
-              // =========================================
-              // LOGO
-              // =========================================
+              padding:
+                  const EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: 20,
+              ),
 
-              Hero(
+              child: ConstrainedBox(
 
-                tag:
-                    'app-logo',
+                constraints:
+                    BoxConstraints(
 
-                child: Image.asset(
+                  minHeight:
+                      height * 0.82,
+                ),
 
-                  'assets/images/tokomiring.png',
+                child: Column(
 
-                  height: 220,
+                  mainAxisAlignment:
+                      MainAxisAlignment.center,
+
+                  children: [
+
+                    // =====================================
+                    // LOGO
+                    // =====================================
+
+                    Hero(
+
+                      tag:
+                          'app-logo',
+
+                      child: Image.asset(
+
+                        'assets/images/tokomiring.png',
+
+                        height:
+
+                            mobile
+
+                                ? 120
+
+                                : 180,
+
+                        fit:
+                            BoxFit.contain,
+                      ),
+                    ),
+
+                    SizedBox(
+                      height:
+
+                          mobile
+                              ? 22
+                              : 30,
+                    ),
+
+                    // =====================================
+                    // TITLE
+                    // =====================================
+
+                    Text(
+
+                      'TOKO MIRING',
+
+                      textAlign:
+                          TextAlign.center,
+
+                      style:
+                          TextStyle(
+
+                        color:
+                            Colors.white,
+
+                        fontSize:
+
+                            mobile
+                                ? 26
+                                : 38,
+
+                        fontWeight:
+                            FontWeight.bold,
+
+                        letterSpacing:
+                            1,
+                      ),
+                    ),
+
+                    const SizedBox(
+                      height: 8,
+                    ),
+
+                    // =====================================
+                    // SUBTITLE
+                    // =====================================
+
+                    Padding(
+
+                      padding:
+                          const EdgeInsets.symmetric(
+                        horizontal: 12,
+                      ),
+
+                      child: Text(
+
+                        'Realtime Ecommerce Management',
+
+                        textAlign:
+                            TextAlign.center,
+
+                        style:
+                            TextStyle(
+
+                          color:
+                              Colors.white70,
+
+                          fontSize:
+
+                              mobile
+                                  ? 11
+                                  : 15,
+                        ),
+                      ),
+                    ),
+
+                    SizedBox(
+                      height:
+
+                          mobile
+                              ? 34
+                              : 42,
+                    ),
+
+                    // =====================================
+                    // LOADING
+                    // =====================================
+
+                    SizedBox(
+
+                      width:
+
+                          mobile
+                              ? 30
+                              : 38,
+
+                      height:
+
+                          mobile
+                              ? 30
+                              : 38,
+
+                      child:
+                          const CircularProgressIndicator(
+
+                        color:
+                            Colors.white,
+
+                        strokeWidth:
+                            3,
+                      ),
+                    ),
+
+                    SizedBox(
+                      height:
+
+                          mobile
+                              ? 18
+                              : 24,
+                    ),
+
+                    // =====================================
+                    // TEXT
+                    // =====================================
+
+                    Text(
+
+                      'Loading System...',
+
+                      textAlign:
+                          TextAlign.center,
+
+                      style:
+                          TextStyle(
+
+                        color:
+                            Colors.white,
+
+                        fontSize:
+
+                            mobile
+                                ? 13
+                                : 17,
+
+                        fontWeight:
+                            FontWeight.w600,
+                      ),
+                    ),
+
+                    SizedBox(
+                      height:
+
+                          mobile
+                              ? 40
+                              : 60,
+                    ),
+
+                    // =====================================
+                    // FOOTER
+                    // =====================================
+
+                    Text(
+
+                      'Version 1.0.0',
+
+                      textAlign:
+                          TextAlign.center,
+
+                      style:
+                          TextStyle(
+
+                        color:
+                            Colors.white
+                                .withOpacity(
+                          0.7,
+                        ),
+
+                        fontSize:
+
+                            mobile
+                                ? 10
+                                : 13,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-
-              const SizedBox(
-                height: 35,
-              ),
-
-              // =========================================
-              // TITLE
-              // =========================================
-
-              const Text(
-
-                'TOKO MIRING',
-
-                style: TextStyle(
-
-                  color:
-                      Colors.white,
-
-                  fontSize: 40,
-
-                  fontWeight:
-                      FontWeight.bold,
-
-                  letterSpacing:
-                      1.5,
-                ),
-              ),
-
-              const SizedBox(
-                height: 10,
-              ),
-
-              // =========================================
-              // SUBTITLE
-              // =========================================
-
-              const Text(
-
-                'Realtime Ecommerce Management',
-
-                textAlign:
-                    TextAlign.center,
-
-                style: TextStyle(
-
-                  color:
-                      Colors.white70,
-
-                  fontSize: 16,
-                ),
-              ),
-
-              const SizedBox(
-                height: 50,
-              ),
-
-              // =========================================
-              // LOADING
-              // =========================================
-
-              const SizedBox(
-
-                width: 38,
-
-                height: 38,
-
-                child:
-                    CircularProgressIndicator(
-
-                  color:
-                      Colors.white,
-
-                  strokeWidth: 3,
-                ),
-              ),
-
-              const SizedBox(
-                height: 25,
-              ),
-
-              // =========================================
-              // TEXT
-              // =========================================
-
-              const Text(
-
-                'Loading System...',
-
-                style: TextStyle(
-
-                  color:
-                      Colors.white,
-
-                  fontSize: 18,
-
-                  fontWeight:
-                      FontWeight.w600,
-                ),
-              ),
-
-              const SizedBox(
-                height: 80,
-              ),
-
-              // =========================================
-              // FOOTER
-              // =========================================
-
-              Text(
-
-                'Version 1.0.0',
-
-                style: TextStyle(
-
-                  color:
-                      Colors.white
-                          .withOpacity(
-                    0.7,
-                  ),
-
-                  fontSize: 14,
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       ),

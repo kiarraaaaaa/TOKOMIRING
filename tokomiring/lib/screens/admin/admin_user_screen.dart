@@ -1,13 +1,9 @@
 // =====================================================
-// FIX FINAL - ADMIN USER SCREEN
-// FIX:
-// ✅ FREEZE
-// ✅ OVERFLOW
-// ✅ GRID CRASH
-// ✅ SIDEBAR LAG
-// ✅ BUTTON KEGEDEAN
-// ✅ SCROLL BUG
+// FINAL RESPONSIVE VERSION FIXED OVERFLOW
+// lib/screens/admin/admin_user_screen.dart
 // =====================================================
+
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -15,44 +11,34 @@ import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../models/user_model.dart';
 
-class AdminUserScreen
-    extends StatefulWidget {
-
+class AdminUserScreen extends StatefulWidget {
   const AdminUserScreen({
     super.key,
   });
 
   @override
-  State<AdminUserScreen>
-      createState() =>
-          _AdminUserScreenState();
+  State<AdminUserScreen> createState() =>
+      _AdminUserScreenState();
 }
 
 class _AdminUserScreenState
     extends State<AdminUserScreen> {
-
   String selectedFilter =
       'All Users';
 
   final List<String> filters = [
-
     'All Users',
-
     'Active Users',
-
     'Banned Users',
-
     'Admins',
   ];
 
   @override
   void initState() {
-
     super.initState();
 
     WidgetsBinding.instance
         .addPostFrameCallback((_) {
-
       final provider =
           Provider.of<AuthProvider>(
         context,
@@ -70,7 +56,6 @@ class _AdminUserScreenState
   Future<void> toggleUserStatus(
     UserModel user,
   ) async {
-
     final provider =
         Provider.of<AuthProvider>(
       context,
@@ -95,58 +80,44 @@ class _AdminUserScreenState
   List<UserModel> getFilteredUsers(
     List<UserModel> users,
   ) {
-
     switch (selectedFilter) {
-
       case 'Active Users':
-
         return users.where(
           (
             e,
           ) {
-
             return e.isActive;
           },
         ).toList();
 
       case 'Banned Users':
-
         return users.where(
           (
             e,
           ) {
-
             return !e.isActive;
           },
         ).toList();
 
       case 'Admins':
-
         return users.where(
           (
             e,
           ) {
-
             return e.role ==
                 'admin';
           },
         ).toList();
 
       default:
-
         return users;
     }
   }
-
-  // =====================================================
-  // BUILD
-  // =====================================================
 
   @override
   Widget build(
     BuildContext context,
   ) {
-
     final provider =
         Provider.of<AuthProvider>(
       context,
@@ -167,71 +138,55 @@ class _AdminUserScreenState
 
     int analyticsCount = 4;
 
-    if (width < 700) {
-
-      analyticsCount = 1;
-
-    } else if (width < 1100) {
-
+    if (width < 650) {
       analyticsCount = 2;
     }
 
-    return Container(
+    if (width < 450) {
+      analyticsCount = 1;
+    }
 
+    return Container(
       color:
           const Color(
         0xffF8FAFC,
       ),
-
       child:
           SingleChildScrollView(
-
         physics:
             const BouncingScrollPhysics(),
-
         padding:
             const EdgeInsets.all(
-          24,
+          14,
         ),
-
         child:
             Column(
           crossAxisAlignment:
               CrossAxisAlignment
                   .start,
-
           children: [
-
             Text(
-
               'User Management',
-
               style:
                   TextStyle(
-
                 fontSize:
                     width < 700
-                        ? 28
-                        : 42,
-
+                        ? 22
+                        : 30,
                 fontWeight:
                     FontWeight.bold,
               ),
             ),
 
             const SizedBox(
-              height: 10,
+              height: 3,
             ),
 
             Text(
-
               'Manage active users and admins.',
-
               style:
                   TextStyle(
-
-                fontSize: 15,
-
+                fontSize: 10,
                 color:
                     Colors.grey
                         .shade600,
@@ -239,7 +194,7 @@ class _AdminUserScreenState
             ),
 
             const SizedBox(
-              height: 30,
+              height: 14,
             ),
 
             // =====================================
@@ -247,116 +202,89 @@ class _AdminUserScreenState
             // =====================================
 
             GridView.builder(
-
               shrinkWrap:
                   true,
-
               physics:
                   const NeverScrollableScrollPhysics(),
-
               itemCount: 4,
-
               gridDelegate:
                   SliverGridDelegateWithFixedCrossAxisCount(
-
                 crossAxisCount:
                     analyticsCount,
-
                 crossAxisSpacing:
-                    18,
-
+                    10,
                 mainAxisSpacing:
-                    18,
-
-                mainAxisExtent:
-                    180,
+                    10,
+                childAspectRatio:
+                    width < 500
+                        ? 2.4
+                        : 2.1,
               ),
-
               itemBuilder:
                   (
                     context,
                     index,
                   ) {
-
                 final analytics = [
-
                   {
                     'title':
                         'Total Users',
-
                     'value':
                         users.length,
-
                     'icon':
-                        Icons.people,
-
+                        Icons.people_rounded,
                     'color':
                         Colors.blue,
                   },
-
                   {
                     'title':
                         'Active Users',
-
                     'value':
                         users
                             .where(
                       (
                         e,
                       ) {
-
                         return e.isActive;
                       },
                     ).length,
-
                     'icon':
-                        Icons.check_circle,
-
+                        Icons.check_circle_rounded,
                     'color':
                         Colors.green,
                   },
-
                   {
                     'title':
                         'Banned Users',
-
                     'value':
                         users
                             .where(
                       (
                         e,
                       ) {
-
                         return !e.isActive;
                       },
                     ).length,
-
                     'icon':
-                        Icons.block,
-
+                        Icons.block_rounded,
                     'color':
                         Colors.red,
                   },
-
                   {
                     'title':
                         'Admins',
-
                     'value':
                         users
                             .where(
                       (
                         e,
                       ) {
-
                         return e.role ==
                             'admin';
                       },
                     ).length,
-
                     'icon':
-                        Icons.admin_panel_settings,
-
+                        Icons.admin_panel_settings_rounded,
                     'color':
                         Colors.purple,
                   },
@@ -366,16 +294,12 @@ class _AdminUserScreenState
                     analytics[index];
 
                 return analyticsCard(
-
                   item['title']
                       as String,
-
                   item['value']
                       as int,
-
                   item['icon']
                       as IconData,
-
                   item['color']
                       as Color,
                 );
@@ -383,133 +307,83 @@ class _AdminUserScreenState
             ),
 
             const SizedBox(
-              height: 28,
+              height: 14,
             ),
 
             // =====================================
             // FILTER
             // =====================================
 
-            SizedBox(
-
-              height: 54,
-
-              child:
-                  ListView.builder(
-
-                scrollDirection:
-                    Axis.horizontal,
-
-                itemCount:
-                    filters.length,
-
-                itemBuilder:
-                    (
-                      context,
-                      index,
-                    ) {
-
-                  final filter =
-                      filters[index];
-
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children:
+                  filters.map(
+                (
+                  filter,
+                ) {
                   final active =
                       selectedFilter ==
                           filter;
 
-                  return Padding(
-
-                    padding:
-                        const EdgeInsets.only(
-                      right: 12,
+                  return InkWell(
+                    borderRadius:
+                        BorderRadius.circular(
+                      10,
                     ),
-
+                    onTap: () {
+                      setState(() {
+                        selectedFilter =
+                            filter;
+                      });
+                    },
                     child:
-                        InkWell(
-
-                      borderRadius:
-                          BorderRadius.circular(
-                        14,
+                        AnimatedContainer(
+                      duration:
+                          const Duration(
+                        milliseconds:
+                            220,
                       ),
-
-                      onTap: () {
-
-                        setState(() {
-
-                          selectedFilter =
-                              filter;
-                        });
-                      },
-
-                      child:
-                          AnimatedContainer(
-
-                        duration:
-                            const Duration(
-                          milliseconds:
-                              220,
+                      padding:
+                          const EdgeInsets.symmetric(
+                        horizontal:
+                            12,
+                        vertical:
+                            10,
+                      ),
+                      decoration:
+                          BoxDecoration(
+                        color:
+                            active
+                                ? Colors.blue
+                                : Colors.white,
+                        borderRadius:
+                            BorderRadius.circular(
+                          10,
                         ),
-
-                        padding:
-                            const EdgeInsets.symmetric(
-
-                          horizontal:
-                              20,
-
-                          vertical:
-                              14,
-                        ),
-
-                        decoration:
-                            BoxDecoration(
-
+                      ),
+                      child: Text(
+                        filter,
+                        style:
+                            TextStyle(
                           color:
-
                               active
-
-                                  ? Colors.blue
-
-                                  : Colors.white,
-
-                          borderRadius:
-                              BorderRadius.circular(
-                            14,
-                          ),
-                        ),
-
-                        child:
-                            Center(
-
-                          child: Text(
-
-                            filter,
-
-                            style:
-                                TextStyle(
-
-                              color:
-
-                                  active
-
-                                      ? Colors.white
-
-                                      : Colors.black,
-
-                              fontWeight:
-                                  FontWeight.bold,
-
-                              fontSize: 13,
-                            ),
-                          ),
+                                  ? Colors.white
+                                  : Colors.black,
+                          fontWeight:
+                              FontWeight.w600,
+                          fontSize:
+                              10,
                         ),
                       ),
                     ),
                   );
                 },
-              ),
+              ).toList(),
             ),
 
             const SizedBox(
-              height: 30,
+              height: 14,
             ),
 
             // =====================================
@@ -518,57 +392,46 @@ class _AdminUserScreenState
 
             if (filteredUsers
                 .isEmpty)
-
               Container(
-
                 width:
                     double.infinity,
-
                 padding:
                     const EdgeInsets.all(
-                  40,
+                  22,
                 ),
-
                 decoration:
                     BoxDecoration(
-
                   color:
                       Colors.white,
-
                   borderRadius:
                       BorderRadius.circular(
-                    24,
+                    16,
                   ),
                 ),
-
                 child:
                     const Center(
-
                   child: Text(
                     'No users found',
+                    style:
+                        TextStyle(
+                      fontSize: 11,
+                    ),
                   ),
                 ),
               )
-
             else
-
               ListView.builder(
-
                 shrinkWrap:
                     true,
-
                 physics:
                     const NeverScrollableScrollPhysics(),
-
                 itemCount:
                     filteredUsers.length,
-
                 itemBuilder:
                     (
                       context,
                       index,
                     ) {
-
                   final user =
                       filteredUsers[
                           index];
@@ -580,7 +443,7 @@ class _AdminUserScreenState
               ),
 
             const SizedBox(
-              height: 100,
+              height: 60,
             ),
           ],
         ),
@@ -595,93 +458,50 @@ class _AdminUserScreenState
   Widget userCard(
     UserModel user,
   ) {
-
     final width =
         MediaQuery.of(context)
             .size
             .width;
 
     final mobile =
-        width < 850;
+        width < 900;
 
     return Container(
-
       margin:
           const EdgeInsets.only(
-        bottom: 18,
+        bottom: 10,
       ),
-
       padding:
           const EdgeInsets.all(
-        22,
+        14,
       ),
-
       decoration:
           BoxDecoration(
-
         color:
             Colors.white,
-
         borderRadius:
             BorderRadius.circular(
-          24,
+          16,
         ),
-
-        boxShadow: [
-
-          BoxShadow(
-
-            color:
-                Colors.black
-                    .withOpacity(
-              0.03,
-            ),
-
-            blurRadius: 10,
-
-            offset:
-                const Offset(
-              0,
-              4,
-            ),
-          ),
-        ],
       ),
-
       child:
-
           mobile
-
               ? Column(
                   crossAxisAlignment:
                       CrossAxisAlignment
                           .start,
-
                   children: [
-
                     Row(
+                      crossAxisAlignment:
+                          CrossAxisAlignment
+                              .start,
                       children: [
-
-                        CircleAvatar(
-
-                          radius: 28,
-
-                          backgroundColor:
-                              Colors.blue
-                                  .withOpacity(
-                            0.1,
-                          ),
-
-                          child:
-                              const Icon(
-                            Icons.person,
-                            color:
-                                Colors.blue,
-                          ),
+                        buildAvatar(
+                          user,
                         ),
 
                         const SizedBox(
-                          width: 16,
+                          width: 10,
                         ),
 
                         Expanded(
@@ -690,35 +510,50 @@ class _AdminUserScreenState
                             crossAxisAlignment:
                                 CrossAxisAlignment
                                     .start,
-
                             children: [
+                              Wrap(
+                                crossAxisAlignment:
+                                    WrapCrossAlignment
+                                        .center,
+                                spacing: 4,
+                                runSpacing: 4,
+                                children: [
+                                  Text(
+                                    user.displayName,
+                                    style:
+                                        const TextStyle(
+                                      fontSize:
+                                          12.5,
+                                      fontWeight:
+                                          FontWeight.bold,
+                                    ),
+                                  ),
 
-                              Text(
-
-                                user.name,
-
-                                overflow:
-                                    TextOverflow
-                                        .ellipsis,
-
-                                style:
-                                    const TextStyle(
-
-                                  fontSize:
-                                      18,
-
-                                  fontWeight:
-                                      FontWeight.bold,
-                                ),
+                                  if (user.role ==
+                                      'admin')
+                                    verifiedBadge(),
+                                ],
                               ),
 
                               const SizedBox(
-                                height:
-                                    6,
+                                height: 3,
                               ),
 
                               Text(
                                 user.email,
+                                overflow:
+                                    TextOverflow
+                                        .ellipsis,
+                                maxLines:
+                                    2,
+                                style:
+                                    TextStyle(
+                                  fontSize:
+                                      9.5,
+                                  color:
+                                      Colors.grey
+                                          .shade700,
+                                ),
                               ),
                             ],
                           ),
@@ -727,40 +562,31 @@ class _AdminUserScreenState
                     ),
 
                     const SizedBox(
-                      height: 18,
+                      height: 12,
                     ),
 
                     Wrap(
-                      spacing: 10,
-                      runSpacing: 10,
+                      spacing: 6,
+                      runSpacing: 6,
                       children: [
-
                         chip(
                           user.role
                               .toUpperCase(),
                           user.role ==
                                   'admin'
-
                               ? Colors
                                   .purple
-
                               : Colors
                                   .blue,
                         ),
 
                         chip(
-
                           user.isActive
-
                               ? 'ACTIVE'
-
                               : 'BANNED',
-
                           user.isActive
-
                               ? Colors
                                   .green
-
                               : Colors
                                   .red,
                         ),
@@ -768,210 +594,285 @@ class _AdminUserScreenState
                     ),
 
                     const SizedBox(
-                      height: 20,
+                      height: 12,
                     ),
 
                     SizedBox(
-
                       width:
                           double.infinity,
-
                       height:
-                          44,
-
+                          38,
                       child:
                           ElevatedButton(
-
                         style:
                             ElevatedButton.styleFrom(
-
                           backgroundColor:
-
                               user.isActive
-
                                   ? Colors.red
-
                                   : Colors.green,
+                          shape:
+                              RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.circular(
+                              10,
+                            ),
+                          ),
                         ),
-
-                        onPressed:
-                            () {
-
+                        onPressed: () {
                           toggleUserStatus(
                             user,
                           );
                         },
-
                         child:
-                            Text(
-
-                          user.isActive
-
-                              ? 'Ban User'
-
-                              : 'Activate User',
-
-                          style:
-                              const TextStyle(
-                            color:
-                                Colors.white,
+                            FittedBox(
+                          child: Text(
+                            user.isActive
+                                ? 'Ban User'
+                                : 'Activate User',
+                            style:
+                                const TextStyle(
+                              fontSize:
+                                  10,
+                              color:
+                                  Colors.white,
+                            ),
                           ),
                         ),
                       ),
                     ),
                   ],
                 )
-
               : Row(
+                  crossAxisAlignment:
+                      CrossAxisAlignment
+                          .center,
                   children: [
-
-                    CircleAvatar(
-
-                      radius: 30,
-
-                      backgroundColor:
-                          Colors.blue
-                              .withOpacity(
-                        0.1,
-                      ),
-
-                      child:
-                          const Icon(
-                        Icons.person,
-                        color:
-                            Colors.blue,
-                      ),
+                    buildAvatar(
+                      user,
                     ),
 
                     const SizedBox(
-                      width: 18,
+                      width: 10,
                     ),
 
                     Expanded(
-                      flex: 3,
-
+                      flex: 4,
                       child:
                           Column(
                         crossAxisAlignment:
                             CrossAxisAlignment
                                 .start,
-
                         children: [
+                          Wrap(
+                            crossAxisAlignment:
+                                WrapCrossAlignment
+                                    .center,
+                            spacing: 4,
+                            runSpacing: 4,
+                            children: [
+                              Text(
+                                user.displayName,
+                                style:
+                                    const TextStyle(
+                                  fontSize:
+                                      12.5,
+                                  fontWeight:
+                                      FontWeight.bold,
+                                ),
+                              ),
 
-                          Text(
-
-                            user.name,
-
-                            overflow:
-                                TextOverflow
-                                    .ellipsis,
-
-                            style:
-                                const TextStyle(
-
-                              fontSize: 18,
-
-                              fontWeight:
-                                  FontWeight.bold,
-                            ),
+                              if (user.role ==
+                                  'admin')
+                                verifiedBadge(),
+                            ],
                           ),
 
                           const SizedBox(
-                            height: 6,
+                            height: 2,
                           ),
 
                           Text(
                             user.email,
+                            overflow:
+                                TextOverflow
+                                    .ellipsis,
+                            maxLines:
+                                1,
+                            style:
+                                TextStyle(
+                              fontSize:
+                                  9.5,
+                              color:
+                                  Colors.grey
+                                      .shade700,
+                            ),
                           ),
                         ],
                       ),
                     ),
 
-                    Expanded(
+                    const SizedBox(
+                      width: 10,
+                    ),
+
+                    Flexible(
                       child:
+                          Wrap(
+                        spacing: 6,
+                        runSpacing: 6,
+                        children: [
                           chip(
-                        user.role
-                            .toUpperCase(),
+                            user.role
+                                .toUpperCase(),
+                            user.role ==
+                                    'admin'
+                                ? Colors
+                                    .purple
+                                : Colors
+                                    .blue,
+                          ),
 
-                        user.role ==
-                                'admin'
-
-                            ? Colors
-                                .purple
-
-                            : Colors
-                                .blue,
+                          chip(
+                            user.isActive
+                                ? 'ACTIVE'
+                                : 'BANNED',
+                            user.isActive
+                                ? Colors
+                                    .green
+                                : Colors
+                                    .red,
+                          ),
+                        ],
                       ),
                     ),
 
-                    Expanded(
-                      child:
-                          chip(
-
-                        user.isActive
-
-                            ? 'ACTIVE'
-
-                            : 'BANNED',
-
-                        user.isActive
-
-                            ? Colors
-                                .green
-
-                            : Colors
-                                .red,
-                      ),
+                    const SizedBox(
+                      width: 10,
                     ),
 
                     SizedBox(
-
-                      width: 140,
-
-                      height: 42,
-
+                      width: 95,
+                      height: 36,
                       child:
                           ElevatedButton(
-
                         style:
                             ElevatedButton.styleFrom(
-
                           backgroundColor:
-
                               user.isActive
-
                                   ? Colors.red
-
                                   : Colors.green,
+                          shape:
+                              RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.circular(
+                              10,
+                            ),
+                          ),
                         ),
-
-                        onPressed:
-                            () {
-
+                        onPressed: () {
                           toggleUserStatus(
                             user,
                           );
                         },
-
                         child:
-                            Text(
-
-                          user.isActive
-
-                              ? 'Ban'
-
-                              : 'Activate',
-
-                          style:
-                              const TextStyle(
-                            color:
-                                Colors.white,
+                            FittedBox(
+                          child: Text(
+                            user.isActive
+                                ? 'Ban User'
+                                : 'Activate',
+                            style:
+                                const TextStyle(
+                              fontSize:
+                                  9,
+                              color:
+                                  Colors.white,
+                            ),
                           ),
                         ),
                       ),
                     ),
                   ],
                 ),
+    );
+  }
+
+  // =====================================================
+  // AVATAR
+  // =====================================================
+
+  Widget buildAvatar(
+    UserModel user,
+  ) {
+    try {
+      if (user.safePhotoUrl
+          .isNotEmpty) {
+        return CircleAvatar(
+          radius: 17,
+          backgroundImage:
+              MemoryImage(
+            base64Decode(
+              user.safePhotoUrl,
+            ),
+          ),
+        );
+      }
+    } catch (_) {}
+
+    return CircleAvatar(
+      radius: 17,
+      backgroundColor:
+          Colors.blue
+              .withOpacity(
+        0.1,
+      ),
+      child:
+          const Icon(
+        Icons.person_rounded,
+        size: 15,
+        color:
+            Colors.blue,
+      ),
+    );
+  }
+
+  // =====================================================
+  // VERIFIED BADGE
+  // =====================================================
+
+  Widget verifiedBadge() {
+    return Container(
+      width: 13,
+      height: 13,
+      decoration:
+          BoxDecoration(
+        shape:
+            BoxShape.circle,
+        gradient:
+            const LinearGradient(
+          colors: [
+            Color(
+              0xff38BDF8,
+            ),
+            Color(
+              0xff2563EB,
+            ),
+          ],
+        ),
+        border: Border.all(
+          color:
+              Colors.white,
+          width: 1,
+        ),
+      ),
+      child:
+          const Center(
+        child: Icon(
+          Icons.check_rounded,
+          size: 7,
+          color:
+              Colors.white,
+        ),
+      ),
     );
   }
 
@@ -983,45 +884,36 @@ class _AdminUserScreenState
     String text,
     Color color,
   ) {
-
-    return Container(
-
-      padding:
-          const EdgeInsets.symmetric(
-
-        horizontal: 14,
-
-        vertical: 8,
-      ),
-
-      decoration:
-          BoxDecoration(
-
-        color:
-            color.withOpacity(
-          0.1,
+    return IntrinsicWidth(
+      child: Container(
+        padding:
+            const EdgeInsets.symmetric(
+          horizontal: 8,
+          vertical: 5,
         ),
-
-        borderRadius:
-            BorderRadius.circular(
-          12,
+        decoration:
+            BoxDecoration(
+          color:
+              color.withOpacity(
+            0.1,
+          ),
+          borderRadius:
+              BorderRadius.circular(
+            8,
+          ),
         ),
-      ),
-
-      child:
-          Text(
-
-        text,
-
-        style:
-            TextStyle(
-
-          color: color,
-
-          fontWeight:
-              FontWeight.bold,
-
-          fontSize: 12,
+        child:
+            Text(
+          text,
+          textAlign:
+              TextAlign.center,
+          style:
+              TextStyle(
+            color: color,
+            fontWeight:
+                FontWeight.w700,
+            fontSize: 8.8,
+          ),
         ),
       ),
     );
@@ -1032,104 +924,95 @@ class _AdminUserScreenState
   // =====================================================
 
   Widget analyticsCard(
-
     String title,
-
     int value,
-
     IconData icon,
-
     Color color,
   ) {
-
     return Container(
-
       padding:
           const EdgeInsets.all(
-        20,
+        12,
       ),
-
       decoration:
           BoxDecoration(
-
         color:
             Colors.white,
-
         borderRadius:
             BorderRadius.circular(
-          24,
+          16,
         ),
       ),
-
       child:
-          Column(
-        crossAxisAlignment:
-            CrossAxisAlignment
-                .start,
-
+          Row(
         children: [
-
           Container(
-
-            width: 56,
-
-            height: 56,
-
+            width: 40,
+            height: 40,
             decoration:
                 BoxDecoration(
-
               color:
                   color.withOpacity(
                 0.12,
               ),
-
               borderRadius:
                   BorderRadius.circular(
-                16,
+                10,
               ),
             ),
-
             child: Icon(
               icon,
               color: color,
-              size: 28,
-            ),
-          ),
-
-          const Spacer(),
-
-          Text(
-
-            '$value',
-
-            style:
-                const TextStyle(
-
-              fontSize: 30,
-
-              fontWeight:
-                  FontWeight.bold,
+              size: 18,
             ),
           ),
 
           const SizedBox(
-            height: 6,
+            width: 10,
           ),
 
-          Text(
+          Expanded(
+            child:
+                Column(
+              mainAxisAlignment:
+                  MainAxisAlignment
+                      .center,
+              crossAxisAlignment:
+                  CrossAxisAlignment
+                      .start,
+              children: [
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    '$value',
+                    style:
+                        const TextStyle(
+                      fontSize: 18,
+                      fontWeight:
+                          FontWeight.bold,
+                    ),
+                  ),
+                ),
 
-            title,
+                const SizedBox(
+                  height: 2,
+                ),
 
-            overflow:
-                TextOverflow
-                    .ellipsis,
-
-            style:
-                TextStyle(
-
-              color:
-                  Colors.grey
-                      .shade700,
+                Text(
+                  title,
+                  maxLines: 1,
+                  overflow:
+                      TextOverflow
+                          .ellipsis,
+                  style:
+                      TextStyle(
+                    fontSize: 10,
+                    color:
+                        Colors.grey
+                            .shade700,
+                  ),
+                ),
+              ],
             ),
           ),
         ],
