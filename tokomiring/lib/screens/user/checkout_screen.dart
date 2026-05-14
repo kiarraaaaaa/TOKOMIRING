@@ -13,6 +13,7 @@ import '../../models/order_model.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/cart_provider.dart';
 import '../../providers/order_provider.dart';
+import '../../providers/product_provider.dart';
 
 class CheckoutScreen
     extends StatefulWidget {
@@ -126,6 +127,47 @@ class _CheckoutScreenState
   }
 
   // =====================================================
+  // STOCK VALIDATION
+  // =====================================================
+
+  bool hasInvalidStock(
+    ProductProvider
+        productProvider,
+
+    CartProvider
+        cartProvider,
+  ) {
+
+    for (final item
+        in cartProvider.items) {
+
+      final product =
+          productProvider
+              .getProductById(
+        item.product.id,
+      );
+
+      if (product == null) {
+
+        return true;
+      }
+
+      if (product.stock <= 0) {
+
+        return true;
+      }
+
+      if (item.quantity >
+          product.stock) {
+
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  // =====================================================
   // CREATE ORDER
   // =====================================================
 
@@ -149,6 +191,40 @@ class _CheckoutScreenState
     final orderProvider =
         context.read<
             OrderProvider>();
+
+    final productProvider =
+        context.read<
+            ProductProvider>();
+
+    // ===================================================
+    // VALIDATE STOCK
+    // ===================================================
+
+    if (hasInvalidStock(
+
+      productProvider,
+
+      cartProvider,
+    )) {
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(
+
+        const SnackBar(
+
+          backgroundColor:
+              Colors.red,
+
+          content: Text(
+
+            'Some products are sold out or stock is insufficient',
+          ),
+        ),
+      );
+
+      return;
+    }
 
     // ===================================================
     // SAVE USER DATA REALTIME
@@ -341,6 +417,10 @@ class _CheckoutScreenState
         context.watch<
             AuthProvider>();
 
+    final productProvider =
+        context.watch<
+            ProductProvider>();
+
     final screenWidth =
         MediaQuery.of(context)
             .size
@@ -348,6 +428,14 @@ class _CheckoutScreenState
 
     final isTablet =
         screenWidth >= 700;
+
+    final invalidStock =
+        hasInvalidStock(
+
+      productProvider,
+
+      cartProvider,
+    );
 
     return Scaffold(
 
@@ -428,12 +516,7 @@ class _CheckoutScreenState
 
             children: [
 
-              Padding(
-
-                padding:
-                    const EdgeInsets.only(
-                  bottom: 0,
-                ),
+              Expanded(
 
                 child:
                     SingleChildScrollView(
@@ -453,6 +536,79 @@ class _CheckoutScreenState
                             .start,
 
                     children: [
+
+                      // =====================================
+                      // INVALID STOCK WARNING
+                      // =====================================
+
+                      if (invalidStock)
+
+                        Container(
+
+                          width:
+                              double.infinity,
+
+                          margin:
+                              const EdgeInsets.only(
+                            bottom: 20,
+                          ),
+
+                          padding:
+                              const EdgeInsets.all(
+                            18,
+                          ),
+
+                          decoration:
+                              BoxDecoration(
+
+                            color:
+                                Colors.red
+                                    .withOpacity(
+                              0.08,
+                            ),
+
+                            borderRadius:
+                                BorderRadius.circular(
+                              22,
+                            ),
+                          ),
+
+                          child: const Row(
+
+                            children: [
+
+                              Icon(
+
+                                Icons.warning_amber_rounded,
+
+                                color:
+                                    Colors.red,
+                              ),
+
+                              SizedBox(
+                                width: 12,
+                              ),
+
+                              Expanded(
+
+                                child: Text(
+
+                                  'Some products are sold out or exceed available stock.',
+
+                                  style:
+                                      TextStyle(
+
+                                    color:
+                                        Colors.red,
+
+                                    fontWeight:
+                                        FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
 
                       // =====================================
                       // PROFILE CARD
@@ -861,6 +1017,25 @@ class _CheckoutScreenState
                                 .map(
                               (item) {
 
+                                final product =
+                                    productProvider
+                                        .getProductById(
+                                  item.product.id,
+                                );
+
+                                final soldOut =
+                                    product ==
+                                            null ||
+
+                                        product.stock <=
+                                            0;
+
+                                final exceedStock =
+                                    product !=
+                                            null &&
+                                        item.quantity >
+                                            product.stock;
+
                                 return Padding(
 
                                   padding:
@@ -869,110 +1044,174 @@ class _CheckoutScreenState
                                         18,
                                   ),
 
-                                  child: Row(
+                                  child: Column(
 
                                     children: [
 
-                                      Container(
+                                      if (soldOut ||
+                                          exceedStock)
 
-                                        width: 60,
+                                        Container(
 
-                                        height: 60,
+                                          width:
+                                              double.infinity,
 
-                                        decoration:
-                                            BoxDecoration(
-
-                                          borderRadius:
-                                              BorderRadius.circular(
-                                            18,
+                                          margin:
+                                              const EdgeInsets.only(
+                                            bottom:
+                                                10,
                                           ),
-                                        ),
 
-                                        child:
-                                            ClipRRect(
+                                          padding:
+                                              const EdgeInsets.all(
+                                            12,
+                                          ),
 
-                                          borderRadius:
-                                              BorderRadius.circular(
-                                            18,
+                                          decoration:
+                                              BoxDecoration(
+
+                                            color:
+                                                Colors.red
+                                                    .withOpacity(
+                                              0.08,
+                                            ),
+
+                                            borderRadius:
+                                                BorderRadius.circular(
+                                              16,
+                                            ),
                                           ),
 
                                           child:
-                                              Image.memory(
+                                              Text(
 
-                                            base64Decode(
-                                              item.product.imageBase64,
+                                            soldOut
+
+                                                ? '${item.product.name} is sold out'
+
+                                                : 'Available stock only ${product.stock}',
+
+                                            style:
+                                                const TextStyle(
+
+                                              color:
+                                                  Colors.red,
+
+                                              fontWeight:
+                                                  FontWeight.w600,
                                             ),
-
-                                            fit:
-                                                BoxFit.cover,
                                           ),
                                         ),
-                                      ),
 
-                                      const SizedBox(
-                                        width:
-                                            14,
-                                      ),
+                                      Row(
 
-                                      Expanded(
+                                        children: [
 
-                                        child: Column(
+                                          Container(
 
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment
-                                                  .start,
+                                            width:
+                                                60,
 
-                                          children: [
+                                            height:
+                                                60,
 
-                                            Text(
+                                            decoration:
+                                                BoxDecoration(
 
-                                              item.product.name,
-
-                                              maxLines:
-                                                  2,
-
-                                              overflow:
-                                                  TextOverflow
-                                                      .ellipsis,
-
-                                              style:
-                                                  const TextStyle(
-
-                                                fontWeight:
-                                                    FontWeight.bold,
+                                              borderRadius:
+                                                  BorderRadius.circular(
+                                                18,
                                               ),
                                             ),
 
-                                            const SizedBox(
-                                              height:
-                                                  4,
+                                            child:
+                                                ClipRRect(
+
+                                              borderRadius:
+                                                  BorderRadius.circular(
+                                                18,
+                                              ),
+
+                                              child:
+                                                  Image.memory(
+
+                                                base64Decode(
+                                                  item.product.imageBase64,
+                                                ),
+
+                                                fit:
+                                                    BoxFit.cover,
+                                              ),
+                                            ),
+                                          ),
+
+                                          const SizedBox(
+                                            width:
+                                                14,
+                                          ),
+
+                                          Expanded(
+
+                                            child:
+                                                Column(
+
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment
+                                                      .start,
+
+                                              children: [
+
+                                                Text(
+
+                                                  item.product.name,
+
+                                                  maxLines:
+                                                      2,
+
+                                                  overflow:
+                                                      TextOverflow
+                                                          .ellipsis,
+
+                                                  style:
+                                                      const TextStyle(
+
+                                                    fontWeight:
+                                                        FontWeight.bold,
+                                                  ),
+                                                ),
+
+                                                const SizedBox(
+                                                  height:
+                                                      4,
+                                                ),
+
+                                                Text(
+
+                                                  '${item.quantity} x ${AppFormat.currency(item.product.price)}',
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+
+                                          const SizedBox(
+                                            width:
+                                                12,
+                                          ),
+
+                                          Text(
+
+                                            AppFormat.currency(
+                                              item.subtotal,
                                             ),
 
-                                            Text(
+                                            style:
+                                                const TextStyle(
 
-                                              '${item.quantity} x ${AppFormat.currency(item.product.price)}',
+                                              fontWeight:
+                                                  FontWeight.bold,
                                             ),
-                                          ],
-                                        ),
-                                      ),
-
-                                      const SizedBox(
-                                        width:
-                                            12,
-                                      ),
-
-                                      Text(
-
-                                        AppFormat.currency(
-                                          item.subtotal,
-                                        ),
-
-                                        style:
-                                            const TextStyle(
-
-                                          fontWeight:
-                                              FontWeight.bold,
-                                        ),
+                                          ),
+                                        ],
                                       ),
                                     ],
                                   ),
@@ -1128,7 +1367,12 @@ class _CheckoutScreenState
                                     ElevatedButton.styleFrom(
 
                                   backgroundColor:
-                                      AppColors.primary,
+
+                                      invalidStock
+
+                                          ? Colors.grey
+
+                                          : AppColors.primary,
 
                                   foregroundColor:
                                       Colors.white,
@@ -1147,8 +1391,11 @@ class _CheckoutScreenState
                                 ),
 
                                 onPressed:
+
                                     orderProvider
-                                            .isLoading
+                                            .isLoading ||
+
+                                        invalidStock
 
                                         ? null
 
@@ -1177,12 +1424,16 @@ class _CheckoutScreenState
                                             ),
                                           )
 
-                                        : const Text(
+                                        : Text(
 
-                                            'Create Order',
+                                            invalidStock
+
+                                                ? 'Stock Not Available'
+
+                                                : 'Create Order',
 
                                             style:
-                                                TextStyle(
+                                                const TextStyle(
 
                                               fontSize:
                                                   16,
@@ -1206,10 +1457,6 @@ class _CheckoutScreenState
       ),
     );
   }
-
-  // =====================================================
-  // INPUT
-  // =====================================================
 
   Widget _buildInputField({
 
@@ -1287,10 +1534,6 @@ class _CheckoutScreenState
     );
   }
 
-  // =====================================================
-  // PAYMENT CARD
-  // =====================================================
-
   Widget _buildPaymentCard(
     String title,
     IconData icon,
@@ -1319,7 +1562,8 @@ class _CheckoutScreenState
               250,
         ),
 
-        width: 170,
+        width:
+            170,
 
         padding:
             const EdgeInsets.all(
@@ -1410,10 +1654,6 @@ class _CheckoutScreenState
       ),
     );
   }
-
-  // =====================================================
-  // PRICE ROW
-  // =====================================================
 
   Widget _buildPriceRow({
 

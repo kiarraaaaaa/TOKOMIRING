@@ -1,3 +1,5 @@
+// lib/models/order_model.dart
+
 class OrderItemModel {
 
   final String productId;
@@ -26,6 +28,32 @@ class OrderItemModel {
 
     required this.subtotal,
   });
+
+  // =====================================================
+  // SOLD OUT CHECK
+  // =====================================================
+
+  bool get hasQuantity {
+
+    return quantity > 0;
+  }
+
+  // =====================================================
+  // UNIT PRICE
+  // =====================================================
+
+  double get unitPrice {
+
+    if (quantity <= 0) {
+      return productPrice;
+    }
+
+    return subtotal / quantity;
+  }
+
+  // =====================================================
+  // FROM MAP
+  // =====================================================
 
   factory OrderItemModel.fromMap(
     Map<dynamic, dynamic> map,
@@ -65,6 +93,10 @@ class OrderItemModel {
     );
   }
 
+  // =====================================================
+  // TO MAP
+  // =====================================================
+
   Map<String, dynamic> toMap() {
 
     return {
@@ -88,6 +120,10 @@ class OrderItemModel {
           subtotal,
     };
   }
+
+  // =====================================================
+  // COPY WITH
+  // =====================================================
 
   OrderItemModel copyWith({
 
@@ -203,6 +239,85 @@ class OrderModel {
 
     this.completedAt,
   });
+
+  // =====================================================
+  // STATUS CHECKS
+  // =====================================================
+
+  bool get isPending {
+
+    return status
+            .toLowerCase() ==
+        'waiting admin validation';
+  }
+
+  bool get isProcessing {
+
+    return status
+            .toLowerCase() ==
+        'processing delivery';
+  }
+
+  bool get isCompleted {
+
+    return status
+            .toLowerCase() ==
+        'completed';
+  }
+
+  bool get isRejected {
+
+    return status
+            .toLowerCase() ==
+        'rejected';
+  }
+
+  // =====================================================
+  // STOCK REDUCED
+  // =====================================================
+
+  bool get shouldReduceStock {
+
+    return !isRejected;
+  }
+
+  // =====================================================
+  // TOTAL QUANTITY
+  // =====================================================
+
+  int get totalQuantity {
+
+    int total = 0;
+
+    for (final item
+        in items) {
+
+      total +=
+          item.quantity;
+    }
+
+    return total;
+  }
+
+  // =====================================================
+  // TOTAL PRODUCTS
+  // =====================================================
+
+  int get totalProductTypes {
+
+    return items.length;
+  }
+
+  // =====================================================
+  // HAS PAYMENT
+  // =====================================================
+
+  bool get hasPaymentProof {
+
+    return paymentProof
+        .trim()
+        .isNotEmpty;
+  }
 
   // =====================================================
   // FROM MAP
@@ -550,7 +665,17 @@ class OrderModel {
   @override
   String toString() {
 
-    return 'OrderModel(orderId: $orderId, customer: $customerName, total: $totalPrice)';
+    return '''
+
+OrderModel(
+  orderId: $orderId,
+  customer: $customerName,
+  total: $totalPrice,
+  status: $status,
+  items: ${items.length}
+)
+
+''';
   }
 }
 

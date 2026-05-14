@@ -76,12 +76,8 @@ class DatabaseService {
                 .toIso8601String(),
 
         'isAvailable':
-            true,
+            product.stock > 0,
       });
-
-      // ===============================================
-      // NOTIFICATION
-      // ===============================================
 
       await createNotification(
 
@@ -122,6 +118,9 @@ class DatabaseService {
           .update({
 
         ...product.toMap(),
+
+        'isAvailable':
+            product.stock > 0,
 
         'updatedAt':
             DateTime.now()
@@ -173,11 +172,12 @@ class DatabaseService {
 
     try {
 
-      if (stock < 0) {
+      int safeStock =
+          stock;
 
-        throw Exception(
-          'Stock cannot be negative',
-        );
+      if (safeStock < 0) {
+
+        safeStock = 0;
       }
 
       await _database
@@ -186,7 +186,236 @@ class DatabaseService {
           .update({
 
         'stock':
-            stock,
+            safeStock,
+
+        'isAvailable':
+            safeStock > 0,
+
+        'updatedAt':
+            DateTime.now()
+                .toIso8601String(),
+      });
+
+    } catch (e) {
+
+      throw Exception(
+        e.toString(),
+      );
+    }
+  }
+
+  // =====================================================
+  // REDUCE PRODUCT STOCK
+  // =====================================================
+
+  Future<void>
+      reduceProductStock({
+
+    required String productId,
+
+    required int quantity,
+
+  }) async {
+
+    try {
+
+      final productRef =
+          _database
+              .child(productsPath)
+              .child(productId);
+
+      final snapshot =
+          await productRef.get();
+
+      if (!snapshot.exists ||
+          snapshot.value == null) {
+
+        throw Exception(
+          'Product not found',
+        );
+      }
+
+      final data =
+          Map<dynamic, dynamic>.from(
+        snapshot.value as Map,
+      );
+
+      int currentStock =
+          data['stock'] ?? 0;
+
+      int currentSold =
+          data['sold'] ?? 0;
+
+      if (quantity <= 0) {
+
+        throw Exception(
+          'Invalid quantity',
+        );
+      }
+
+      if (currentStock <
+          quantity) {
+
+        throw Exception(
+          'Insufficient stock',
+        );
+      }
+
+      final newStock =
+          currentStock -
+              quantity;
+
+      final newSold =
+          currentSold +
+              quantity;
+
+      await productRef.update({
+
+        'stock':
+            newStock,
+
+        'sold':
+            newSold,
+
+        'isAvailable':
+            newStock > 0,
+
+        'updatedAt':
+            DateTime.now()
+                .toIso8601String(),
+      });
+
+    } catch (e) {
+
+      throw Exception(
+        e.toString(),
+      );
+    }
+  }
+
+  // =====================================================
+  // RESTORE PRODUCT STOCK
+  // =====================================================
+
+  Future<void>
+      restoreProductStock({
+
+    required String productId,
+
+    required int quantity,
+
+  }) async {
+
+    try {
+
+      final productRef =
+          _database
+              .child(productsPath)
+              .child(productId);
+
+      final snapshot =
+          await productRef.get();
+
+      if (!snapshot.exists ||
+          snapshot.value == null) {
+
+        return;
+      }
+
+      final data =
+          Map<dynamic, dynamic>.from(
+        snapshot.value as Map,
+      );
+
+      int currentStock =
+          data['stock'] ?? 0;
+
+      int currentSold =
+          data['sold'] ?? 0;
+
+      int newSold =
+          currentSold -
+              quantity;
+
+      if (newSold < 0) {
+
+        newSold = 0;
+      }
+
+      final newStock =
+          currentStock +
+              quantity;
+
+      await productRef.update({
+
+        'stock':
+            newStock,
+
+        'sold':
+            newSold,
+
+        'isAvailable':
+            true,
+
+        'updatedAt':
+            DateTime.now()
+                .toIso8601String(),
+      });
+
+    } catch (e) {
+
+      throw Exception(
+        e.toString(),
+      );
+    }
+  }
+
+  // =====================================================
+  // UPDATE PRODUCT STOCK + SOLD
+  // =====================================================
+
+  Future<void>
+      updateProductStockAndSold({
+
+    required String productId,
+
+    required int stock,
+
+    required int sold,
+
+  }) async {
+
+    try {
+
+      int safeStock =
+          stock;
+
+      int safeSold =
+          sold;
+
+      if (safeStock < 0) {
+
+        safeStock = 0;
+      }
+
+      if (safeSold < 0) {
+
+        safeSold = 0;
+      }
+
+      await _database
+          .child(productsPath)
+          .child(productId)
+          .update({
+
+        'stock':
+            safeStock,
+
+        'sold':
+            safeSold,
+
+        'isAvailable':
+            safeStock > 0,
 
         'updatedAt':
             DateTime.now()
@@ -243,10 +472,9 @@ class DatabaseService {
             key,
           );
 
-          if (product.stock > 0) {
-
-            products.add(product);
-          }
+          products.add(
+            product,
+          );
 
         } catch (_) {}
       });
@@ -284,14 +512,12 @@ class DatabaseService {
             return product.name
                     .toLowerCase()
                     .contains(
-
                       query.toLowerCase(),
                     ) ||
 
                 product.category
                     .toLowerCase()
                     .contains(
-
                       query.toLowerCase(),
                     );
           },
@@ -326,6 +552,68 @@ class DatabaseService {
   }
 
   // =====================================================
+  // GET ORDERS
+  // =====================================================
+
+  Stream<List<OrderModel>>
+      getOrders() {
+
+    return _database
+        .child(ordersPath)
+        .onValue
+        .map((event) {
+
+      final data =
+          event.snapshot.value;
+
+      if (data == null) {
+
+        return [];
+      }
+
+      final map =
+          Map<dynamic, dynamic>.from(
+        data as Map,
+      );
+
+      final List<OrderModel>
+          orders = [];
+
+      map.forEach((key, value) {
+
+        try {
+
+          final order =
+              OrderModel.fromMap(
+
+            Map<dynamic, dynamic>.from(
+              value,
+            ),
+
+            key,
+          );
+
+          orders.add(
+            order,
+          );
+
+        } catch (_) {}
+      });
+
+      orders.sort(
+
+        (a, b) =>
+
+            b.createdAt.compareTo(
+          a.createdAt,
+        ),
+      );
+
+      return orders;
+    });
+  }
+
+  // =====================================================
   // CART SECTION
   // =====================================================
 
@@ -340,6 +628,13 @@ class DatabaseService {
   }) async {
 
     try {
+
+      if (product.stock <= 0) {
+
+        throw Exception(
+          'Product sold out',
+        );
+      }
 
       final cartRef =
           _database
@@ -366,6 +661,14 @@ class DatabaseService {
 
       final updatedQty =
           currentQty + quantity;
+
+      if (updatedQty >
+          product.stock) {
+
+        throw Exception(
+          'Stock not enough',
+        );
+      }
 
       await cartRef.set({
 
@@ -499,6 +802,17 @@ class DatabaseService {
 
       final price =
           data['price'] ?? 0;
+
+      final stock =
+          data['stock'] ?? 0;
+
+      if (quantity >
+          stock) {
+
+        throw Exception(
+          'Stock not enough',
+        );
+      }
 
       await cartRef.update({
 
@@ -638,40 +952,6 @@ class DatabaseService {
       final now =
           DateTime.now();
 
-      final newOrder =
-          order.copyWith(
-
-        orderId:
-            orderId,
-
-        createdAt:
-            now,
-
-        updatedAt:
-            now,
-
-        status:
-            'Pending',
-
-        isValidated:
-            false,
-      );
-
-      // ===============================================
-      // SAVE ORDER
-      // ===============================================
-
-      await _database
-          .child(ordersPath)
-          .child(orderId)
-          .set(
-            newOrder.toMap(),
-          );
-
-      // ===============================================
-      // UPDATE STOCK
-      // ===============================================
-
       for (final item
           in order.items) {
 
@@ -686,49 +966,70 @@ class DatabaseService {
         if (!snapshot.exists ||
             snapshot.value == null) {
 
-          continue;
+          throw Exception(
+            '${item.productName} not found',
+          );
         }
 
-        final productData =
+        final data =
             Map<dynamic, dynamic>.from(
           snapshot.value as Map,
         );
 
-        final currentStock =
-            productData['stock'] ?? 0;
+        final stock =
+            data['stock'] ?? 0;
 
-        int updatedStock =
-            currentStock -
-                item.quantity;
+        if (stock <
+            item.quantity) {
 
-        if (updatedStock < 0) {
-
-          updatedStock = 0;
+          throw Exception(
+            '${item.productName} stock not enough',
+          );
         }
-
-        await _database
-            .child(productsPath)
-            .child(
-              item.productId,
-            )
-            .update({
-
-          'stock':
-              updatedStock,
-        });
       }
 
-      // ===============================================
-      // CLEAR CART
-      // ===============================================
+      final newOrder =
+          order.copyWith(
+
+        orderId:
+            orderId,
+
+        createdAt:
+            now,
+
+        updatedAt:
+            now,
+
+        status:
+            'Waiting Admin Validation',
+
+        isValidated:
+            false,
+      );
+
+      await _database
+          .child(ordersPath)
+          .child(orderId)
+          .set(
+            newOrder.toMap(),
+          );
+
+      for (final item
+          in order.items) {
+
+        await reduceProductStock(
+
+          productId:
+              item.productId,
+
+          quantity:
+              item.quantity,
+        );
+      }
 
       await clearCart(
         order.userId,
       );
-
-      // ===============================================
-      // ADMIN NOTIFICATION
-      // ===============================================
 
       await createNotification(
 
@@ -744,10 +1045,6 @@ class DatabaseService {
         targetRole:
             'admin',
       );
-
-      // ===============================================
-      // USER NOTIFICATION
-      // ===============================================
 
       await createNotification(
 
@@ -775,88 +1072,6 @@ class DatabaseService {
   }
 
   // =====================================================
-  // GET ORDERS
-  // =====================================================
-
-  Stream<List<OrderModel>>
-      getOrders() {
-
-    return _database
-        .child(ordersPath)
-        .onValue
-        .map((event) {
-
-      final data =
-          event.snapshot.value;
-
-      if (data == null) {
-
-        return [];
-      }
-
-      final map =
-          Map<dynamic, dynamic>.from(
-        data as Map,
-      );
-
-      final List<OrderModel>
-          orders = [];
-
-      map.forEach((key, value) {
-
-        try {
-
-          orders.add(
-
-            OrderModel.fromMap(
-
-              Map<dynamic, dynamic>.from(
-                value,
-              ),
-
-              key,
-            ),
-          );
-
-        } catch (_) {}
-      });
-
-      orders.sort(
-
-        (a, b) =>
-
-            b.createdAt.compareTo(
-          a.createdAt,
-        ),
-      );
-
-      return orders;
-    });
-  }
-
-  // =====================================================
-  // USER ORDERS
-  // =====================================================
-
-  Stream<List<OrderModel>>
-      getUserOrders(
-    String userId,
-  ) {
-
-    return getOrders().map(
-
-      (orders) => orders
-          .where(
-
-            (order) =>
-                order.userId ==
-                userId,
-          )
-          .toList(),
-    );
-  }
-
-  // =====================================================
   // UPDATE ORDER STATUS
   // =====================================================
 
@@ -871,41 +1086,25 @@ class DatabaseService {
 
     try {
 
-      final orderSnapshot =
-          await _database
-              .child(ordersPath)
-              .child(orderId)
-              .get();
-
-      if (!orderSnapshot.exists ||
-          orderSnapshot.value ==
-              null) {
-
-        throw Exception(
-          'Order not found',
-        );
-      }
-
-      final orderData =
-          Map<dynamic, dynamic>.from(
-        orderSnapshot.value as Map,
-      );
-
-      final customerName =
-          orderData['customerName']
-                  ?.toString() ??
-              'Customer';
-
       final now =
           DateTime.now();
 
-      final updates = {
+      final Map<String, dynamic>
+          updates = {
 
         'status':
             status,
 
         'updatedAt':
             now.toIso8601String(),
+
+        'isValidated':
+
+            status ==
+                    'Processing Delivery' ||
+
+                status ==
+                    'Completed',
       };
 
       if (status
@@ -923,20 +1122,16 @@ class DatabaseService {
             updates,
           );
 
-      // ===============================================
-      // USER NOTIFICATION
-      // ===============================================
-
       await createNotification(
 
         title:
-            'Order Status Updated',
+            'Order Updated',
 
         message:
-            '$customerName order changed to $status',
+            'Order status changed to $status',
 
         type:
-            'status',
+            'order',
 
         targetRole:
             'user',
@@ -948,277 +1143,5 @@ class DatabaseService {
         e.toString(),
       );
     }
-  }
-
-  // =====================================================
-  // VALIDATE ORDER
-  // =====================================================
-
-  Future<void> validateOrder(
-    String orderId,
-  ) async {
-
-    try {
-
-      final orderSnapshot =
-          await _database
-              .child(ordersPath)
-              .child(orderId)
-              .get();
-
-      if (!orderSnapshot.exists ||
-          orderSnapshot.value ==
-              null) {
-
-        throw Exception(
-          'Order not found',
-        );
-      }
-
-      final orderData =
-          Map<dynamic, dynamic>.from(
-        orderSnapshot.value as Map,
-      );
-
-      final customerName =
-          orderData['customerName']
-                  ?.toString() ??
-              'Customer';
-
-      final now =
-          DateTime.now();
-
-      await _database
-          .child(ordersPath)
-          .child(orderId)
-          .update({
-
-        'isValidated':
-            true,
-
-        'status':
-            'Validated',
-
-        'updatedAt':
-            now.toIso8601String(),
-      });
-
-      // ===============================================
-      // USER NOTIFICATION
-      // ===============================================
-
-      await createNotification(
-
-        title:
-            'Order Validated',
-
-        message:
-            '$customerName order validated successfully',
-
-        type:
-            'validation',
-
-        targetRole:
-            'user',
-      );
-
-    } catch (e) {
-
-      throw Exception(
-        e.toString(),
-      );
-    }
-  }
-
-  // =====================================================
-  // NOTIFICATIONS
-  // =====================================================
-
-  Stream<List<Map<dynamic, dynamic>>>
-      getNotifications() {
-
-    return _database
-        .child(notificationsPath)
-        .onValue
-        .map((event) {
-
-      final data =
-          event.snapshot.value;
-
-      if (data == null) {
-
-        return [];
-      }
-
-      final map =
-          Map<dynamic, dynamic>.from(
-        data as Map,
-      );
-
-      final List<Map<dynamic, dynamic>>
-          notifications = [];
-
-      map.forEach((key, value) {
-
-        try {
-
-          notifications.add(
-
-            Map<dynamic, dynamic>.from(
-              value,
-            ),
-          );
-
-        } catch (_) {}
-      });
-
-      notifications.sort(
-
-        (a, b) {
-
-          final aDate =
-              DateTime.tryParse(
-                    a['createdAt']
-                        .toString(),
-                  ) ??
-                  DateTime.now();
-
-          final bDate =
-              DateTime.tryParse(
-                    b['createdAt']
-                        .toString(),
-                  ) ??
-                  DateTime.now();
-
-          return bDate.compareTo(
-            aDate,
-          );
-        },
-      );
-
-      return notifications;
-    });
-  }
-
-  // =====================================================
-  // DASHBOARD
-  // =====================================================
-
-  Stream<int>
-      getTotalProducts() {
-
-    return getProducts().map(
-      (products) =>
-          products.length,
-    );
-  }
-
-  Stream<int>
-      getLowStockProducts() {
-
-    return getProducts().map(
-
-      (products) => products
-          .where(
-
-            (product) =>
-                product.stock <= 5,
-          )
-          .length,
-    );
-  }
-
-  Stream<double>
-      getTotalRevenue() {
-
-    return getOrders().map(
-
-      (orders) {
-
-        double total = 0;
-
-        for (final order
-            in orders) {
-
-          if (order.status
-                  .toLowerCase() ==
-              'completed') {
-
-            total +=
-                order.totalPrice;
-          }
-        }
-
-        return total;
-      },
-    );
-  }
-
-  Stream<int>
-      getTotalOrders() {
-
-    return getOrders().map(
-      (orders) =>
-          orders.length,
-    );
-  }
-
-  // =====================================================
-  // USER ANALYTICS
-  // =====================================================
-
-  Stream<int>
-      getUserPendingOrders(
-    String userId,
-  ) {
-
-    return getUserOrders(
-      userId,
-    ).map(
-
-      (orders) => orders
-          .where(
-
-            (order) =>
-
-                order.status
-                    .toLowerCase() ==
-
-                'pending',
-          )
-          .length,
-    );
-  }
-
-  Stream<int>
-      getUserValidatedOrders(
-    String userId,
-  ) {
-
-    return getUserOrders(
-      userId,
-    ).map(
-
-      (orders) => orders
-          .where(
-
-            (order) =>
-                order.isValidated,
-          )
-          .length,
-    );
-  }
-
-  Stream<int>
-      getUserTotalOrders(
-    String userId,
-  ) {
-
-    return getUserOrders(
-      userId,
-    ).map(
-      (orders) =>
-          orders.length,
-    );
   }
 }

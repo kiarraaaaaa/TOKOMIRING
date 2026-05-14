@@ -41,6 +41,8 @@ class _AdminOrderScreenState
     'Package On Delivery',
 
     'Completed',
+
+    'Rejected',
   ];
 
   @override
@@ -248,7 +250,7 @@ class _AdminOrderScreenState
                 );
 
                 await orderProvider
-                    .initializeOrders();
+                    .refreshOrders();
 
                 if (!mounted) {
                   return;
@@ -423,7 +425,7 @@ class _AdminOrderScreenState
                 physics:
                     const NeverScrollableScrollPhysics(),
 
-                itemCount: 4,
+                itemCount: 5,
 
                 gridDelegate:
                     SliverGridDelegateWithFixedCrossAxisCount(
@@ -544,6 +546,29 @@ class _AdminOrderScreenState
 
                       'color':
                           Colors.green,
+                    },
+
+                    {
+                      'title':
+                          'Rejected',
+
+                      'value':
+                          allOrders
+                              .where(
+                        (
+                          e,
+                        ) {
+
+                          return e.status ==
+                              'Rejected';
+                        },
+                      ).length,
+
+                      'icon':
+                          Icons.cancel,
+
+                      'color':
+                          Colors.red,
                     },
                   ];
 
@@ -1167,13 +1192,33 @@ class _AdminOrderScreenState
     );
   }
 
-  // =====================================================
-  // STATUS CHIP
-  // =====================================================
-
   Widget statusChip(
     String status,
   ) {
+
+    Color color =
+        Colors.blue;
+
+    if (status ==
+        'Completed') {
+
+      color =
+          Colors.green;
+    }
+
+    else if (status ==
+        'Rejected') {
+
+      color =
+          Colors.red;
+    }
+
+    else if (status ==
+        'Package On Delivery') {
+
+      color =
+          Colors.purple;
+    }
 
     return Container(
 
@@ -1189,8 +1234,7 @@ class _AdminOrderScreenState
           BoxDecoration(
 
         color:
-            Colors.blue
-                .withOpacity(
+            color.withOpacity(
           0.1,
         ),
 
@@ -1206,12 +1250,12 @@ class _AdminOrderScreenState
         status,
 
         style:
-            const TextStyle(
+            TextStyle(
 
           fontSize: 9,
 
           color:
-              Colors.blue,
+              color,
 
           fontWeight:
               FontWeight.w600,
@@ -1219,10 +1263,6 @@ class _AdminOrderScreenState
       ),
     );
   }
-
-  // =====================================================
-  // PRICE CHIP
-  // =====================================================
 
   Widget priceChip(
     String text,
@@ -1276,10 +1316,6 @@ class _AdminOrderScreenState
       ),
     );
   }
-
-  // =====================================================
-  // ANALYTICS CARD
-  // =====================================================
 
   Widget analyticsCard(
 
