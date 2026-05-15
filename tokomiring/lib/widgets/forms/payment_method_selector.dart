@@ -1,4 +1,7 @@
+// =====================================================
 // lib/widgets/forms/payment_method_selector.dart
+// FINAL COMPACT PREMIUM VERSION
+// =====================================================
 
 import 'package:flutter/material.dart';
 
@@ -11,10 +14,6 @@ class PaymentMethodSelector
 
   final Function(String)
       onChanged;
-
-  // =====================================================
-  // CONSTRUCTOR
-  // =====================================================
 
   const PaymentMethodSelector({
 
@@ -34,17 +33,13 @@ class PaymentMethodSelector
 
       children: [
 
-        // ===============================================
-        // CASH
-        // ===============================================
-
         paymentTile(
 
           title:
               'Cash',
 
           subtitle:
-              'Pay directly when the order arrives',
+              'Pay when order arrives',
 
           icon:
               Icons.payments_rounded,
@@ -57,12 +52,8 @@ class PaymentMethodSelector
         ),
 
         const SizedBox(
-          height: 16,
+          height: 12,
         ),
-
-        // ===============================================
-        // QRIS
-        // ===============================================
 
         paymentTile(
 
@@ -70,7 +61,7 @@ class PaymentMethodSelector
               'QRIS',
 
           subtitle:
-              'Scan QR code for instant payment',
+              'Instant QR payment',
 
           icon:
               Icons.qr_code_rounded,
@@ -115,22 +106,28 @@ class PaymentMethodSelector
         );
       },
 
-      child: AnimatedContainer(
+      child:
+          AnimatedContainer(
 
         duration:
             const Duration(
-          milliseconds: 250,
+          milliseconds:
+              220,
         ),
 
         padding:
-            const EdgeInsets.all(
-          18,
+            const EdgeInsets.symmetric(
+
+          horizontal: 14,
+
+          vertical: 14,
         ),
 
         decoration:
             BoxDecoration(
 
           color:
+
               isSelected
 
                   ? color.withOpacity(
@@ -141,13 +138,14 @@ class PaymentMethodSelector
 
           borderRadius:
               BorderRadius.circular(
-            24,
+            18,
           ),
 
           border:
               Border.all(
 
             color:
+
                 isSelected
 
                     ? color
@@ -157,8 +155,8 @@ class PaymentMethodSelector
 
             width:
                 isSelected
-                    ? 2
-                    : 1.2,
+                    ? 1.6
+                    : 1,
           ),
 
           boxShadow: [
@@ -168,16 +166,16 @@ class PaymentMethodSelector
               color:
                   Colors.black
                       .withOpacity(
-                0.04,
+                0.03,
               ),
 
               blurRadius:
-                  14,
+                  10,
 
               offset:
                   const Offset(
                 0,
-                8,
+                5,
               ),
             ),
           ],
@@ -187,15 +185,15 @@ class PaymentMethodSelector
 
           children: [
 
-            // =========================================
+            // =====================================
             // ICON
-            // =========================================
+            // =====================================
 
             Container(
 
-              width: 56,
+              width: 46,
 
-              height: 56,
+              height: 46,
 
               decoration:
                   BoxDecoration(
@@ -207,7 +205,7 @@ class PaymentMethodSelector
 
                 borderRadius:
                     BorderRadius.circular(
-                  18,
+                  14,
                 ),
               ),
 
@@ -218,17 +216,17 @@ class PaymentMethodSelector
                 color:
                     color,
 
-                size: 30,
+                size: 24,
               ),
             ),
 
             const SizedBox(
-              width: 18,
+              width: 14,
             ),
 
-            // =========================================
+            // =====================================
             // TEXT
-            // =========================================
+            // =====================================
 
             Expanded(
 
@@ -244,10 +242,14 @@ class PaymentMethodSelector
 
                     title,
 
+                    overflow:
+                        TextOverflow
+                            .ellipsis,
+
                     style:
                         const TextStyle(
 
-                      fontSize: 17,
+                      fontSize: 14,
 
                       fontWeight:
                           FontWeight.bold,
@@ -255,21 +257,27 @@ class PaymentMethodSelector
                   ),
 
                   const SizedBox(
-                    height: 6,
+                    height: 3,
                   ),
 
                   Text(
 
                     subtitle,
 
+                    maxLines: 1,
+
+                    overflow:
+                        TextOverflow
+                            .ellipsis,
+
                     style:
                         TextStyle(
+
+                      fontSize: 11,
 
                       color:
                           Colors.grey
                               .shade600,
-
-                      height: 1.4,
                     ),
                   ),
                 ],
@@ -277,23 +285,24 @@ class PaymentMethodSelector
             ),
 
             const SizedBox(
-              width: 12,
+              width: 10,
             ),
 
-            // =========================================
+            // =====================================
             // RADIO
-            // =========================================
+            // =====================================
 
             AnimatedContainer(
 
               duration:
                   const Duration(
-                milliseconds: 220,
+                milliseconds:
+                    220,
               ),
 
-              width: 26,
+              width: 22,
 
-              height: 26,
+              height: 22,
 
               decoration:
                   BoxDecoration(
@@ -302,6 +311,7 @@ class PaymentMethodSelector
                     BoxShape.circle,
 
                 color:
+
                     isSelected
 
                         ? color
@@ -313,6 +323,7 @@ class PaymentMethodSelector
                     Border.all(
 
                   color:
+
                       isSelected
 
                           ? color
@@ -320,11 +331,12 @@ class PaymentMethodSelector
                           : Colors.grey
                               .shade400,
 
-                  width: 2,
+                  width: 1.8,
                 ),
               ),
 
               child:
+
                   isSelected
 
                       ? const Icon(
@@ -334,7 +346,7 @@ class PaymentMethodSelector
                           color:
                               Colors.white,
 
-                          size: 16,
+                          size: 13,
                         )
 
                       : null,

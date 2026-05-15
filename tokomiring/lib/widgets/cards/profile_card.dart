@@ -1,17 +1,25 @@
+// =====================================================
 // lib/widgets/cards/profile_card.dart
+// FINAL FULL REVISED VERSION
+// PREMIUM + COMPACT + UPLOAD PHOTO READY
+// =====================================================
+
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 
 import '../../core/constants/app_colors.dart';
-
 import '../../models/user_model.dart';
 
 class ProfileCard
-    extends StatelessWidget {
+    extends StatefulWidget {
 
   final UserModel user;
 
   final VoidCallback? onTap;
+
+  final VoidCallback?
+      onUploadPhoto;
 
   const ProfileCard({
 
@@ -20,7 +28,20 @@ class ProfileCard
     required this.user,
 
     this.onTap,
+
+    this.onUploadPhoto,
   });
+
+  @override
+  State<ProfileCard>
+      createState() =>
+          _ProfileCardState();
+}
+
+class _ProfileCardState
+    extends State<ProfileCard> {
+
+  bool hovered = false;
 
   // =====================================================
   // ROLE COLOR
@@ -28,7 +49,8 @@ class ProfileCard
 
   Color getRoleColor() {
 
-    switch (user.role) {
+    switch (
+        widget.user.role) {
 
       case 'admin':
         return AppColors.danger;
@@ -47,13 +69,16 @@ class ProfileCard
 
   IconData getRoleIcon() {
 
-    switch (user.role) {
+    switch (
+        widget.user.role) {
 
       case 'admin':
-        return Icons.admin_panel_settings_rounded;
+        return Icons
+            .admin_panel_settings_rounded;
 
       case 'user':
-        return Icons.person_rounded;
+        return Icons
+            .person_rounded;
 
       default:
         return Icons.info_rounded;
@@ -68,425 +93,862 @@ class ProfileCard
     final roleColor =
         getRoleColor();
 
-    return Material(
+    final width =
+        MediaQuery.of(context)
+            .size
+            .width;
 
-      color:
-          Colors.transparent,
+    final isMobile =
+        width < 700;
 
-      child: InkWell(
+    return MouseRegion(
 
-        borderRadius:
-            BorderRadius.circular(
-          18,
+      onEnter: (_) {
+
+        setState(() {
+
+          hovered = true;
+        });
+      },
+
+      onExit: (_) {
+
+        setState(() {
+
+          hovered = false;
+        });
+      },
+
+      child:
+          AnimatedContainer(
+
+        duration:
+            const Duration(
+          milliseconds: 220,
         ),
 
-        onTap:
-            onTap,
+        transform:
+            Matrix4.identity()
+              ..translate(
+                0.0,
+                hovered ? -3 : 0,
+              ),
 
-        child: Container(
+        child: Material(
 
-          padding:
-              const EdgeInsets.all(
-            16,
-          ),
+          color:
+              Colors.transparent,
 
-          decoration:
-              BoxDecoration(
-
-            color:
-                Colors.white,
+          child: InkWell(
 
             borderRadius:
                 BorderRadius.circular(
-              18,
+              28,
             ),
 
-            boxShadow: [
+            onTap:
+                widget.onTap,
 
-              BoxShadow(
+            child:
+                AnimatedContainer(
 
-                color:
-                    Colors.black
-                        .withOpacity(
-                  0.025,
-                ),
-
-                blurRadius:
-                    10,
-
-                offset:
-                    const Offset(
-                  0,
-                  4,
-                ),
+              duration:
+                  const Duration(
+                milliseconds:
+                    220,
               ),
-            ],
-          ),
 
-          child: Row(
+              padding:
+                  EdgeInsets.all(
 
-            crossAxisAlignment:
-                CrossAxisAlignment
-                    .center,
+                isMobile
+                    ? 16
+                    : 18,
+              ),
 
-            children: [
+              decoration:
+                  BoxDecoration(
 
-              // =====================================
-              // AVATAR
-              // =====================================
+                gradient:
+                    const LinearGradient(
 
-              Container(
+                  begin:
+                      Alignment.topLeft,
 
-                decoration:
-                    BoxDecoration(
+                  end:
+                      Alignment.bottomRight,
 
-                  shape:
-                      BoxShape.circle,
+                  colors: [
 
-                  boxShadow: [
+                    Colors.white,
 
-                    BoxShadow(
-
-                      color:
-                          roleColor
-                              .withOpacity(
-                        0.12,
-                      ),
-
-                      blurRadius:
-                          8,
-
-                      offset:
-                          const Offset(
-                        0,
-                        3,
-                      ),
+                    Color(
+                      0xffF8FAFC,
                     ),
                   ],
                 ),
 
-                child: CircleAvatar(
-
-                  radius: 30,
-
-                  backgroundColor:
-                      Colors.grey
-                          .shade200,
-
-                  backgroundImage:
-                      user.photoUrl
-                              .isEmpty
-
-                          ? null
-
-                          : NetworkImage(
-                              user.photoUrl,
-                            ),
-
-                  child:
-                      user.photoUrl
-                              .isEmpty
-
-                          ? Icon(
-
-                              Icons.person_rounded,
-
-                              size: 28,
-
-                              color:
-                                  Colors.grey
-                                      .shade600,
-                            )
-
-                          : null,
+                borderRadius:
+                    BorderRadius.circular(
+                  28,
                 ),
+
+                border: Border.all(
+
+                  color:
+
+                      hovered
+
+                          ? roleColor
+                              .withOpacity(
+                            0.10,
+                          )
+
+                          : Colors.grey
+                              .shade100,
+                ),
+
+                boxShadow: [
+
+                  BoxShadow(
+
+                    color:
+                        Colors.black
+                            .withOpacity(
+
+                      hovered
+                          ? 0.05
+                          : 0.03,
+                    ),
+
+                    blurRadius:
+
+                        hovered
+                            ? 22
+                            : 16,
+
+                    offset:
+                        Offset(
+                      0,
+                      hovered
+                          ? 12
+                          : 8,
+                    ),
+                  ),
+                ],
               ),
 
-              const SizedBox(
-                width: 14,
-              ),
+              child: Row(
 
-              // =====================================
-              // USER INFO
-              // =====================================
+                crossAxisAlignment:
+                    CrossAxisAlignment
+                        .center,
 
-              Expanded(
+                children: [
 
-                child: Column(
+                  // =====================================
+                  // AVATAR
+                  // =====================================
 
-                  crossAxisAlignment:
-                      CrossAxisAlignment
-                          .start,
+                  Stack(
 
-                  children: [
+                    clipBehavior:
+                        Clip.none,
 
-                    // ===============================
-                    // NAME
-                    // ===============================
+                    children: [
 
-                    Text(
+                      AnimatedContainer(
 
-                      user.name,
-
-                      maxLines: 1,
-
-                      overflow:
-                          TextOverflow
-                              .ellipsis,
-
-                      style:
-                          const TextStyle(
-
-                        fontSize: 16,
-
-                        fontWeight:
-                            FontWeight.bold,
-                      ),
-                    ),
-
-                    const SizedBox(
-                      height: 2,
-                    ),
-
-                    // ===============================
-                    // USERNAME
-                    // ===============================
-
-                    Text(
-
-                      '@${user.username}',
-
-                      maxLines: 1,
-
-                      overflow:
-                          TextOverflow
-                              .ellipsis,
-
-                      style:
-                          TextStyle(
-
-                        color:
-                            Colors.grey
-                                .shade700,
-
-                        fontSize: 11,
-                      ),
-                    ),
-
-                    const SizedBox(
-                      height: 8,
-                    ),
-
-                    // ===============================
-                    // EMAIL
-                    // ===============================
-
-                    Row(
-
-                      children: [
-
-                        Icon(
-
-                          Icons.email_outlined,
-
-                          size: 14,
-
-                          color:
-                              Colors.grey
-                                  .shade600,
+                        duration:
+                            const Duration(
+                          milliseconds:
+                              220,
                         ),
 
-                        const SizedBox(
-                          width: 5,
-                        ),
+                        decoration:
+                            BoxDecoration(
 
-                        Expanded(
+                          shape:
+                              BoxShape.circle,
 
-                          child: Text(
+                          boxShadow: [
 
-                            user.email,
-
-                            maxLines: 1,
-
-                            overflow:
-                                TextOverflow
-                                    .ellipsis,
-
-                            style:
-                                TextStyle(
-
-                              fontSize: 11,
+                            BoxShadow(
 
                               color:
-                                  Colors.grey
-                                      .shade700,
+                                  roleColor
+                                      .withOpacity(
+                                hovered
+                                    ? 0.22
+                                    : 0.14,
+                              ),
+
+                              blurRadius:
+                                  hovered
+                                      ? 20
+                                      : 14,
+
+                              offset:
+                                  const Offset(
+                                0,
+                                8,
+                              ),
                             ),
-                          ),
+                          ],
                         ),
-                      ],
-                    ),
 
-                    const SizedBox(
-                      height: 10,
-                    ),
-
-                    // ===============================
-                    // BADGES
-                    // ===============================
-
-                    Wrap(
-
-                      spacing: 8,
-
-                      runSpacing: 8,
-
-                      children: [
-
-                        Container(
+                        child: Container(
 
                           padding:
-                              const EdgeInsets.symmetric(
-
-                            horizontal: 10,
-
-                            vertical: 6,
+                              const EdgeInsets.all(
+                            2,
                           ),
 
                           decoration:
                               BoxDecoration(
 
-                            color:
+                            shape:
+                                BoxShape.circle,
+
+                            gradient:
+                                LinearGradient(
+
+                              colors: [
+
+                                roleColor,
+
                                 roleColor
                                     .withOpacity(
-                              0.1,
-                            ),
-
-                            borderRadius:
-                                BorderRadius.circular(
-                              10,
-                            ),
-                          ),
-
-                          child: Row(
-
-                            mainAxisSize:
-                                MainAxisSize.min,
-
-                            children: [
-
-                              Icon(
-
-                                getRoleIcon(),
-
-                                size: 13,
-
-                                color:
-                                    roleColor,
-                              ),
-
-                              const SizedBox(
-                                width: 4,
-                              ),
-
-                              Text(
-
-                                user.role
-                                    .toUpperCase(),
-
-                                style:
-                                    TextStyle(
-
-                                  fontSize: 10,
-
-                                  fontWeight:
-                                      FontWeight.bold,
-
-                                  color:
-                                      roleColor,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        if (user.isActive)
-
-                          Container(
-
-                            padding:
-                                const EdgeInsets.symmetric(
-
-                              horizontal: 10,
-
-                              vertical: 6,
-                            ),
-
-                            decoration:
-                                BoxDecoration(
-
-                              color:
-                                  AppColors
-                                      .success
-                                      .withOpacity(
-                                0.1,
-                              ),
-
-                              borderRadius:
-                                  BorderRadius.circular(
-                                10,
-                              ),
-                            ),
-
-                            child: const Row(
-
-                              mainAxisSize:
-                                  MainAxisSize.min,
-
-                              children: [
-
-                                Icon(
-
-                                  Icons
-                                      .check_circle,
-
-                                  size: 13,
-
-                                  color:
-                                      AppColors
-                                          .success,
-                                ),
-
-                                SizedBox(
-                                  width: 4,
-                                ),
-
-                                Text(
-
-                                  'ACTIVE',
-
-                                  style:
-                                      TextStyle(
-
-                                    fontSize:
-                                        10,
-
-                                    fontWeight:
-                                        FontWeight.bold,
-
-                                    color:
-                                        AppColors
-                                            .success,
-                                  ),
+                                  0.6,
                                 ),
                               ],
                             ),
                           ),
+
+                          child:
+                              CircleAvatar(
+
+                            radius:
+                                isMobile
+                                    ? 32
+                                    : 36,
+
+                            backgroundColor:
+                                Colors
+                                    .grey
+                                    .shade200,
+
+                            backgroundImage:
+
+                                widget.user
+                                        .photoUrl
+                                        .isEmpty
+
+                                    ? null
+
+                                    : widget.user
+                                            .photoUrl
+                                            .startsWith(
+                                          'http',
+                                        )
+
+                                        ? NetworkImage(
+                                            widget.user.photoUrl,
+                                          )
+
+                                        : MemoryImage(
+
+                                            base64Decode(
+                                              widget.user.photoUrl,
+                                            ),
+                                          )
+                                              as ImageProvider,
+
+                            child:
+
+                                widget.user
+                                        .photoUrl
+                                        .isEmpty
+
+                                    ? Icon(
+
+                                        Icons
+                                            .person_rounded,
+
+                                        size:
+                                            isMobile
+                                                ? 28
+                                                : 32,
+
+                                        color:
+                                            Colors
+                                                .grey
+                                                .shade600,
+                                      )
+
+                                    : null,
+                          ),
+                        ),
+                      ),
+
+                      // =================================
+                      // CAMERA BUTTON
+                      // =================================
+
+                      Positioned(
+
+                        right: -2,
+
+                        bottom: -2,
+
+                        child:
+                            GestureDetector(
+
+                          onTap:
+                              widget
+                                  .onUploadPhoto,
+
+                          child:
+                              AnimatedContainer(
+
+                            duration:
+                                const Duration(
+                              milliseconds:
+                                  220,
+                            ),
+
+                            width:
+                                hovered
+                                    ? 32
+                                    : 30,
+
+                            height:
+                                hovered
+                                    ? 32
+                                    : 30,
+
+                            decoration:
+                                BoxDecoration(
+
+                              gradient:
+                                  const LinearGradient(
+
+                                colors: [
+
+                                  Color(
+                                    0xff2563EB,
+                                  ),
+
+                                  Color(
+                                    0xff4F46E5,
+                                  ),
+                                ],
+                              ),
+
+                              shape:
+                                  BoxShape.circle,
+
+                              border:
+                                  Border.all(
+
+                                color:
+                                    Colors.white,
+
+                                width: 2,
+                              ),
+
+                              boxShadow: [
+
+                                BoxShadow(
+
+                                  color:
+                                      Colors.blue
+                                          .withOpacity(
+                                    0.24,
+                                  ),
+
+                                  blurRadius:
+                                      12,
+
+                                  offset:
+                                      const Offset(
+                                    0,
+                                    4,
+                                  ),
+                                ),
+                              ],
+                            ),
+
+                            child:
+                                const Icon(
+
+                              Icons
+                                  .camera_alt_rounded,
+
+                              size: 14,
+
+                              color:
+                                  Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      // VERIFIED
+
+                      Positioned(
+
+                        top: -2,
+
+                        right: 0,
+
+                        child:
+                            Container(
+
+                          width: 20,
+
+                          height: 20,
+
+                          decoration:
+                              const BoxDecoration(
+
+                            gradient:
+                                LinearGradient(
+
+                              colors: [
+
+                                Color(
+                                  0xff38BDF8,
+                                ),
+
+                                Color(
+                                  0xff2563EB,
+                                ),
+                              ],
+                            ),
+
+                            shape:
+                                BoxShape.circle,
+                          ),
+
+                          child:
+                              const Icon(
+
+                            Icons.check,
+
+                            size: 11,
+
+                            color:
+                                Colors.white,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  SizedBox(
+                    width:
+                        isMobile
+                            ? 14
+                            : 18,
+                  ),
+
+                  // =====================================
+                  // USER INFO
+                  // =====================================
+
+                  Expanded(
+
+                    child: Column(
+
+                      crossAxisAlignment:
+                          CrossAxisAlignment
+                              .start,
+
+                      children: [
+
+                        Row(
+
+                          children: [
+
+                            Expanded(
+
+                              child: Text(
+
+                                widget.user.name,
+
+                                maxLines: 1,
+
+                                overflow:
+                                    TextOverflow
+                                        .ellipsis,
+
+                                style:
+                                    TextStyle(
+
+                                  fontSize:
+
+                                      isMobile
+                                          ? 16
+                                          : 18,
+
+                                  fontWeight:
+                                      FontWeight
+                                          .bold,
+                                ),
+                              ),
+                            ),
+
+                            Container(
+
+                              padding:
+                                  const EdgeInsets.symmetric(
+
+                                horizontal:
+                                    8,
+
+                                vertical:
+                                    5,
+                              ),
+
+                              decoration:
+                                  BoxDecoration(
+
+                                color:
+                                    AppColors
+                                        .primary
+                                        .withOpacity(
+                                  0.08,
+                                ),
+
+                                borderRadius:
+                                    BorderRadius.circular(
+                                  12,
+                                ),
+                              ),
+
+                              child: Row(
+
+                                mainAxisSize:
+                                    MainAxisSize
+                                        .min,
+
+                                children: const [
+
+                                  Icon(
+
+                                    Icons
+                                        .verified_rounded,
+
+                                    size: 12,
+
+                                    color:
+                                        AppColors
+                                            .primary,
+                                  ),
+
+                                  SizedBox(
+                                    width:
+                                        4,
+                                  ),
+
+                                  Text(
+
+                                    'Premium',
+
+                                    style:
+                                        TextStyle(
+
+                                      fontSize:
+                                          9,
+
+                                      fontWeight:
+                                          FontWeight
+                                              .bold,
+
+                                      color:
+                                          AppColors
+                                              .primary,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(
+                          height: 4,
+                        ),
+
+                        Text(
+
+                          '@${widget.user.username}',
+
+                          maxLines: 1,
+
+                          overflow:
+                              TextOverflow
+                                  .ellipsis,
+
+                          style:
+                              TextStyle(
+
+                            color:
+                                Colors.grey
+                                    .shade700,
+
+                            fontSize: 11,
+                          ),
+                        ),
+
+                        const SizedBox(
+                          height: 10,
+                        ),
+
+                        Row(
+
+                          children: [
+
+                            Container(
+
+                              width: 24,
+
+                              height: 24,
+
+                              decoration:
+                                  BoxDecoration(
+
+                                color:
+                                    Colors.grey
+                                        .shade100,
+
+                                borderRadius:
+                                    BorderRadius.circular(
+                                  8,
+                                ),
+                              ),
+
+                              child: Icon(
+
+                                Icons
+                                    .email_outlined,
+
+                                size: 13,
+
+                                color:
+                                    Colors.grey
+                                        .shade700,
+                              ),
+                            ),
+
+                            const SizedBox(
+                              width: 8,
+                            ),
+
+                            Expanded(
+
+                              child: Text(
+
+                                widget.user.email,
+
+                                maxLines: 1,
+
+                                overflow:
+                                    TextOverflow
+                                        .ellipsis,
+
+                                style:
+                                    TextStyle(
+
+                                  fontSize:
+                                      11,
+
+                                  color:
+                                      Colors.grey
+                                          .shade700,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(
+                          height: 12,
+                        ),
+
+                        Wrap(
+
+                          spacing: 8,
+
+                          runSpacing: 8,
+
+                          children: [
+
+                            Container(
+
+                              padding:
+                                  const EdgeInsets.symmetric(
+
+                                horizontal:
+                                    10,
+
+                                vertical:
+                                    6,
+                              ),
+
+                              decoration:
+                                  BoxDecoration(
+
+                                color:
+                                    roleColor
+                                        .withOpacity(
+                                  0.10,
+                                ),
+
+                                borderRadius:
+                                    BorderRadius.circular(
+                                  12,
+                                ),
+                              ),
+
+                              child: Row(
+
+                                mainAxisSize:
+                                    MainAxisSize
+                                        .min,
+
+                                children: [
+
+                                  Icon(
+
+                                    getRoleIcon(),
+
+                                    size: 13,
+
+                                    color:
+                                        roleColor,
+                                  ),
+
+                                  const SizedBox(
+                                    width:
+                                        5,
+                                  ),
+
+                                  Text(
+
+                                    widget
+                                        .user
+                                        .role
+                                        .toUpperCase(),
+
+                                    style:
+                                        TextStyle(
+
+                                      fontSize:
+                                          10,
+
+                                      fontWeight:
+                                          FontWeight
+                                              .bold,
+
+                                      color:
+                                          roleColor,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                            if (widget
+                                .user
+                                .isActive)
+
+                              Container(
+
+                                padding:
+                                    const EdgeInsets.symmetric(
+
+                                  horizontal:
+                                      10,
+
+                                  vertical:
+                                      6,
+                                ),
+
+                                decoration:
+                                    BoxDecoration(
+
+                                  color:
+                                      AppColors
+                                          .success
+                                          .withOpacity(
+                                    0.10,
+                                  ),
+
+                                  borderRadius:
+                                      BorderRadius.circular(
+                                    12,
+                                  ),
+                                ),
+
+                                child:
+                                    const Row(
+
+                                  mainAxisSize:
+                                      MainAxisSize
+                                          .min,
+
+                                  children: [
+
+                                    Icon(
+
+                                      Icons
+                                          .check_circle,
+
+                                      size:
+                                          13,
+
+                                      color:
+                                          AppColors
+                                              .success,
+                                    ),
+
+                                    SizedBox(
+                                      width:
+                                          4,
+                                    ),
+
+                                    Text(
+
+                                      'ACTIVE',
+
+                                      style:
+                                          TextStyle(
+
+                                        fontSize:
+                                            10,
+
+                                        fontWeight:
+                                            FontWeight
+                                                .bold,
+
+                                        color:
+                                            AppColors
+                                                .success,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                          ],
+                        ),
                       ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),

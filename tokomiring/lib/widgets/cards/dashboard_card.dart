@@ -1,6 +1,6 @@
 // =====================================================
 // lib/widgets/cards/dashboard_card.dart
-// CLEAN MODERN RESPONSIVE VERSION
+// ULTRA COMPACT PREMIUM ANALYTICS CARD
 // =====================================================
 
 import 'package:flutter/material.dart';
@@ -65,53 +65,57 @@ class _DashboardCardState
         width >= 700 &&
             width < 1100;
 
+    // =====================================
+    // RESPONSIVE SIZE
+    // =====================================
+
     final cardPadding =
-
-        mobile
-            ? 12.0
-            : tablet
-                ? 14.0
-                : 16.0;
-
-    final iconBox =
-
-        mobile
-            ? 42.0
-            : tablet
-                ? 48.0
-                : 54.0;
-
-    final iconSize =
-
-        mobile
-            ? 18.0
-            : tablet
-                ? 22.0
-                : 24.0;
-
-    final titleFont =
 
         mobile
             ? 10.0
             : tablet
-                ? 11.0
-                : 12.0;
+                ? 12.0
+                : 14.0;
 
-    final valueFont =
+    final iconBox =
+
+        mobile
+            ? 36.0
+            : tablet
+                ? 40.0
+                : 44.0;
+
+    final iconSize =
 
         mobile
             ? 16.0
             : tablet
-                ? 19.0
-                : 22.0;
+                ? 18.0
+                : 20.0;
 
-    final subtitleFont =
+    final titleFont =
 
         mobile
             ? 9.0
             : tablet
                 ? 10.0
                 : 11.0;
+
+    final valueFont =
+
+        mobile
+            ? 15.0
+            : tablet
+                ? 17.0
+                : 19.0;
+
+    final subtitleFont =
+
+        mobile
+            ? 8.0
+            : tablet
+                ? 9.0
+                : 10.0;
 
     return MouseRegion(
 
@@ -131,7 +135,8 @@ class _DashboardCardState
         });
       },
 
-      child: AnimatedContainer(
+      child:
+          AnimatedContainer(
 
         duration:
             const Duration(
@@ -154,7 +159,7 @@ class _DashboardCardState
 
             borderRadius:
                 BorderRadius.circular(
-              mobile ? 16 : 20,
+              18,
             ),
 
             onTap:
@@ -175,7 +180,23 @@ class _DashboardCardState
 
                 borderRadius:
                     BorderRadius.circular(
-                  mobile ? 16 : 20,
+                  18,
+                ),
+
+                border: Border.all(
+
+                  color:
+
+                      hovered
+
+                          ? widget.color
+                              .withOpacity(
+                            0.10,
+                          )
+
+                          : Colors
+                              .grey
+                              .shade100,
                 ),
 
                 boxShadow: [
@@ -187,20 +208,20 @@ class _DashboardCardState
                             .withOpacity(
                       hovered
                           ? 0.05
-                          : 0.03,
+                          : 0.025,
                     ),
 
                     blurRadius:
                         hovered
                             ? 18
-                            : 12,
+                            : 10,
 
                     offset:
                         Offset(
                       0,
                       hovered
                           ? 10
-                          : 6,
+                          : 5,
                     ),
                   ),
                 ],
@@ -214,7 +235,13 @@ class _DashboardCardState
                   // ICON
                   // =================================
 
-                  Container(
+                  AnimatedContainer(
+
+                    duration:
+                        const Duration(
+                      milliseconds:
+                          220,
+                    ),
 
                     width:
                         iconBox,
@@ -228,26 +255,26 @@ class _DashboardCardState
                       gradient:
                           LinearGradient(
 
+                        begin:
+                            Alignment.topLeft,
+
+                        end:
+                            Alignment.bottomRight,
+
                         colors: [
 
                           widget.color,
 
                           widget.color
                               .withOpacity(
-                            0.80,
+                            0.78,
                           ),
                         ],
-
-                        begin:
-                            Alignment.topLeft,
-
-                        end:
-                            Alignment.bottomRight,
                       ),
 
                       borderRadius:
                           BorderRadius.circular(
-                        mobile ? 12 : 16,
+                        14,
                       ),
 
                       boxShadow: [
@@ -257,7 +284,7 @@ class _DashboardCardState
                           color:
                               widget.color
                                   .withOpacity(
-                            0.18,
+                            0.16,
                           ),
 
                           blurRadius: 10,
@@ -287,22 +314,24 @@ class _DashboardCardState
                     width:
                         mobile
                             ? 10
-                            : 14,
+                            : 12,
                   ),
 
                   // =================================
-                  // INFO
+                  // CONTENT
                   // =================================
 
                   Expanded(
 
                     child: Column(
 
-                      mainAxisAlignment:
-                          MainAxisAlignment.center,
-
                       crossAxisAlignment:
-                          CrossAxisAlignment.start,
+                          CrossAxisAlignment
+                              .start,
+
+                      mainAxisAlignment:
+                          MainAxisAlignment
+                              .center,
 
                       children: [
 
@@ -323,23 +352,23 @@ class _DashboardCardState
                           style:
                               TextStyle(
 
-                            color:
-                                Colors.grey
-                                    .shade600,
-
                             fontSize:
                                 titleFont,
 
                             fontWeight:
                                 FontWeight.w600,
+
+                            color:
+                                Colors.grey
+                                    .shade500,
                           ),
                         ),
 
                         SizedBox(
                           height:
                               mobile
-                                  ? 4
-                                  : 5,
+                                  ? 3
+                                  : 4,
                         ),
 
                         // =============================
@@ -388,8 +417,8 @@ class _DashboardCardState
                           SizedBox(
                             height:
                                 mobile
-                                    ? 3
-                                    : 5,
+                                    ? 2
+                                    : 4,
                           ),
 
                           Text(
@@ -405,12 +434,12 @@ class _DashboardCardState
                             style:
                                 TextStyle(
 
+                              fontSize:
+                                  subtitleFont,
+
                               color:
                                   Colors.grey
                                       .shade500,
-
-                              fontSize:
-                                  subtitleFont,
 
                               fontWeight:
                                   FontWeight.w500,
@@ -418,6 +447,27 @@ class _DashboardCardState
                           ),
                         ],
                       ],
+                    ),
+                  ),
+
+                  // =================================
+                  // DOT
+                  // =================================
+
+                  Container(
+
+                    width: 8,
+
+                    height: 8,
+
+                    decoration:
+                        BoxDecoration(
+
+                      color:
+                          widget.color,
+
+                      shape:
+                          BoxShape.circle,
                     ),
                   ),
                 ],

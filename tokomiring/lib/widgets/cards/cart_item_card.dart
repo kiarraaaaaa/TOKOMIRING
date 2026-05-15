@@ -1,4 +1,7 @@
+// =====================================================
 // lib/widgets/cards/cart_item_card.dart
+// ULTRA COMPACT CLEAN PREMIUM VERSION
+// =====================================================
 
 import 'dart:convert';
 
@@ -33,22 +36,18 @@ class _CartItemCardState
 
   bool hovered = false;
 
-  // =====================================================
-  // BUILD
-  // =====================================================
-
   @override
   Widget build(
     BuildContext context,
   ) {
 
-    final screenWidth =
+    final width =
         MediaQuery.of(context)
             .size
             .width;
 
     final isMobile =
-        screenWidth < 600;
+        width < 700;
 
     return MouseRegion(
 
@@ -69,95 +68,81 @@ class _CartItemCardState
       },
 
       child:
-          AnimatedScale(
+          AnimatedContainer(
 
         duration:
             const Duration(
           milliseconds: 220,
         ),
 
-        scale:
-            hovered
-                ? 1.01
-                : 1,
+        padding:
+            EdgeInsets.all(
+          isMobile
+              ? 12
+              : 14,
+        ),
 
-        child:
-            AnimatedContainer(
+        decoration:
+            BoxDecoration(
 
-          duration:
-              const Duration(
-            milliseconds: 220,
+          color:
+              Colors.white,
+
+          borderRadius:
+              BorderRadius.circular(
+            22,
           ),
 
-          margin:
-              const EdgeInsets.only(
-            bottom: 18,
-          ),
-
-          decoration:
-              BoxDecoration(
+          border: Border.all(
 
             color:
-                Colors.white,
+                hovered
 
-            borderRadius:
-                BorderRadius.circular(
-              28,
-            ),
+                    ? AppColors.primary
+                        .withOpacity(
+                      0.12,
+                    )
 
-            boxShadow: [
+                    : Colors.transparent,
+          ),
 
-              BoxShadow(
+          boxShadow: [
 
-                color:
-                    hovered
+            BoxShadow(
 
-                        ? Colors.black
-                            .withOpacity(
-                          0.08,
-                        )
-
-                        : Colors.black
-                            .withOpacity(
-                          0.04,
-                        ),
-
-                blurRadius:
-                    hovered
-                        ? 24
-                        : 16,
-
-                offset:
-                    Offset(
-                  0,
-                  hovered
-                      ? 12
-                      : 8,
-                ),
+              color:
+                  Colors.black
+                      .withOpacity(
+                hovered
+                    ? 0.06
+                    : 0.03,
               ),
-            ],
-          ),
 
-          child: Padding(
+              blurRadius:
+                  hovered
+                      ? 16
+                      : 10,
 
-            padding:
-                const EdgeInsets.all(
-              16,
+              offset:
+                  const Offset(
+                0,
+                6,
+              ),
             ),
-
-            child:
-
-                isMobile
-
-                    ? _mobileLayout(
-                        context,
-                      )
-
-                    : _desktopLayout(
-                        context,
-                      ),
-          ),
+          ],
         ),
+
+        child:
+
+            isMobile
+
+                ? _mobileLayout(
+                    context,
+                  )
+
+                : _desktopLayout(
+                    context,
+                  ),
       ),
     );
   }
@@ -172,26 +157,15 @@ class _CartItemCardState
 
     return Row(
 
-      crossAxisAlignment:
-          CrossAxisAlignment.start,
-
       children: [
 
-        // ===============================================
-        // IMAGE
-        // ===============================================
-
         buildImage(
-          110,
+          76,
         ),
 
         const SizedBox(
-          width: 18,
+          width: 14,
         ),
-
-        // ===============================================
-        // CONTENT
-        // ===============================================
 
         Expanded(
 
@@ -203,15 +177,12 @@ class _CartItemCardState
 
             children: [
 
-              // =========================================
-              // NAME
-              // =========================================
-
               Text(
 
-                widget.item.product.name,
+                widget.item
+                    .product.name,
 
-                maxLines: 2,
+                maxLines: 1,
 
                 overflow:
                     TextOverflow
@@ -220,22 +191,16 @@ class _CartItemCardState
                 style:
                     const TextStyle(
 
-                  fontSize: 18,
+                  fontSize: 15,
 
                   fontWeight:
                       FontWeight.bold,
-
-                  height: 1.35,
                 ),
               ),
 
               const SizedBox(
-                height: 10,
+                height: 6,
               ),
-
-              // =========================================
-              // PRICE
-              // =========================================
 
               Text(
 
@@ -248,7 +213,7 @@ class _CartItemCardState
                 style:
                     TextStyle(
 
-                  fontSize: 15,
+                  fontSize: 13,
 
                   color:
                       Colors.grey
@@ -257,29 +222,17 @@ class _CartItemCardState
               ),
 
               const SizedBox(
-                height: 14,
+                height: 10,
               ),
 
-              // =========================================
-              // SUBTOTAL
-              // =========================================
-
-              AnimatedContainer(
-
-                duration:
-                    const Duration(
-                  milliseconds:
-                      220,
-                ),
+              Container(
 
                 padding:
                     const EdgeInsets.symmetric(
 
-                  horizontal:
-                      14,
+                  horizontal: 10,
 
-                  vertical:
-                      10,
+                  vertical: 6,
                 ),
 
                 decoration:
@@ -289,156 +242,34 @@ class _CartItemCardState
                       AppColors
                           .success
                           .withOpacity(
-                    0.1,
+                    0.10,
                   ),
 
                   borderRadius:
                       BorderRadius.circular(
-                    14,
+                    10,
                   ),
                 ),
 
-                child: Row(
+                child: Text(
 
-                  mainAxisSize:
-                      MainAxisSize.min,
-
-                  children: [
-
-                    const Icon(
-
-                      Icons
-                          .payments_rounded,
-
-                      size: 18,
-
-                      color:
-                          AppColors
-                              .success,
-                    ),
-
-                    const SizedBox(
-                      width: 8,
-                    ),
-
-                    Text(
-
-                      AppFormat.currency(
-                        widget.item
-                            .subtotal,
-                      ),
-
-                      style:
-                          const TextStyle(
-
-                        color:
-                            AppColors
-                                .success,
-
-                        fontWeight:
-                            FontWeight.bold,
-
-                        fontSize:
-                            14,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(
-                height: 18,
-              ),
-
-              // =========================================
-              // REMOVE
-              // =========================================
-
-              GestureDetector(
-
-                onTap: () {
-
-                  Provider.of<
-                      CartProvider>(
-
-                    context,
-
-                    listen:
-                        false,
-
-                  ).removeFromCart(
+                  AppFormat.currency(
                     widget.item
-                        .product.id,
-                  );
-                },
-
-                child: Container(
-
-                  padding:
-                      const EdgeInsets.symmetric(
-
-                    horizontal:
-                        14,
-
-                    vertical:
-                        10,
+                        .subtotal,
                   ),
 
-                  decoration:
-                      BoxDecoration(
+                  style:
+                      const TextStyle(
 
                     color:
                         AppColors
-                            .danger
-                            .withOpacity(
-                      0.08,
-                    ),
+                            .success,
 
-                    borderRadius:
-                        BorderRadius.circular(
-                      14,
-                    ),
-                  ),
+                    fontWeight:
+                        FontWeight.bold,
 
-                  child: const Row(
-
-                    mainAxisSize:
-                        MainAxisSize.min,
-
-                    children: [
-
-                      Icon(
-
-                        Icons
-                            .delete_outline,
-
-                        color:
-                            AppColors
-                                .danger,
-
-                        size: 18,
-                      ),
-
-                      SizedBox(
-                        width: 8,
-                      ),
-
-                      Text(
-
-                        'Remove',
-
-                        style:
-                            TextStyle(
-
-                          color:
-                              AppColors
-                                  .danger,
-
-                          fontWeight:
-                              FontWeight.bold,
-                        ),
-                      ),
-                    ],
+                    fontSize:
+                        12,
                   ),
                 ),
               ),
@@ -447,14 +278,18 @@ class _CartItemCardState
         ),
 
         const SizedBox(
-          width: 14,
+          width: 12,
         ),
 
-        // ===============================================
-        // QTY
-        // ===============================================
-
         quantityBox(
+          context,
+        ),
+
+        const SizedBox(
+          width: 10,
+        ),
+
+        removeButton(
           context,
         ),
       ],
@@ -471,25 +306,18 @@ class _CartItemCardState
 
     return Column(
 
-      crossAxisAlignment:
-          CrossAxisAlignment.start,
-
       children: [
 
         Row(
 
-          crossAxisAlignment:
-              CrossAxisAlignment
-                  .start,
-
           children: [
 
             buildImage(
-              95,
+              70,
             ),
 
             const SizedBox(
-              width: 16,
+              width: 12,
             ),
 
             Expanded(
@@ -516,17 +344,15 @@ class _CartItemCardState
                     style:
                         const TextStyle(
 
-                      fontSize: 16,
+                      fontSize: 14,
 
                       fontWeight:
                           FontWeight.bold,
-
-                      height: 1.3,
                     ),
                   ),
 
                   const SizedBox(
-                    height: 8,
+                    height: 6,
                   ),
 
                   Text(
@@ -540,6 +366,8 @@ class _CartItemCardState
                     style:
                         TextStyle(
 
+                      fontSize: 12,
+
                       color:
                           Colors.grey
                               .shade700,
@@ -547,25 +375,17 @@ class _CartItemCardState
                   ),
 
                   const SizedBox(
-                    height: 12,
+                    height: 8,
                   ),
 
-                  AnimatedContainer(
-
-                    duration:
-                        const Duration(
-                      milliseconds:
-                          220,
-                    ),
+                  Container(
 
                     padding:
                         const EdgeInsets.symmetric(
 
-                      horizontal:
-                          12,
+                      horizontal: 10,
 
-                      vertical:
-                          8,
+                      vertical: 6,
                     ),
 
                     decoration:
@@ -575,12 +395,12 @@ class _CartItemCardState
                           AppColors
                               .success
                               .withOpacity(
-                        0.1,
+                        0.10,
                       ),
 
                       borderRadius:
                           BorderRadius.circular(
-                        12,
+                        10,
                       ),
                     ),
 
@@ -598,6 +418,9 @@ class _CartItemCardState
                             AppColors
                                 .success,
 
+                        fontSize:
+                            12,
+
                         fontWeight:
                             FontWeight.bold,
                       ),
@@ -610,7 +433,7 @@ class _CartItemCardState
         ),
 
         const SizedBox(
-          height: 18,
+          height: 12,
         ),
 
         Row(
@@ -621,93 +444,11 @@ class _CartItemCardState
 
           children: [
 
-            GestureDetector(
-
-              onTap: () {
-
-                Provider.of<
-                    CartProvider>(
-
-                  context,
-
-                  listen:
-                      false,
-
-                ).removeFromCart(
-                  widget.item
-                      .product.id,
-                );
-              },
-
-              child: Container(
-
-                padding:
-                    const EdgeInsets.symmetric(
-
-                  horizontal:
-                      14,
-
-                  vertical:
-                      10,
-                ),
-
-                decoration:
-                    BoxDecoration(
-
-                  color:
-                      AppColors
-                          .danger
-                          .withOpacity(
-                    0.08,
-                  ),
-
-                  borderRadius:
-                      BorderRadius.circular(
-                    14,
-                  ),
-                ),
-
-                child: const Row(
-
-                  children: [
-
-                    Icon(
-
-                      Icons
-                          .delete_outline,
-
-                      color:
-                          AppColors
-                              .danger,
-
-                      size: 18,
-                    ),
-
-                    SizedBox(
-                      width: 6,
-                    ),
-
-                    Text(
-
-                      'Remove',
-
-                      style:
-                          TextStyle(
-
-                        color:
-                            AppColors
-                                .danger,
-
-                        fontWeight:
-                            FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+            quantityBox(
+              context,
             ),
 
-            quantityBox(
+            removeButton(
               context,
             ),
           ],
@@ -728,7 +469,7 @@ class _CartItemCardState
 
       borderRadius:
           BorderRadius.circular(
-        22,
+        16,
       ),
 
       child:
@@ -746,13 +487,13 @@ class _CartItemCardState
                       Colors.grey
                           .shade200,
 
-                  child: Icon(
+                  child:
+                      Icon(
 
-                    Icons
-                        .image_outlined,
+                    Icons.image_outlined,
 
                     size:
-                        size * 0.35,
+                        size * 0.30,
 
                     color:
                         Colors.grey
@@ -775,47 +516,75 @@ class _CartItemCardState
 
                   fit:
                       BoxFit.cover,
-
-                  filterQuality:
-                      FilterQuality
-                          .high,
-
-                  errorBuilder: (
-
-                    context,
-
-                    error,
-
-                    stackTrace,
-
-                  ) {
-
-                    return Container(
-
-                      width: size,
-
-                      height: size,
-
-                      color:
-                          Colors.grey
-                              .shade200,
-
-                      child:
-                          Icon(
-
-                        Icons
-                            .broken_image_outlined,
-
-                        size:
-                            size * 0.35,
-
-                        color:
-                            Colors.grey
-                                .shade500,
-                      ),
-                    );
-                  },
                 ),
+    );
+  }
+
+  // =====================================================
+  // REMOVE
+  // =====================================================
+
+  Widget removeButton(
+    BuildContext context,
+  ) {
+
+    return InkWell(
+
+      borderRadius:
+          BorderRadius.circular(
+        12,
+      ),
+
+      onTap: () {
+
+        Provider.of<
+            CartProvider>(
+
+          context,
+
+          listen: false,
+
+        ).removeFromCart(
+          widget.item
+              .product.id,
+        );
+      },
+
+      child: Container(
+
+        padding:
+            const EdgeInsets.all(
+          10,
+        ),
+
+        decoration:
+            BoxDecoration(
+
+          color:
+              AppColors
+                  .danger
+                  .withOpacity(
+            0.08,
+          ),
+
+          borderRadius:
+              BorderRadius.circular(
+            12,
+          ),
+        ),
+
+        child:
+            const Icon(
+
+          Icons.delete_outline,
+
+          color:
+              AppColors
+                  .danger,
+
+          size: 18,
+        ),
+      ),
     );
   }
 
@@ -832,9 +601,9 @@ class _CartItemCardState
       padding:
           const EdgeInsets.symmetric(
 
-        horizontal: 10,
+        horizontal: 8,
 
-        vertical: 12,
+        vertical: 8,
       ),
 
       decoration:
@@ -847,145 +616,21 @@ class _CartItemCardState
 
         borderRadius:
             BorderRadius.circular(
-          20,
+          14,
         ),
       ),
 
-      child: Column(
+      child: Row(
 
         children: [
 
-          // ===============================================
-          // ADD
-          // ===============================================
+          qtyButton(
 
-          InkWell(
+            icon:
+                Icons.remove,
 
-            borderRadius:
-                BorderRadius.circular(
-              100,
-            ),
-
-            onTap: () {
-
-              Provider.of<
-                  CartProvider>(
-
-                context,
-
-                listen:
-                    false,
-
-              ).increaseQuantity(
-                widget.item
-                    .product.id,
-              );
-            },
-
-            child:
-                AnimatedContainer(
-
-              duration:
-                  const Duration(
-                milliseconds:
-                    220,
-              ),
-
-              padding:
-                  const EdgeInsets.all(
-                7,
-              ),
-
-              decoration:
-                  const BoxDecoration(
-
-                color:
-                    AppColors
-                        .success,
-
-                shape:
-                    BoxShape.circle,
-              ),
-
-              child:
-                  const Icon(
-
-                Icons.add,
-
-                size: 18,
-
-                color:
-                    Colors.white,
-              ),
-            ),
-          ),
-
-          const SizedBox(
-            height: 14,
-          ),
-
-          // ===============================================
-          // QTY
-          // ===============================================
-
-          AnimatedSwitcher(
-
-            duration:
-                const Duration(
-              milliseconds:
-                  220,
-            ),
-
-            transitionBuilder:
-                (
-                  child,
-                  animation,
-                ) {
-
-              return ScaleTransition(
-
-                scale:
-                    animation,
-
-                child:
-                    child,
-              );
-            },
-
-            child: Text(
-
-              '${widget.item.quantity}',
-
-              key: ValueKey(
-                widget.item
-                    .quantity,
-              ),
-
-              style:
-                  const TextStyle(
-
-                fontSize: 20,
-
-                fontWeight:
-                    FontWeight.bold,
-              ),
-            ),
-          ),
-
-          const SizedBox(
-            height: 14,
-          ),
-
-          // ===============================================
-          // MINUS
-          // ===============================================
-
-          InkWell(
-
-            borderRadius:
-                BorderRadius.circular(
-              100,
-            ),
+            color:
+                AppColors.danger,
 
             onTap: () {
 
@@ -1002,45 +647,109 @@ class _CartItemCardState
                     .product.id,
               );
             },
+          ),
 
-            child:
-                AnimatedContainer(
+          Padding(
 
-              duration:
-                  const Duration(
-                milliseconds:
-                    220,
-              ),
+            padding:
+                const EdgeInsets.symmetric(
+              horizontal: 12,
+            ),
 
-              padding:
-                  const EdgeInsets.all(
-                7,
-              ),
+            child: Text(
 
-              decoration:
-                  const BoxDecoration(
+              '${widget.item.quantity}',
 
-                color:
-                    AppColors
-                        .danger,
+              style:
+                  const TextStyle(
 
-                shape:
-                    BoxShape.circle,
-              ),
+                fontSize: 14,
 
-              child:
-                  const Icon(
-
-                Icons.remove,
-
-                size: 18,
-
-                color:
-                    Colors.white,
+                fontWeight:
+                    FontWeight.bold,
               ),
             ),
           ),
+
+          qtyButton(
+
+            icon:
+                Icons.add,
+
+            color:
+                AppColors.success,
+
+            onTap: () {
+
+              Provider.of<
+                  CartProvider>(
+
+                context,
+
+                listen:
+                    false,
+
+              ).increaseQuantity(
+                widget.item
+                    .product.id,
+              );
+            },
+          ),
         ],
+      ),
+    );
+  }
+
+  // =====================================================
+  // QTY BUTTON
+  // =====================================================
+
+  Widget qtyButton({
+
+    required IconData icon,
+
+    required Color color,
+
+    required VoidCallback onTap,
+  }) {
+
+    return InkWell(
+
+      borderRadius:
+          BorderRadius.circular(
+        100,
+      ),
+
+      onTap: onTap,
+
+      child: Container(
+
+        width: 28,
+
+        height: 28,
+
+        decoration:
+            BoxDecoration(
+
+          color:
+              color.withOpacity(
+            0.12,
+          ),
+
+          shape:
+              BoxShape.circle,
+        ),
+
+        child:
+            Icon(
+
+          icon,
+
+          size: 16,
+
+          color:
+              color,
+        ),
       ),
     );
   }

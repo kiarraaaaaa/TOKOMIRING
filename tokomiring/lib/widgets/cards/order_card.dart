@@ -1,4 +1,8 @@
+// =====================================================
 // lib/widgets/cards/order_card.dart
+// ULTRA COMPACT MODERN TRANSACTION CARD
+// PREMIUM AESTHETIC VERSION
+// =====================================================
 
 import 'package:flutter/material.dart';
 
@@ -56,8 +60,6 @@ class _OrderCardState
         return AppColors.success;
 
       case 'Cancelled':
-        return AppColors.danger;
-
       case 'Rejected':
         return AppColors.danger;
 
@@ -76,7 +78,7 @@ class _OrderCardState
         widget.order.status) {
 
       case 'Waiting Admin Validation':
-        return Icons.access_time_rounded;
+        return Icons.schedule_rounded;
 
       case 'Processing Delivery':
         return Icons.inventory_2_rounded;
@@ -88,10 +90,8 @@ class _OrderCardState
         return Icons.check_circle_rounded;
 
       case 'Cancelled':
-        return Icons.cancel_rounded;
-
       case 'Rejected':
-        return Icons.close_rounded;
+        return Icons.cancel_rounded;
 
       default:
         return Icons.info_rounded;
@@ -154,6 +154,14 @@ class _OrderCardState
     final statusColor =
         getStatusColor();
 
+    final width =
+        MediaQuery.of(context)
+            .size
+            .width;
+
+    final isMobile =
+        width < 700;
+
     return MouseRegion(
 
       onEnter: (_) {
@@ -173,20 +181,21 @@ class _OrderCardState
       },
 
       child:
-          AnimatedScale(
+          AnimatedContainer(
 
         duration:
             const Duration(
           milliseconds: 220,
         ),
 
-        scale:
-            hovered
-                ? 1.01
-                : 1,
+        transform:
+            Matrix4.identity()
+              ..translate(
+                0.0,
+                hovered ? -3 : 0,
+              ),
 
-        child:
-            Material(
+        child: Material(
 
           color:
               Colors.transparent,
@@ -195,7 +204,7 @@ class _OrderCardState
 
             borderRadius:
                 BorderRadius.circular(
-              30,
+              24,
             ),
 
             onTap:
@@ -212,12 +221,14 @@ class _OrderCardState
 
               margin:
                   const EdgeInsets.only(
-                bottom: 20,
+                bottom: 14,
               ),
 
               padding:
-                  const EdgeInsets.all(
-                22,
+                  EdgeInsets.all(
+                isMobile
+                    ? 14
+                    : 16,
               ),
 
               decoration:
@@ -228,7 +239,22 @@ class _OrderCardState
 
                 borderRadius:
                     BorderRadius.circular(
-                  30,
+                  24,
+                ),
+
+                border: Border.all(
+
+                  color:
+
+                      hovered
+
+                          ? statusColor
+                              .withOpacity(
+                            0.08,
+                          )
+
+                          : Colors.grey
+                              .shade100,
                 ),
 
                 boxShadow: [
@@ -236,29 +262,24 @@ class _OrderCardState
                   BoxShadow(
 
                     color:
-                        hovered
-
-                            ? Colors.black
-                                .withOpacity(
-                              0.08,
-                            )
-
-                            : Colors.black
-                                .withOpacity(
-                              0.04,
-                            ),
+                        Colors.black
+                            .withOpacity(
+                      hovered
+                          ? 0.06
+                          : 0.03,
+                    ),
 
                     blurRadius:
                         hovered
-                            ? 24
-                            : 16,
+                            ? 20
+                            : 12,
 
                     offset:
                         Offset(
                       0,
                       hovered
-                          ? 14
-                          : 8,
+                          ? 10
+                          : 6,
                     ),
                   ),
                 ],
@@ -308,7 +329,7 @@ class _OrderCardState
                                   const TextStyle(
 
                                 fontSize:
-                                    20,
+                                    15,
 
                                 fontWeight:
                                     FontWeight.bold,
@@ -316,7 +337,7 @@ class _OrderCardState
                             ),
 
                             const SizedBox(
-                              height: 6,
+                              height: 4,
                             ),
 
                             Text(
@@ -335,7 +356,7 @@ class _OrderCardState
                                         .shade600,
 
                                 fontSize:
-                                    13,
+                                    11,
                               ),
                             ),
                           ],
@@ -343,25 +364,19 @@ class _OrderCardState
                       ),
 
                       const SizedBox(
-                        width: 10,
+                        width: 8,
                       ),
 
-                      AnimatedContainer(
-
-                        duration:
-                            const Duration(
-                          milliseconds:
-                              220,
-                        ),
+                      Container(
 
                         padding:
                             const EdgeInsets.symmetric(
 
                           horizontal:
-                              14,
+                              10,
 
                           vertical:
-                              10,
+                              6,
                         ),
 
                         decoration:
@@ -370,12 +385,12 @@ class _OrderCardState
                           color:
                               statusColor
                                   .withOpacity(
-                            0.1,
+                            0.10,
                           ),
 
                           borderRadius:
                               BorderRadius.circular(
-                            18,
+                            12,
                           ),
                         ),
 
@@ -390,14 +405,14 @@ class _OrderCardState
 
                               getStatusIcon(),
 
-                              size: 18,
+                              size: 13,
 
                               color:
                                   statusColor,
                             ),
 
                             const SizedBox(
-                              width: 8,
+                              width: 5,
                             ),
 
                             Text(
@@ -416,7 +431,7 @@ class _OrderCardState
                                     FontWeight.bold,
 
                                 fontSize:
-                                    12,
+                                    10,
                               ),
                             ),
                           ],
@@ -426,7 +441,7 @@ class _OrderCardState
                   ),
 
                   const SizedBox(
-                    height: 22,
+                    height: 16,
                   ),
 
                   // =========================================
@@ -439,9 +454,9 @@ class _OrderCardState
 
                       Container(
 
-                        width: 52,
+                        width: 42,
 
-                        height: 52,
+                        height: 42,
 
                         decoration:
                             BoxDecoration(
@@ -467,7 +482,7 @@ class _OrderCardState
 
                           borderRadius:
                               BorderRadius.circular(
-                            18,
+                            14,
                           ),
                         ),
 
@@ -480,11 +495,13 @@ class _OrderCardState
                           color:
                               AppColors
                                   .primary,
+
+                          size: 18,
                         ),
                       ),
 
                       const SizedBox(
-                        width: 16,
+                        width: 12,
                       ),
 
                       Expanded(
@@ -515,12 +532,12 @@ class _OrderCardState
                                     FontWeight.bold,
 
                                 fontSize:
-                                    16,
+                                    13,
                               ),
                             ),
 
                             const SizedBox(
-                              height: 4,
+                              height: 2,
                             ),
 
                             Text(
@@ -534,6 +551,9 @@ class _OrderCardState
                                     Colors
                                         .grey
                                         .shade600,
+
+                                fontSize:
+                                    11,
                               ),
                             ),
                           ],
@@ -543,11 +563,11 @@ class _OrderCardState
                   ),
 
                   const SizedBox(
-                    height: 24,
+                    height: 16,
                   ),
 
                   // =========================================
-                  // PAYMENT STATUS
+                  // PAYMENT & VALIDATION
                   // =========================================
 
                   Row(
@@ -560,7 +580,7 @@ class _OrderCardState
 
                           padding:
                               const EdgeInsets.all(
-                            16,
+                            12,
                           ),
 
                           decoration:
@@ -569,12 +589,12 @@ class _OrderCardState
                             color:
                                 paymentColor()
                                     .withOpacity(
-                              0.1,
+                              0.08,
                             ),
 
                             borderRadius:
                                 BorderRadius.circular(
-                              20,
+                              18,
                             ),
                           ),
 
@@ -595,7 +615,7 @@ class _OrderCardState
                                     Icons
                                         .verified_user_rounded,
 
-                                    size: 18,
+                                    size: 14,
 
                                     color:
                                         paymentColor(),
@@ -603,7 +623,7 @@ class _OrderCardState
 
                                   const SizedBox(
                                     width:
-                                        8,
+                                        5,
                                   ),
 
                                   Text(
@@ -619,32 +639,26 @@ class _OrderCardState
                                               .shade700,
 
                                       fontSize:
-                                          13,
+                                          10,
                                     ),
                                   ),
                                 ],
                               ),
 
                               const SizedBox(
-                                height: 10,
+                                height: 8,
                               ),
 
-                              AnimatedContainer(
-
-                                duration:
-                                    const Duration(
-                                  milliseconds:
-                                      220,
-                                ),
+                              Container(
 
                                 padding:
                                     const EdgeInsets.symmetric(
 
                                   horizontal:
-                                      14,
+                                      10,
 
                                   vertical:
-                                      8,
+                                      5,
                                 ),
 
                                 decoration:
@@ -655,7 +669,7 @@ class _OrderCardState
 
                                   borderRadius:
                                       BorderRadius.circular(
-                                    30,
+                                    20,
                                   ),
                                 ),
 
@@ -671,6 +685,9 @@ class _OrderCardState
 
                                     fontWeight:
                                         FontWeight.bold,
+
+                                    fontSize:
+                                        10,
                                   ),
                                 ),
                               ),
@@ -680,7 +697,7 @@ class _OrderCardState
                       ),
 
                       const SizedBox(
-                        width: 16,
+                        width: 10,
                       ),
 
                       Expanded(
@@ -689,7 +706,7 @@ class _OrderCardState
 
                           padding:
                               const EdgeInsets.all(
-                            16,
+                            12,
                           ),
 
                           decoration:
@@ -703,7 +720,7 @@ class _OrderCardState
 
                             borderRadius:
                                 BorderRadius.circular(
-                              20,
+                              18,
                             ),
                           ),
 
@@ -724,7 +741,7 @@ class _OrderCardState
                                     Icons
                                         .payments_rounded,
 
-                                    size: 18,
+                                    size: 14,
 
                                     color:
                                         AppColors
@@ -733,7 +750,7 @@ class _OrderCardState
 
                                   const SizedBox(
                                     width:
-                                        8,
+                                        5,
                                   ),
 
                                   Text(
@@ -749,14 +766,14 @@ class _OrderCardState
                                               .shade700,
 
                                       fontSize:
-                                          13,
+                                          10,
                                     ),
                                   ),
                                 ],
                               ),
 
                               const SizedBox(
-                                height: 10,
+                                height: 8,
                               ),
 
                               Text(
@@ -776,7 +793,7 @@ class _OrderCardState
                                     const TextStyle(
 
                                   fontSize:
-                                      22,
+                                      16,
 
                                   fontWeight:
                                       FontWeight.bold,
@@ -794,7 +811,7 @@ class _OrderCardState
                   ),
 
                   const SizedBox(
-                    height: 22,
+                    height: 16,
                   ),
 
                   // =========================================
@@ -808,20 +825,34 @@ class _OrderCardState
 
                     padding:
                         const EdgeInsets.all(
-                      18,
+                      14,
                     ),
 
                     decoration:
                         BoxDecoration(
 
-                      color:
-                          const Color(
-                        0xffF8FAFC,
+                      gradient:
+                          const LinearGradient(
+
+                        begin:
+                            Alignment.topLeft,
+
+                        end:
+                            Alignment.bottomRight,
+
+                        colors: [
+
+                          Color(
+                            0xffFAFBFC,
+                          ),
+
+                          Colors.white,
+                        ],
                       ),
 
                       borderRadius:
                           BorderRadius.circular(
-                        22,
+                        18,
                       ),
                     ),
 
@@ -831,26 +862,26 @@ class _OrderCardState
 
                         _buildDetailRow(
 
-                          'Payment Method',
+                          'Payment',
 
                           widget.order
                               .paymentMethod,
                         ),
 
                         const SizedBox(
-                          height: 14,
+                          height: 10,
                         ),
 
                         _buildDetailRow(
 
-                          'Phone Number',
+                          'Phone',
 
                           widget.order
                               .customerPhone,
                         ),
 
                         const SizedBox(
-                          height: 14,
+                          height: 10,
                         ),
 
                         _buildDetailRow(
@@ -891,9 +922,9 @@ class _OrderCardState
 
       children: [
 
-        Expanded(
+        SizedBox(
 
-          flex: 2,
+          width: 70,
 
           child: Text(
 
@@ -907,18 +938,12 @@ class _OrderCardState
                       .shade600,
 
               fontSize:
-                  13,
+                  11,
             ),
           ),
         ),
 
-        const SizedBox(
-          width: 12,
-        ),
-
         Expanded(
-
-          flex: 3,
 
           child: Text(
 
@@ -927,6 +952,12 @@ class _OrderCardState
             textAlign:
                 TextAlign.right,
 
+            maxLines: 2,
+
+            overflow:
+                TextOverflow
+                    .ellipsis,
+
             style:
                 const TextStyle(
 
@@ -934,7 +965,7 @@ class _OrderCardState
                   FontWeight.bold,
 
               fontSize:
-                  14,
+                  12,
             ),
           ),
         ),

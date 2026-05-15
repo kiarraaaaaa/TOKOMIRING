@@ -1,4 +1,7 @@
+// =====================================================
 // lib/widgets/forms/quantity_selector.dart
+// COMPACT PREMIUM SMALL VERSION
+// =====================================================
 
 import 'package:flutter/material.dart';
 
@@ -17,10 +20,6 @@ class QuantitySelector
 
   final bool enabled;
 
-  // =====================================================
-  // CONSTRUCTOR
-  // =====================================================
-
   const QuantitySelector({
 
     super.key,
@@ -33,8 +32,7 @@ class QuantitySelector
 
     this.maxQuantity,
 
-    this.enabled =
-        true,
+    this.enabled = true,
   });
 
   @override
@@ -59,9 +57,9 @@ class QuantitySelector
       padding:
           const EdgeInsets.symmetric(
 
-        horizontal: 10,
+        horizontal: 7,
 
-        vertical: 8,
+        vertical: 6,
       ),
 
       decoration:
@@ -72,7 +70,7 @@ class QuantitySelector
 
         borderRadius:
             BorderRadius.circular(
-          20,
+          16,
         ),
 
         border:
@@ -81,6 +79,8 @@ class QuantitySelector
           color:
               Colors.grey
                   .shade300,
+
+          width: 1,
         ),
 
         boxShadow: [
@@ -90,16 +90,15 @@ class QuantitySelector
             color:
                 Colors.black
                     .withOpacity(
-              0.04,
+              0.025,
             ),
 
-            blurRadius:
-                12,
+            blurRadius: 8,
 
             offset:
                 const Offset(
               0,
-              6,
+              4,
             ),
           ),
         ],
@@ -112,9 +111,9 @@ class QuantitySelector
 
         children: [
 
-          // =============================================
-          // DECREASE BUTTON
-          // =============================================
+          // =========================================
+          // DECREASE
+          // =========================================
 
           _actionButton(
 
@@ -132,16 +131,16 @@ class QuantitySelector
                 canDecrease,
           ),
 
-          // =============================================
-          // QUANTITY
-          // =============================================
+          // =========================================
+          // QUANTITY TEXT
+          // =========================================
 
           Container(
 
             constraints:
                 const BoxConstraints(
 
-              minWidth: 52,
+              minWidth: 34,
             ),
 
             alignment:
@@ -154,7 +153,7 @@ class QuantitySelector
               style:
                   const TextStyle(
 
-                fontSize: 20,
+                fontSize: 14,
 
                 fontWeight:
                     FontWeight.bold,
@@ -162,9 +161,9 @@ class QuantitySelector
             ),
           ),
 
-          // =============================================
-          // INCREASE BUTTON
-          // =============================================
+          // =========================================
+          // INCREASE
+          // =========================================
 
           _actionButton(
 
@@ -208,32 +207,35 @@ class QuantitySelector
 
         borderRadius:
             BorderRadius.circular(
-          14,
+          10,
         ),
 
         onTap:
             onTap,
 
-        child: AnimatedContainer(
+        child:
+            AnimatedContainer(
 
           duration:
               const Duration(
-            milliseconds: 200,
+            milliseconds: 180,
           ),
 
-          width: 42,
+          width: 30,
 
-          height: 42,
+          height: 30,
 
           decoration:
               BoxDecoration(
 
             color:
+
                 enabled
 
-                    ? AppColors.primary
+                    ? AppColors
+                        .primary
                         .withOpacity(
-                      0.1,
+                      0.10,
                     )
 
                     : Colors.grey
@@ -241,7 +243,7 @@ class QuantitySelector
 
             borderRadius:
                 BorderRadius.circular(
-              14,
+              10,
             ),
           ),
 
@@ -249,10 +251,14 @@ class QuantitySelector
 
             icon,
 
+            size: 16,
+
             color:
+
                 enabled
 
-                    ? AppColors.primary
+                    ? AppColors
+                        .primary
 
                     : Colors.grey
                         .shade400,

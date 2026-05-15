@@ -1,6 +1,6 @@
 // =====================================================
 // lib/widgets/shared/glass_container.dart
-// CLEAN MODERN RESPONSIVE VERSION
+// ULTRA AESTHETIC PREMIUM GLASSMORPHISM VERSION
 // =====================================================
 
 import 'dart:ui';
@@ -42,17 +42,21 @@ class GlassContainer
 
   final bool animated;
 
+  final bool glowEffect;
+
+  final bool shineEffect;
+
   const GlassContainer({
 
     super.key,
 
     required this.child,
 
-    this.borderRadius = 24,
+    this.borderRadius = 28,
 
-    this.blur = 14,
+    this.blur = 18,
 
-    this.opacity = 0.10,
+    this.opacity = 0.08,
 
     this.padding,
 
@@ -73,6 +77,10 @@ class GlassContainer
     this.onTap,
 
     this.animated = true,
+
+    this.glowEffect = true,
+
+    this.shineEffect = true,
   });
 
   @override
@@ -95,7 +103,9 @@ class _GlassContainerState
         widget.borderColor ??
 
             Colors.white.withOpacity(
-              0.12,
+              hovered
+                  ? 0.18
+                  : 0.10,
             );
 
     return MouseRegion(
@@ -124,18 +134,22 @@ class _GlassContainerState
         });
       },
 
-      child: AnimatedContainer(
+      child:
+          AnimatedContainer(
 
         duration:
             const Duration(
-          milliseconds: 220,
+          milliseconds: 260,
         ),
+
+        curve:
+            Curves.easeOutCubic,
 
         transform:
             Matrix4.identity()
               ..translate(
                 0.0,
-                hovered ? -2 : 0,
+                hovered ? -4 : 0,
               ),
 
         width:
@@ -147,82 +161,114 @@ class _GlassContainerState
         margin:
             widget.margin,
 
-        decoration:
-            BoxDecoration(
+        child: Stack(
 
-          borderRadius:
-              BorderRadius.circular(
-            widget.borderRadius,
-          ),
+          children: [
 
-          boxShadow:
+            // =====================================
+            // GLOW EFFECT
+            // =====================================
 
-              widget.boxShadow ??
+            if (widget.glowEffect)
 
-                  [
+              Positioned.fill(
 
-                    BoxShadow(
+                child:
+                    AnimatedOpacity(
 
-                      color:
-                          Colors.black
-                              .withOpacity(
+                  duration:
+                      const Duration(
+                    milliseconds:
+                        260,
+                  ),
 
-                        hovered
-                            ? 0.08
-                            : 0.04,
+                  opacity:
+                      hovered
+                          ? 1
+                          : 0.7,
+
+                  child: Container(
+
+                    decoration:
+                        BoxDecoration(
+
+                      borderRadius:
+                          BorderRadius.circular(
+                        widget.borderRadius,
                       ),
 
-                      blurRadius:
-                          hovered
-                              ? 22
-                              : 14,
+                      gradient:
+                          RadialGradient(
 
-                      offset:
-                          Offset(
-                        0,
-                        hovered
-                            ? 10
-                            : 6,
+                        radius: 1.25,
+
+                        colors: [
+
+                          Colors.white
+                              .withOpacity(
+                            hovered
+                                ? 0.12
+                                : 0.06,
+                          ),
+
+                          Colors
+                              .transparent,
+                        ],
                       ),
                     ),
-                  ],
-        ),
+                  ),
+                ),
+              ),
 
-        child: ClipRRect(
+            // =====================================
+            // MAIN GLASS
+            // =====================================
 
-          borderRadius:
-              BorderRadius.circular(
-            widget.borderRadius,
-          ),
+            ClipRRect(
 
-          child: BackdropFilter(
+              borderRadius:
+                  BorderRadius.circular(
+                widget.borderRadius,
+              ),
 
-            filter: ImageFilter.blur(
+              child: BackdropFilter(
 
-              sigmaX:
-                  widget.blur,
+                filter:
+                    ImageFilter.blur(
 
-              sigmaY:
-                  widget.blur,
-            ),
+                  sigmaX:
+                      hovered
 
-            child: Material(
+                          ? widget.blur +
+                              2
 
-              color:
-                  Colors.transparent,
+                          : widget.blur,
 
-              child: InkWell(
+                  sigmaY:
+                      hovered
 
-                onTap:
-                    widget.onTap,
+                          ? widget.blur +
+                              2
 
-                child: Container(
+                          : widget.blur,
+                ),
 
-                  padding:
-                      widget.padding,
+                child:
+                    AnimatedContainer(
+
+                  duration:
+                      const Duration(
+                    milliseconds:
+                        260,
+                  ),
 
                   decoration:
                       BoxDecoration(
+
+                    borderRadius:
+                        BorderRadius.circular(
+                      widget.borderRadius,
+                    ),
 
                     gradient:
 
@@ -241,22 +287,27 @@ class _GlassContainerState
                                 Colors.white
                                     .withOpacity(
 
-                                  widget.opacity +
-                                      0.05,
+                                  hovered
+
+                                      ? widget.opacity +
+                                          0.12
+
+                                      : widget.opacity +
+                                          0.08,
                                 ),
 
                                 Colors.white
                                     .withOpacity(
 
-                                  widget.opacity,
+                                  hovered
+
+                                      ? widget.opacity +
+                                          0.04
+
+                                      : widget.opacity,
                                 ),
                               ],
                             ),
-
-                    borderRadius:
-                        BorderRadius.circular(
-                      widget.borderRadius,
-                    ),
 
                     border: Border.all(
 
@@ -266,14 +317,172 @@ class _GlassContainerState
                       width:
                           widget.borderWidth,
                     ),
+
+                    boxShadow:
+
+                        widget.boxShadow ??
+
+                            [
+
+                              BoxShadow(
+
+                                color:
+                                    Colors.white
+                                        .withOpacity(
+                                  hovered
+                                      ? 0.08
+                                      : 0.03,
+                                ),
+
+                                blurRadius:
+                                    hovered
+                                        ? 24
+                                        : 12,
+
+                                spreadRadius:
+                                    hovered
+                                        ? 1
+                                        : 0,
+                              ),
+
+                              BoxShadow(
+
+                                color:
+                                    Colors.black
+                                        .withOpacity(
+
+                                  hovered
+                                      ? 0.10
+                                      : 0.05,
+                                ),
+
+                                blurRadius:
+                                    hovered
+                                        ? 26
+                                        : 16,
+
+                                offset:
+                                    Offset(
+                                  0,
+                                  hovered
+                                      ? 14
+                                      : 8,
+                                ),
+                              ),
+                            ],
                   ),
 
-                  child:
-                      widget.child,
+                  child: Stack(
+
+                    children: [
+
+                      // ===============================
+                      // SHINE EFFECT
+                      // ===============================
+
+                      if (widget.shineEffect)
+
+                        Positioned(
+
+                          top: -40,
+
+                          left: -30,
+
+                          child:
+                              AnimatedContainer(
+
+                            duration:
+                                const Duration(
+                              milliseconds:
+                                  260,
+                            ),
+
+                            width:
+                                hovered
+                                    ? 180
+                                    : 140,
+
+                            height:
+                                hovered
+                                    ? 180
+                                    : 140,
+
+                            decoration:
+                                BoxDecoration(
+
+                              shape:
+                                  BoxShape.circle,
+
+                              gradient:
+                                  RadialGradient(
+
+                                colors: [
+
+                                  Colors.white
+                                      .withOpacity(
+                                    hovered
+                                        ? 0.12
+                                        : 0.06,
+                                  ),
+
+                                  Colors
+                                      .transparent,
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+
+                      // ===============================
+                      // CONTENT
+                      // ===============================
+
+                      Material(
+
+                        color:
+                            Colors.transparent,
+
+                        child: InkWell(
+
+                          onTap:
+                              widget.onTap,
+
+                          borderRadius:
+                              BorderRadius.circular(
+                            widget.borderRadius,
+                          ),
+
+                          splashColor:
+                              Colors.white
+                                  .withOpacity(
+                            0.04,
+                          ),
+
+                          highlightColor:
+                              Colors.transparent,
+
+                          child: Container(
+
+                            width:
+                                widget.width,
+
+                            height:
+                                widget.height,
+
+                            padding:
+                                widget.padding,
+
+                            child:
+                                widget.child,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
+          ],
         ),
       ),
     );

@@ -1,6 +1,6 @@
 // =====================================================
 // lib/screens/user/checkout_screen.dart
-// CLEAN PREMIUM RESPONSIVE VERSION
+// FINAL COMPACT PREMIUM RESPONSIVE VERSION
 // =====================================================
 
 import 'dart:convert';
@@ -36,10 +36,6 @@ class _CheckoutScreenState
     with
         SingleTickerProviderStateMixin {
 
-  // =========================================
-  // FORM
-  // =========================================
-
   final GlobalKey<FormState>
       _formKey =
       GlobalKey<FormState>();
@@ -53,26 +49,14 @@ class _CheckoutScreenState
   final addressController =
       TextEditingController();
 
-  // =========================================
-  // PAYMENT
-  // =========================================
-
   String paymentMethod =
       'Cash';
-
-  // =========================================
-  // ANIMATION
-  // =========================================
 
   late AnimationController
       _animationController;
 
   late Animation<double>
       _fadeAnimation;
-
-  // =========================================
-  // INIT
-  // =========================================
 
   @override
   void initState() {
@@ -129,10 +113,6 @@ class _CheckoutScreenState
     );
   }
 
-  // =========================================
-  // VALIDATION
-  // =========================================
-
   bool hasInvalidStock(
 
     ProductProvider
@@ -168,10 +148,6 @@ class _CheckoutScreenState
     return false;
   }
 
-  // =========================================
-  // CREATE ORDER
-  // =========================================
-
   Future<void>
       createOrder()
       async {
@@ -197,10 +173,6 @@ class _CheckoutScreenState
     final productProvider =
         context.read<
             ProductProvider>();
-
-    // ===============================
-    // VALIDATE STOCK
-    // ===============================
 
     if (hasInvalidStock(
 
@@ -228,10 +200,6 @@ class _CheckoutScreenState
       return;
     }
 
-    // ===============================
-    // UPDATE USER DATA
-    // ===============================
-
     await authProvider
         .updateAddress(
 
@@ -245,10 +213,6 @@ class _CheckoutScreenState
       phoneController.text
           .trim(),
     );
-
-    // ===============================
-    // CREATE ORDER MODEL
-    // ===============================
 
     final order =
         OrderModel(
@@ -329,10 +293,6 @@ class _CheckoutScreenState
           null,
     );
 
-    // ===============================
-    // CREATE ORDER
-    // ===============================
-
     final success =
         await orderProvider
             .createOrder(
@@ -342,10 +302,6 @@ class _CheckoutScreenState
     if (!mounted) {
       return;
     }
-
-    // ===============================
-    // SUCCESS
-    // ===============================
 
     if (success) {
 
@@ -371,10 +327,6 @@ class _CheckoutScreenState
       );
     }
 
-    // ===============================
-    // FAILED
-    // ===============================
-
     else {
 
       ScaffoldMessenger.of(
@@ -397,10 +349,6 @@ class _CheckoutScreenState
       );
     }
   }
-
-  // =========================================
-  // BUILD
-  // =========================================
 
   @override
   Widget build(
@@ -446,10 +394,6 @@ class _CheckoutScreenState
         0xffF5F7FB,
       ),
 
-      // =====================================
-      // APPBAR
-      // =====================================
-
       appBar: AppBar(
 
         elevation: 0,
@@ -479,7 +423,7 @@ class _CheckoutScreenState
                 color:
                     Colors.black,
 
-                fontSize: 20,
+                fontSize: 18,
 
                 fontWeight:
                     FontWeight.bold,
@@ -492,23 +436,19 @@ class _CheckoutScreenState
 
             Text(
 
-              'Modern marketplace checkout',
+              'Modern compact checkout',
 
               style: TextStyle(
 
                 color:
                     Colors.grey,
 
-                fontSize: 12,
+                fontSize: 11,
               ),
             ),
           ],
         ),
       ),
-
-      // =====================================
-      // BODY
-      // =====================================
 
       body: FadeTransition(
 
@@ -527,7 +467,7 @@ class _CheckoutScreenState
 
             padding:
                 EdgeInsets.all(
-              isMobile ? 14 : 20,
+              isMobile ? 14 : 18,
             ),
 
             child: Center(
@@ -536,7 +476,7 @@ class _CheckoutScreenState
 
                 constraints:
                     const BoxConstraints(
-                  maxWidth: 920,
+                  maxWidth: 760,
                 ),
 
                 child: Column(
@@ -547,10 +487,6 @@ class _CheckoutScreenState
 
                   children: [
 
-                    // ===============================
-                    // WARNING
-                    // ===============================
-
                     if (invalidStock)
 
                       Container(
@@ -560,12 +496,15 @@ class _CheckoutScreenState
 
                         margin:
                             const EdgeInsets.only(
-                          bottom: 20,
+                          bottom: 16,
                         ),
 
                         padding:
-                            const EdgeInsets.all(
-                          16,
+                            const EdgeInsets.symmetric(
+
+                          horizontal: 14,
+
+                          vertical: 12,
                         ),
 
                         decoration:
@@ -579,7 +518,7 @@ class _CheckoutScreenState
 
                           borderRadius:
                               BorderRadius.circular(
-                            22,
+                            18,
                           ),
                         ),
 
@@ -594,10 +533,12 @@ class _CheckoutScreenState
 
                               color:
                                   Colors.red,
+
+                              size: 18,
                             ),
 
                             SizedBox(
-                              width: 12,
+                              width: 10,
                             ),
 
                             Expanded(
@@ -612,6 +553,8 @@ class _CheckoutScreenState
                                   color:
                                       Colors.red,
 
+                                  fontSize: 12,
+
                                   fontWeight:
                                       FontWeight.w600,
                                 ),
@@ -621,9 +564,9 @@ class _CheckoutScreenState
                         ),
                       ),
 
-                    // ===============================
-                    // PROFILE CARD
-                    // ===============================
+                    // =====================================
+                    // PROFILE
+                    // =====================================
 
                     Container(
 
@@ -633,8 +576,8 @@ class _CheckoutScreenState
                       padding:
                           EdgeInsets.all(
                         isMobile
-                            ? 18
-                            : 24,
+                            ? 16
+                            : 18,
                       ),
 
                       decoration:
@@ -642,7 +585,7 @@ class _CheckoutScreenState
 
                         borderRadius:
                             BorderRadius.circular(
-                          30,
+                          24,
                         ),
 
                         gradient:
@@ -667,15 +610,9 @@ class _CheckoutScreenState
 
                           Container(
 
-                            width:
-                                isMobile
-                                    ? 56
-                                    : 64,
+                            width: 52,
 
-                            height:
-                                isMobile
-                                    ? 56
-                                    : 64,
+                            height: 52,
 
                             decoration:
                                 BoxDecoration(
@@ -718,12 +655,12 @@ class _CheckoutScreenState
                                             Colors.white,
 
                                         size:
-                                            28,
+                                            22,
                                       ),
                           ),
 
                           const SizedBox(
-                            width: 16,
+                            width: 14,
                           ),
 
                           Expanded(
@@ -757,8 +694,8 @@ class _CheckoutScreenState
 
                                     fontSize:
                                         isMobile
-                                            ? 18
-                                            : 22,
+                                            ? 16
+                                            : 18,
 
                                     fontWeight:
                                         FontWeight.bold,
@@ -766,8 +703,7 @@ class _CheckoutScreenState
                                 ),
 
                                 const SizedBox(
-                                  height:
-                                      4,
+                                  height: 3,
                                 ),
 
                                 Text(
@@ -781,6 +717,8 @@ class _CheckoutScreenState
 
                                   style:
                                       TextStyle(
+
+                                    fontSize: 11,
 
                                     color:
                                         Colors
@@ -798,12 +736,12 @@ class _CheckoutScreenState
                     ),
 
                     const SizedBox(
-                      height: 26,
+                      height: 22,
                     ),
 
-                    // ===============================
+                    // =====================================
                     // SHIPPING
-                    // ===============================
+                    // =====================================
 
                     const Text(
 
@@ -811,7 +749,7 @@ class _CheckoutScreenState
 
                       style: TextStyle(
 
-                        fontSize: 24,
+                        fontSize: 20,
 
                         fontWeight:
                             FontWeight.bold,
@@ -819,7 +757,7 @@ class _CheckoutScreenState
                     ),
 
                     const SizedBox(
-                      height: 20,
+                      height: 14,
                     ),
 
                     _buildInputField(
@@ -835,7 +773,7 @@ class _CheckoutScreenState
                     ),
 
                     const SizedBox(
-                      height: 16,
+                      height: 12,
                     ),
 
                     _buildInputField(
@@ -855,7 +793,7 @@ class _CheckoutScreenState
                     ),
 
                     const SizedBox(
-                      height: 16,
+                      height: 12,
                     ),
 
                     _buildInputField(
@@ -869,18 +807,18 @@ class _CheckoutScreenState
                       icon:
                           Icons.location_on,
 
-                      minLines: 3,
+                      minLines: 2,
 
-                      maxLines: 4,
+                      maxLines: 3,
                     ),
 
                     const SizedBox(
-                      height: 28,
+                      height: 22,
                     ),
 
-                    // ===============================
+                    // =====================================
                     // PAYMENT
-                    // ===============================
+                    // =====================================
 
                     const Text(
 
@@ -888,7 +826,7 @@ class _CheckoutScreenState
 
                       style: TextStyle(
 
-                        fontSize: 24,
+                        fontSize: 20,
 
                         fontWeight:
                             FontWeight.bold,
@@ -896,14 +834,14 @@ class _CheckoutScreenState
                     ),
 
                     const SizedBox(
-                      height: 18,
+                      height: 14,
                     ),
 
                     Wrap(
 
-                      spacing: 16,
+                      spacing: 12,
 
-                      runSpacing: 16,
+                      runSpacing: 12,
 
                       children: [
 
@@ -920,12 +858,12 @@ class _CheckoutScreenState
                     ),
 
                     const SizedBox(
-                      height: 28,
+                      height: 20,
                     ),
 
-                    // ===============================
+                    // =====================================
                     // INFO BOX
-                    // ===============================
+                    // =====================================
 
                     Container(
 
@@ -934,7 +872,7 @@ class _CheckoutScreenState
 
                       padding:
                           const EdgeInsets.all(
-                        18,
+                        14,
                       ),
 
                       decoration:
@@ -948,7 +886,7 @@ class _CheckoutScreenState
 
                         borderRadius:
                             BorderRadius.circular(
-                          22,
+                          18,
                         ),
                       ),
 
@@ -966,26 +904,30 @@ class _CheckoutScreenState
 
                             color:
                                 Colors.orange,
+
+                            size: 18,
                           ),
 
                           const SizedBox(
-                            width: 12,
+                            width: 10,
                           ),
 
                           Expanded(
 
                             child: Text(
 
-                              'Orders will be validated by admin before delivery processing.',
+                              'Orders will be validated before delivery process.',
 
                               style:
                                   TextStyle(
+
+                                fontSize: 12,
 
                                 color:
                                     Colors.grey
                                         .shade800,
 
-                                height: 1.5,
+                                height: 1.4,
                               ),
                             ),
                           ),
@@ -994,12 +936,12 @@ class _CheckoutScreenState
                     ),
 
                     const SizedBox(
-                      height: 30,
+                      height: 24,
                     ),
 
-                    // ===============================
-                    // ORDER SUMMARY
-                    // ===============================
+                    // =====================================
+                    // SUMMARY TITLE
+                    // =====================================
 
                     const Text(
 
@@ -1007,7 +949,7 @@ class _CheckoutScreenState
 
                       style: TextStyle(
 
-                        fontSize: 24,
+                        fontSize: 20,
 
                         fontWeight:
                             FontWeight.bold,
@@ -1015,8 +957,12 @@ class _CheckoutScreenState
                     ),
 
                     const SizedBox(
-                      height: 18,
+                      height: 14,
                     ),
+
+                    // =====================================
+                    // SUMMARY CARD
+                    // =====================================
 
                     Container(
 
@@ -1026,8 +972,8 @@ class _CheckoutScreenState
                       padding:
                           EdgeInsets.all(
                         isMobile
-                            ? 16
-                            : 20,
+                            ? 14
+                            : 16,
                       ),
 
                       decoration:
@@ -1038,7 +984,195 @@ class _CheckoutScreenState
 
                         borderRadius:
                             BorderRadius.circular(
-                          28,
+                          22,
+                        ),
+
+                        boxShadow: [
+
+                          BoxShadow(
+
+                            color:
+                                Colors.black
+                                    .withOpacity(
+                              0.03,
+                            ),
+
+                            blurRadius: 12,
+
+                            offset:
+                                const Offset(
+                              0,
+                              6,
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      child: Column(
+
+                        children: [
+
+                          ...cartProvider
+                              .items
+                              .map(
+                            (item) {
+
+                              return Padding(
+
+                                padding:
+                                    const EdgeInsets.only(
+                                  bottom:
+                                      12,
+                                ),
+
+                                child: Row(
+
+                                  children: [
+
+                                    ClipRRect(
+
+                                      borderRadius:
+                                          BorderRadius.circular(
+                                        14,
+                                      ),
+
+                                      child:
+                                          Image.memory(
+
+                                        base64Decode(
+                                          item.product.imageBase64,
+                                        ),
+
+                                        width:
+                                            50,
+
+                                        height:
+                                            50,
+
+                                        fit:
+                                            BoxFit.cover,
+                                      ),
+                                    ),
+
+                                    const SizedBox(
+                                      width:
+                                          10,
+                                    ),
+
+                                    Expanded(
+
+                                      child:
+                                          Column(
+
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment
+                                                .start,
+
+                                        children: [
+
+                                          Text(
+
+                                            item.product.name,
+
+                                            maxLines:
+                                                1,
+
+                                            overflow:
+                                                TextOverflow
+                                                    .ellipsis,
+
+                                            style:
+                                                const TextStyle(
+
+                                              fontSize:
+                                                  13,
+
+                                              fontWeight:
+                                                  FontWeight.bold,
+                                            ),
+                                          ),
+
+                                          const SizedBox(
+                                            height:
+                                                3,
+                                          ),
+
+                                          Text(
+
+                                            '${item.quantity} x ${AppFormat.currency(item.product.price)}',
+
+                                            style:
+                                                TextStyle(
+
+                                              fontSize:
+                                                  11,
+
+                                              color:
+                                                  Colors.grey
+                                                      .shade700,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+
+                                    const SizedBox(
+                                      width:
+                                          10,
+                                    ),
+
+                                    Text(
+
+                                      AppFormat.currency(
+                                        item.subtotal,
+                                      ),
+
+                                      style:
+                                          const TextStyle(
+
+                                        fontSize:
+                                            13,
+
+                                        fontWeight:
+                                            FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(
+                      height: 18,
+                    ),
+
+                    // =====================================
+                    // TOTAL CARD
+                    // =====================================
+
+                    Container(
+
+                      width:
+                          double.infinity,
+
+                      padding:
+                          const EdgeInsets.all(
+                        18,
+                      ),
+
+                      decoration:
+                          BoxDecoration(
+
+                        color:
+                            Colors.white,
+
+                        borderRadius:
+                            BorderRadius.circular(
+                          22,
                         ),
 
                         boxShadow: [
@@ -1066,280 +1200,6 @@ class _CheckoutScreenState
 
                         children: [
 
-                          ...cartProvider
-                              .items
-                              .map(
-                            (item) {
-
-                              final product =
-                                  productProvider
-                                      .getProductById(
-                                item.product.id,
-                              );
-
-                              final soldOut =
-                                  product ==
-                                          null ||
-
-                                      product.stock <=
-                                          0;
-
-                              final exceedStock =
-                                  product !=
-                                          null &&
-                                      item.quantity >
-                                          product.stock;
-
-                              return Padding(
-
-                                padding:
-                                    const EdgeInsets.only(
-                                  bottom:
-                                      18,
-                                ),
-
-                                child: Column(
-
-                                  children: [
-
-                                    if (soldOut ||
-                                        exceedStock)
-
-                                      Container(
-
-                                        width:
-                                            double.infinity,
-
-                                        margin:
-                                            const EdgeInsets.only(
-                                          bottom:
-                                              10,
-                                        ),
-
-                                        padding:
-                                            const EdgeInsets.all(
-                                          12,
-                                        ),
-
-                                        decoration:
-                                            BoxDecoration(
-
-                                          color:
-                                              Colors.red
-                                                  .withOpacity(
-                                            0.08,
-                                          ),
-
-                                          borderRadius:
-                                              BorderRadius.circular(
-                                            16,
-                                          ),
-                                        ),
-
-                                        child:
-                                            Text(
-
-                                          soldOut
-
-                                              ? '${item.product.name} sold out'
-
-                                              : 'Available stock only ${product.stock}',
-
-                                          style:
-                                              const TextStyle(
-
-                                            color:
-                                                Colors.red,
-
-                                            fontWeight:
-                                                FontWeight.w600,
-                                          ),
-                                        ),
-                                      ),
-
-                                    Row(
-
-                                      children: [
-
-                                        Container(
-
-                                          width:
-                                              60,
-
-                                          height:
-                                              60,
-
-                                          decoration:
-                                              BoxDecoration(
-
-                                            borderRadius:
-                                                BorderRadius.circular(
-                                              18,
-                                            ),
-                                          ),
-
-                                          child:
-                                              ClipRRect(
-
-                                            borderRadius:
-                                                BorderRadius.circular(
-                                              18,
-                                            ),
-
-                                            child:
-                                                Image.memory(
-
-                                              base64Decode(
-                                                item.product.imageBase64,
-                                              ),
-
-                                              fit:
-                                                  BoxFit.cover,
-                                            ),
-                                          ),
-                                        ),
-
-                                        const SizedBox(
-                                          width:
-                                              14,
-                                        ),
-
-                                        Expanded(
-
-                                          child:
-                                              Column(
-
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment
-                                                    .start,
-
-                                            children: [
-
-                                              Text(
-
-                                                item.product.name,
-
-                                                maxLines:
-                                                    2,
-
-                                                overflow:
-                                                    TextOverflow
-                                                        .ellipsis,
-
-                                                style:
-                                                    const TextStyle(
-
-                                                  fontWeight:
-                                                      FontWeight.bold,
-                                                ),
-                                              ),
-
-                                              const SizedBox(
-                                                height:
-                                                    4,
-                                              ),
-
-                                              Text(
-
-                                                '${item.quantity} x ${AppFormat.currency(item.product.price)}',
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-
-                                        const SizedBox(
-                                          width:
-                                              12,
-                                        ),
-
-                                        Flexible(
-
-                                          child: Text(
-
-                                            AppFormat.currency(
-                                              item.subtotal,
-                                            ),
-
-                                            overflow:
-                                                TextOverflow
-                                                    .ellipsis,
-
-                                            textAlign:
-                                                TextAlign.right,
-
-                                            style:
-                                                const TextStyle(
-
-                                              fontWeight:
-                                                  FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    const SizedBox(
-                      height: 24,
-                    ),
-
-                    // ===============================
-                    // TOTAL CARD
-                    // ===============================
-
-                    Container(
-
-                      width:
-                          double.infinity,
-
-                      padding:
-                          const EdgeInsets.all(
-                        22,
-                      ),
-
-                      decoration:
-                          BoxDecoration(
-
-                        color:
-                            Colors.white,
-
-                        borderRadius:
-                            BorderRadius.circular(
-                          28,
-                        ),
-
-                        boxShadow: [
-
-                          BoxShadow(
-
-                            color:
-                                Colors.black
-                                    .withOpacity(
-                              0.05,
-                            ),
-
-                            blurRadius: 20,
-
-                            offset:
-                                const Offset(
-                              0,
-                              10,
-                            ),
-                          ),
-                        ],
-                      ),
-
-                      child: Column(
-
-                        children: [
-
                           _buildPriceRow(
 
                             title:
@@ -1353,7 +1213,7 @@ class _CheckoutScreenState
                           ),
 
                           const SizedBox(
-                            height: 10,
+                            height: 8,
                           ),
 
                           _buildPriceRow(
@@ -1370,7 +1230,7 @@ class _CheckoutScreenState
                             padding:
                                 EdgeInsets.symmetric(
                               vertical:
-                                  16,
+                                  14,
                             ),
 
                             child:
@@ -1393,7 +1253,7 @@ class _CheckoutScreenState
                                     TextStyle(
 
                                   fontSize:
-                                      18,
+                                      16,
 
                                   fontWeight:
                                       FontWeight.bold,
@@ -1420,7 +1280,7 @@ class _CheckoutScreenState
                                       const TextStyle(
 
                                     fontSize:
-                                        24,
+                                        22,
 
                                     color:
                                         AppColors.primary,
@@ -1434,7 +1294,7 @@ class _CheckoutScreenState
                           ),
 
                           const SizedBox(
-                            height: 20,
+                            height: 16,
                           ),
 
                           SizedBox(
@@ -1442,7 +1302,7 @@ class _CheckoutScreenState
                             width:
                                 double.infinity,
 
-                            height: 54,
+                            height: 48,
 
                             child:
                                 ElevatedButton(
@@ -1469,7 +1329,7 @@ class _CheckoutScreenState
 
                                   borderRadius:
                                       BorderRadius.circular(
-                                    18,
+                                    16,
                                   ),
                                 ),
                               ),
@@ -1492,10 +1352,10 @@ class _CheckoutScreenState
                                       ? const SizedBox(
 
                                           width:
-                                              24,
+                                              20,
 
                                           height:
-                                              24,
+                                              20,
 
                                           child:
                                               CircularProgressIndicator(
@@ -1508,19 +1368,15 @@ class _CheckoutScreenState
                                           ),
                                         )
 
-                                      : Text(
+                                      : const Text(
 
-                                          invalidStock
-
-                                              ? 'Stock Not Available'
-
-                                              : 'Create Order',
+                                          'Create Order',
 
                                           style:
-                                              const TextStyle(
+                                              TextStyle(
 
                                             fontSize:
-                                                16,
+                                                14,
 
                                             fontWeight:
                                                 FontWeight.bold,
@@ -1544,10 +1400,6 @@ class _CheckoutScreenState
       ),
     );
   }
-
-  // =========================================
-  // INPUT
-  // =========================================
 
   Widget _buildInputField({
 
@@ -1580,14 +1432,27 @@ class _CheckoutScreenState
       maxLines:
           maxLines,
 
+      style:
+          const TextStyle(
+        fontSize: 13,
+      ),
+
       decoration:
           InputDecoration(
 
         labelText:
             label,
 
+        labelStyle:
+            const TextStyle(
+          fontSize: 13,
+        ),
+
         prefixIcon:
-            Icon(icon),
+            Icon(
+          icon,
+          size: 18,
+        ),
 
         filled: true,
 
@@ -1597,9 +1462,9 @@ class _CheckoutScreenState
         contentPadding:
             const EdgeInsets.symmetric(
 
-          horizontal: 18,
+          horizontal: 14,
 
-          vertical: 18,
+          vertical: 14,
         ),
 
         border:
@@ -1607,7 +1472,7 @@ class _CheckoutScreenState
 
           borderRadius:
               BorderRadius.circular(
-            20,
+            16,
           ),
 
           borderSide:
@@ -1630,10 +1495,6 @@ class _CheckoutScreenState
       },
     );
   }
-
-  // =========================================
-  // PAYMENT CARD
-  // =========================================
 
   Widget _buildPaymentCard(
     String title,
@@ -1664,11 +1525,11 @@ class _CheckoutScreenState
               220,
         ),
 
-        width: 170,
+        width: 145,
 
         padding:
             const EdgeInsets.all(
-          18,
+          14,
         ),
 
         decoration:
@@ -1687,7 +1548,7 @@ class _CheckoutScreenState
 
           borderRadius:
               BorderRadius.circular(
-            22,
+            18,
           ),
 
           border: Border.all(
@@ -1702,7 +1563,7 @@ class _CheckoutScreenState
                     : Colors.grey
                         .shade200,
 
-            width: 2,
+            width: 1.5,
           ),
         ),
 
@@ -1714,7 +1575,7 @@ class _CheckoutScreenState
 
               icon,
 
-              size: 34,
+              size: 24,
 
               color:
 
@@ -1728,7 +1589,7 @@ class _CheckoutScreenState
             ),
 
             const SizedBox(
-              height: 12,
+              height: 8,
             ),
 
             Text(
@@ -1739,6 +1600,8 @@ class _CheckoutScreenState
                   TextAlign.center,
 
               style: TextStyle(
+
+                fontSize: 12,
 
                 fontWeight:
                     FontWeight.bold,
@@ -1758,10 +1621,6 @@ class _CheckoutScreenState
       ),
     );
   }
-
-  // =========================================
-  // PRICE ROW
-  // =========================================
 
   Widget _buildPriceRow({
 
@@ -1785,6 +1644,8 @@ class _CheckoutScreenState
           style:
               TextStyle(
 
+            fontSize: 13,
+
             color:
                 Colors.grey
                     .shade700,
@@ -1806,6 +1667,8 @@ class _CheckoutScreenState
 
             style:
                 const TextStyle(
+
+              fontSize: 13,
 
               fontWeight:
                   FontWeight.bold,

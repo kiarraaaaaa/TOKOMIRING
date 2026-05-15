@@ -1,6 +1,6 @@
 // =====================================================
 // lib/screens/user/cart_screen.dart
-// CLEAN MODERN RESPONSIVE VERSION
+// ULTRA CLEAN COMPACT PREMIUM VERSION
 // =====================================================
 
 import 'package:flutter/material.dart';
@@ -52,7 +52,7 @@ class _CartScreenState
 
       duration:
           const Duration(
-        milliseconds: 450,
+        milliseconds: 350,
       ),
     );
 
@@ -78,7 +78,7 @@ class _CartScreenState
   }
 
   // =========================================
-  // STOCK VALIDATION
+  // VALIDATION
   // =========================================
 
   bool _hasInvalidStock(
@@ -129,13 +129,13 @@ class _CartScreenState
     final productProvider =
         context.watch<ProductProvider>();
 
-    final screenWidth =
+    final width =
         MediaQuery.of(context)
             .size
             .width;
 
     final isMobile =
-        screenWidth < 700;
+        width < 700;
 
     final hasInvalidStock =
         _hasInvalidStock(
@@ -148,7 +148,9 @@ class _CartScreenState
     return Scaffold(
 
       backgroundColor:
-          const Color(0xffF4F7FC),
+          const Color(
+        0xffF5F7FB,
+      ),
 
       // =====================================
       // APPBAR
@@ -164,14 +166,28 @@ class _CartScreenState
         surfaceTintColor:
             Colors.transparent,
 
-        centerTitle: false,
+        leading: IconButton(
 
-        titleSpacing: 18,
+          onPressed: () {
+
+            Navigator.pop(
+              context,
+            );
+          },
+
+          icon: const Icon(
+            Icons.arrow_back_ios_new,
+            size: 18,
+          ),
+        ),
+
+        titleSpacing: 0,
 
         title: Column(
 
           crossAxisAlignment:
-              CrossAxisAlignment.start,
+              CrossAxisAlignment
+                  .start,
 
           children: const [
 
@@ -181,13 +197,13 @@ class _CartScreenState
 
               style: TextStyle(
 
-                color:
-                    Colors.black,
-
-                fontSize: 20,
+                fontSize: 22,
 
                 fontWeight:
                     FontWeight.bold,
+
+                color:
+                    Colors.black,
               ),
             ),
 
@@ -201,14 +217,64 @@ class _CartScreenState
 
               style: TextStyle(
 
+                fontSize: 12,
+
                 color:
                     Colors.grey,
-
-                fontSize: 12,
               ),
             ),
           ],
         ),
+
+        actions: [
+
+          if (!cartProvider
+              .isEmpty)
+
+            Padding(
+
+              padding:
+                  const EdgeInsets.only(
+                right: 16,
+              ),
+
+              child: TextButton(
+
+                onPressed: () {
+
+                  Navigator.pop(
+                    context,
+                  );
+                },
+
+                style:
+                    TextButton.styleFrom(
+
+                  padding:
+                      const EdgeInsets.symmetric(
+
+                    horizontal: 18,
+
+                    vertical: 10,
+                  ),
+
+                  backgroundColor:
+                      Colors.white,
+                ),
+
+                child: const Text(
+
+                  'Continue Shopping',
+
+                  style: TextStyle(
+
+                    fontWeight:
+                        FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+        ],
       ),
 
       // =====================================
@@ -225,106 +291,83 @@ class _CartScreenState
 
                   child: Center(
 
-                    child: Padding(
+                    child: Column(
 
-                      padding:
-                          const EdgeInsets.all(
-                        24,
-                      ),
+                      mainAxisAlignment:
+                          MainAxisAlignment
+                              .center,
 
-                      child: Column(
+                      children: [
 
-                        mainAxisAlignment:
-                            MainAxisAlignment.center,
+                        Container(
 
-                        children: [
+                          width: 120,
 
-                          Container(
+                          height: 120,
 
-                            width:
-                                isMobile
-                                    ? 140
-                                    : 180,
+                          decoration:
+                              BoxDecoration(
 
-                            height:
-                                isMobile
-                                    ? 140
-                                    : 180,
+                            shape:
+                                BoxShape.circle,
 
-                            decoration:
-                                BoxDecoration(
-
-                              shape:
-                                  BoxShape.circle,
-
-                              gradient:
-                                  LinearGradient(
-
-                                colors: [
-
-                                  AppColors.primary
-                                      .withOpacity(0.12),
-
-                                  AppColors.primary
-                                      .withOpacity(0.04),
-                                ],
-                              ),
-                            ),
-
-                            child:
-                                const Icon(
-
-                              Icons
-                                  .shopping_bag_outlined,
-
-                              size: 72,
-
-                              color:
-                                  AppColors.primary,
+                            color:
+                                AppColors
+                                    .primary
+                                    .withOpacity(
+                              0.08,
                             ),
                           ),
 
-                          const SizedBox(
-                            height: 24,
+                          child:
+                              const Icon(
+
+                            Icons
+                                .shopping_cart_outlined,
+
+                            size: 52,
+
+                            color:
+                                AppColors
+                                    .primary,
                           ),
+                        ),
 
-                          const Text(
+                        const SizedBox(
+                          height: 20,
+                        ),
 
-                            'Your Cart is Empty',
+                        const Text(
 
-                            textAlign:
-                                TextAlign.center,
+                          'Your Cart is Empty',
 
-                            style: TextStyle(
+                          style:
+                              TextStyle(
 
-                              fontSize: 24,
+                            fontSize: 24,
 
-                              fontWeight:
-                                  FontWeight.bold,
-                            ),
+                            fontWeight:
+                                FontWeight.bold,
                           ),
+                        ),
 
-                          const SizedBox(
-                            height: 10,
+                        const SizedBox(
+                          height: 8,
+                        ),
+
+                        Text(
+
+                          'Add products to continue shopping.',
+
+                          style:
+                              TextStyle(
+
+                            color:
+                                Colors.grey
+                                    .shade600,
                           ),
-
-                          Text(
-
-                            'Add products and enjoy premium shopping experience.',
-
-                            textAlign:
-                                TextAlign.center,
-
-                            style: TextStyle(
-
-                              color:
-                                  Colors.grey.shade600,
-
-                              fontSize: 14,
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
                 )
@@ -349,11 +392,12 @@ class _CartScreenState
 
                           bottom:
                               isMobile
-                                  ? 220
-                                  : 240,
+                                  ? 180
+                                  : 200,
                         ),
 
-                        child: SingleChildScrollView(
+                        child:
+                            SingleChildScrollView(
 
                           physics:
                               const BouncingScrollPhysics(),
@@ -368,13 +412,14 @@ class _CartScreenState
                           child: Column(
 
                             crossAxisAlignment:
-                                CrossAxisAlignment.start,
+                                CrossAxisAlignment
+                                    .start,
 
                             children: [
 
-                              // ===============================
+                              // =========================
                               // WARNING
-                              // ===============================
+                              // =========================
 
                               if (hasInvalidStock)
 
@@ -385,12 +430,15 @@ class _CartScreenState
 
                                   margin:
                                       const EdgeInsets.only(
-                                    bottom: 18,
+                                    bottom: 16,
                                   ),
 
                                   padding:
-                                      const EdgeInsets.all(
-                                    14,
+                                      const EdgeInsets.symmetric(
+
+                                    horizontal: 14,
+
+                                    vertical: 12,
                                   ),
 
                                   decoration:
@@ -398,11 +446,13 @@ class _CartScreenState
 
                                     color:
                                         Colors.red
-                                            .withOpacity(0.08),
+                                            .withOpacity(
+                                      0.08,
+                                    ),
 
                                     borderRadius:
                                         BorderRadius.circular(
-                                      18,
+                                      16,
                                     ),
                                   ),
 
@@ -412,13 +462,12 @@ class _CartScreenState
 
                                       Icon(
 
-                                        Icons
-                                            .warning_amber_rounded,
+                                        Icons.warning_amber_rounded,
 
                                         color:
                                             Colors.red,
 
-                                        size: 20,
+                                        size: 18,
                                       ),
 
                                       SizedBox(
@@ -429,7 +478,7 @@ class _CartScreenState
 
                                         child: Text(
 
-                                          'Some products exceed available stock.',
+                                          'Some products exceed stock.',
 
                                           style:
                                               TextStyle(
@@ -439,6 +488,8 @@ class _CartScreenState
 
                                             fontWeight:
                                                 FontWeight.w600,
+
+                                            fontSize: 12,
                                           ),
                                         ),
                                       ),
@@ -446,84 +497,74 @@ class _CartScreenState
                                   ),
                                 ),
 
-                              // ===============================
+                              // =========================
                               // ANALYTICS
-                              // ===============================
+                              // =========================
 
-                              SingleChildScrollView(
+                              Wrap(
 
-                                scrollDirection:
-                                    Axis.horizontal,
+                                spacing: 12,
 
-                                child: Row(
+                                runSpacing: 12,
 
-                                  children: [
+                                children: [
 
-                                    _buildAnalyticsCard(
+                                  _buildAnalyticsCard(
 
-                                      title:
-                                          'Items',
+                                    title:
+                                        'Items',
 
-                                      value:
-                                          '${cartProvider.totalItems}',
+                                    value:
+                                        '${cartProvider.totalItems}',
 
-                                      icon:
-                                          Icons.shopping_cart,
+                                    icon:
+                                        Icons.shopping_cart,
 
-                                      color:
-                                          Colors.blue,
+                                    color:
+                                        Colors.blue,
+                                  ),
+
+                                  _buildAnalyticsCard(
+
+                                    title:
+                                        'Products',
+
+                                    value:
+                                        '${cartProvider.totalUniqueProducts}',
+
+                                    icon:
+                                        Icons.inventory_2,
+
+                                    color:
+                                        Colors.orange,
+                                  ),
+
+                                  _buildAnalyticsCard(
+
+                                    title:
+                                        'Subtotal',
+
+                                    value:
+                                        AppFormat.currency(
+                                      cartProvider.totalPrice,
                                     ),
 
-                                    const SizedBox(
-                                      width: 14,
-                                    ),
+                                    icon:
+                                        Icons.payments,
 
-                                    _buildAnalyticsCard(
-
-                                      title:
-                                          'Products',
-
-                                      value:
-                                          '${cartProvider.totalUniqueProducts}',
-
-                                      icon:
-                                          Icons.inventory_2,
-
-                                      color:
-                                          Colors.orange,
-                                    ),
-
-                                    const SizedBox(
-                                      width: 14,
-                                    ),
-
-                                    _buildAnalyticsCard(
-
-                                      title:
-                                          'Subtotal',
-
-                                      value:
-                                          AppFormat.currency(
-                                        cartProvider.totalPrice,
-                                      ),
-
-                                      icon:
-                                          Icons.payments,
-
-                                      color:
-                                          Colors.green,
-                                    ),
-                                  ],
-                                ),
+                                    color:
+                                        Colors.green,
+                                  ),
+                                ],
                               ),
 
                               const SizedBox(
-                                height: 26,
+                                height: 24,
                               ),
 
-                              // ===============================
+                              // =========================
                               // TITLE
-                              // ===============================
+                              // =========================
 
                               Row(
 
@@ -533,24 +574,17 @@ class _CartScreenState
 
                                 children: [
 
-                                  const Expanded(
+                                  const Text(
 
-                                    child: Text(
+                                    'Cart Items',
 
-                                      'Cart Products',
+                                    style:
+                                        TextStyle(
 
-                                      overflow:
-                                          TextOverflow
-                                              .ellipsis,
+                                      fontSize: 24,
 
-                                      style:
-                                          TextStyle(
-
-                                        fontSize: 20,
-
-                                        fontWeight:
-                                            FontWeight.bold,
-                                      ),
+                                      fontWeight:
+                                          FontWeight.bold,
                                     ),
                                   ),
 
@@ -575,9 +609,9 @@ class _CartScreenState
                                 height: 18,
                               ),
 
-                              // ===============================
-                              // LIST
-                              // ===============================
+                              // =========================
+                              // ITEMS
+                              // =========================
 
                               ListView.separated(
 
@@ -599,7 +633,7 @@ class _CartScreenState
                                     ) {
 
                                   return const SizedBox(
-                                    height: 14,
+                                    height: 12,
                                   );
                                 },
 
@@ -614,115 +648,14 @@ class _CartScreenState
                                               .items[
                                           index];
 
-                                  final product =
-                                      productProvider
-                                          .getProductById(
-                                    item.productId,
-                                  );
-
-                                  final isSoldOut =
-                                      product ==
-                                              null ||
-
-                                          product.stock <=
-                                              0;
-
-                                  final exceedStock =
-                                      product !=
-                                              null &&
-                                          item.quantity >
-                                              product.stock;
-
-                                  return Column(
-
-                                    children: [
-
-                                      if (isSoldOut ||
-                                          exceedStock)
-
-                                        Container(
-
-                                          width:
-                                              double.infinity,
-
-                                          margin:
-                                              const EdgeInsets.only(
-                                            bottom: 8,
-                                          ),
-
-                                          padding:
-                                              const EdgeInsets.symmetric(
-
-                                            horizontal: 12,
-
-                                            vertical: 10,
-                                          ),
-
-                                          decoration:
-                                              BoxDecoration(
-
-                                            color:
-                                                Colors.red
-                                                    .withOpacity(0.08),
-
-                                            borderRadius:
-                                                BorderRadius.circular(
-                                              14,
-                                            ),
-                                          ),
-
-                                          child:
-                                              Row(
-
-                                            children: [
-
-                                              const Icon(
-
-                                                Icons.warning_rounded,
-
-                                                color:
-                                                    Colors.red,
-
-                                                size: 16,
-                                              ),
-
-                                              const SizedBox(
-                                                width: 8,
-                                              ),
-
-                                              Expanded(
-
-                                                child: Text(
-
-                                                  isSoldOut
-
-                                                      ? '${item.productName} sold out'
-
-                                                      : 'Available stock only ${product.stock}',
-
-                                                  style:
-                                                      const TextStyle(
-
-                                                    color:
-                                                        Colors.red,
-
-                                                    fontSize: 12,
-
-                                                    fontWeight:
-                                                        FontWeight.w600,
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-
-                                      CartItemCard(
-                                        item: item,
-                                      ),
-                                    ],
+                                  return CartItemCard(
+                                    item: item,
                                   );
                                 },
+                              ),
+
+                              const SizedBox(
+                                height: 40,
                               ),
                             ],
                           ),
@@ -730,7 +663,7 @@ class _CartScreenState
                       ),
 
                       // =====================================
-                      // FLOATING SUMMARY
+                      // BOTTOM CHECKOUT
                       // =====================================
 
                       Positioned(
@@ -747,14 +680,14 @@ class _CartScreenState
 
                             constraints:
                                 const BoxConstraints(
-                              maxWidth: 540,
+                              maxWidth: 620,
                             ),
 
                             padding:
                                 EdgeInsets.all(
                               isMobile
                                   ? 18
-                                  : 22,
+                                  : 20,
                             ),
 
                             decoration:
@@ -765,7 +698,7 @@ class _CartScreenState
 
                               borderRadius:
                                   BorderRadius.circular(
-                                26,
+                                24,
                               ),
 
                               boxShadow: [
@@ -774,215 +707,280 @@ class _CartScreenState
 
                                   color:
                                       Colors.black
-                                          .withOpacity(0.06),
+                                          .withOpacity(
+                                    0.05,
+                                  ),
 
-                                  blurRadius: 24,
+                                  blurRadius: 18,
 
                                   offset:
                                       const Offset(
                                     0,
-                                    10,
+                                    8,
                                   ),
                                 ),
                               ],
                             ),
 
-                            child: Column(
+                            child:
+                                isMobile
 
-                              mainAxisSize:
-                                  MainAxisSize.min,
+                                    ? Column(
 
-                              children: [
+                                        children: [
 
-                                _buildPriceRow(
-
-                                  title:
-                                      'Subtotal',
-
-                                  value:
-                                      AppFormat.currency(
-                                    cartProvider.totalPrice,
-                                  ),
-                                ),
-
-                                const SizedBox(
-                                  height: 12,
-                                ),
-
-                                _buildPriceRow(
-
-                                  title:
-                                      'Shipping',
-
-                                  value:
-                                      'Free',
-                                ),
-
-                                const Padding(
-
-                                  padding:
-                                      EdgeInsets.symmetric(
-                                    vertical: 16,
-                                  ),
-
-                                  child: Divider(),
-                                ),
-
-                                Row(
-
-                                  mainAxisAlignment:
-                                      MainAxisAlignment
-                                          .spaceBetween,
-
-                                  children: [
-
-                                    const Text(
-
-                                      'Grand Total',
-
-                                      style:
-                                          TextStyle(
-
-                                        fontSize: 18,
-
-                                        fontWeight:
-                                            FontWeight.bold,
-                                      ),
-                                    ),
-
-                                    Flexible(
-
-                                      child: Text(
-
-                                        AppFormat.currency(
-                                          cartProvider.totalPrice,
-                                        ),
-
-                                        overflow:
-                                            TextOverflow
-                                                .ellipsis,
-
-                                        textAlign:
-                                            TextAlign.right,
-
-                                        style:
-                                            const TextStyle(
-
-                                          fontSize: 22,
-
-                                          color:
-                                              AppColors.primary,
-
-                                          fontWeight:
-                                              FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-
-                                const SizedBox(
-                                  height: 20,
-                                ),
-
-                                SizedBox(
-
-                                  width:
-                                      double.infinity,
-
-                                  height:
-                                      isMobile
-                                          ? 50
-                                          : 56,
-
-                                  child:
-                                      ElevatedButton(
-
-                                    style:
-                                        ElevatedButton.styleFrom(
-
-                                      elevation: 0,
-
-                                      backgroundColor:
-                                          hasInvalidStock
-
-                                              ? Colors.grey
-
-                                              : AppColors.primary,
-
-                                      foregroundColor:
-                                          Colors.white,
-
-                                      shape:
-                                          RoundedRectangleBorder(
-
-                                        borderRadius:
-                                            BorderRadius.circular(
-                                          18,
-                                        ),
-                                      ),
-                                    ),
-
-                                    onPressed:
-                                        hasInvalidStock
-
-                                            ? null
-
-                                            : () {
-
-                                                Navigator.pushNamed(
-
-                                                  context,
-
-                                                  AppRoutes.checkout,
-                                                );
-                                              },
-
-                                    child: Row(
-
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-
-                                      children: [
-
-                                        const Icon(
-                                          Icons.shopping_bag,
-                                          size: 18,
-                                        ),
-
-                                        const SizedBox(
-                                          width: 8,
-                                        ),
-
-                                        Text(
-
-                                          hasInvalidStock
-
-                                              ? 'Stock Not Available'
-
-                                              : 'Proceed Checkout',
-
-                                          style:
-                                              const TextStyle(
-
-                                            fontSize: 15,
-
-                                            fontWeight:
-                                                FontWeight.bold,
+                                          buildSummary(
+                                            cartProvider,
                                           ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
+
+                                          const SizedBox(
+                                            height:
+                                                18,
+                                          ),
+
+                                          buildCheckoutButton(
+                                            hasInvalidStock,
+                                          ),
+                                        ],
+                                      )
+
+                                    : Row(
+
+                                        children: [
+
+                                          Expanded(
+
+                                            child:
+                                                buildSummary(
+                                              cartProvider,
+                                            ),
+                                          ),
+
+                                          const SizedBox(
+                                            width:
+                                                24,
+                                          ),
+
+                                          SizedBox(
+
+                                            width:
+                                                250,
+
+                                            child:
+                                                buildCheckoutButton(
+                                              hasInvalidStock,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                           ),
                         ),
                       ),
                     ],
                   ),
                 ),
+    );
+  }
+
+  // =========================================
+  // SUMMARY
+  // =========================================
+
+  Widget buildSummary(
+    CartProvider cartProvider,
+  ) {
+
+    return Column(
+
+      crossAxisAlignment:
+          CrossAxisAlignment
+              .start,
+
+      children: [
+
+        _buildPriceRow(
+
+          title:
+              'Subtotal',
+
+          value:
+              AppFormat.currency(
+            cartProvider.totalPrice,
+          ),
+        ),
+
+        const SizedBox(
+          height: 10,
+        ),
+
+        _buildPriceRow(
+
+          title:
+              'Shipping',
+
+          value:
+              'Free',
+        ),
+
+        const Padding(
+
+          padding:
+              EdgeInsets.symmetric(
+            vertical: 14,
+          ),
+
+          child: Divider(),
+        ),
+
+        Row(
+
+          mainAxisAlignment:
+              MainAxisAlignment
+                  .spaceBetween,
+
+          children: [
+
+            const Text(
+
+              'Grand Total',
+
+              style:
+                  TextStyle(
+
+                fontSize: 20,
+
+                fontWeight:
+                    FontWeight.bold,
+              ),
+            ),
+
+            Flexible(
+
+              child: Text(
+
+                AppFormat.currency(
+                  cartProvider
+                      .totalPrice,
+                ),
+
+                overflow:
+                    TextOverflow
+                        .ellipsis,
+
+                style:
+                    const TextStyle(
+
+                  fontSize: 28,
+
+                  color:
+                      AppColors
+                          .primary,
+
+                  fontWeight:
+                      FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  // =========================================
+  // CHECKOUT BUTTON
+  // =========================================
+
+  Widget buildCheckoutButton(
+    bool hasInvalidStock,
+  ) {
+
+    return SizedBox(
+
+      width: double.infinity,
+
+      height: 54,
+
+      child: ElevatedButton(
+
+        style:
+            ElevatedButton.styleFrom(
+
+          elevation: 0,
+
+          backgroundColor:
+
+              hasInvalidStock
+
+                  ? Colors.grey
+
+                  : AppColors
+                      .primary,
+
+          foregroundColor:
+              Colors.white,
+
+          shape:
+              RoundedRectangleBorder(
+
+            borderRadius:
+                BorderRadius.circular(
+              18,
+            ),
+          ),
+        ),
+
+        onPressed:
+            hasInvalidStock
+
+                ? null
+
+                : () {
+
+                    Navigator.pushNamed(
+                      context,
+                      AppRoutes
+                          .checkout,
+                    );
+                  },
+
+        child: Row(
+
+          mainAxisAlignment:
+              MainAxisAlignment
+                  .center,
+
+          children: [
+
+            const Icon(
+              Icons.lock,
+              size: 18,
+            ),
+
+            const SizedBox(
+              width: 8,
+            ),
+
+            Text(
+
+              hasInvalidStock
+
+                  ? 'Stock Not Available'
+
+                  : 'Proceed Checkout',
+
+              style:
+                  const TextStyle(
+
+                fontSize: 15,
+
+                fontWeight:
+                    FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -1009,7 +1007,8 @@ class _CartScreenState
 
           title,
 
-          style: TextStyle(
+          style:
+              TextStyle(
 
             color:
                 Colors.grey
@@ -1019,27 +1018,17 @@ class _CartScreenState
           ),
         ),
 
-        Flexible(
+        Text(
 
-          child: Text(
+          value,
 
-            value,
+          style:
+              const TextStyle(
 
-            overflow:
-                TextOverflow
-                    .ellipsis,
+            fontWeight:
+                FontWeight.bold,
 
-            textAlign:
-                TextAlign.right,
-
-            style:
-                const TextStyle(
-
-              fontWeight:
-                  FontWeight.bold,
-
-              fontSize: 15,
-            ),
+            fontSize: 15,
           ),
         ),
       ],
@@ -1063,7 +1052,7 @@ class _CartScreenState
 
     return Container(
 
-      width: 155,
+      width: 145,
 
       padding:
           const EdgeInsets.all(
@@ -1078,7 +1067,7 @@ class _CartScreenState
 
         borderRadius:
             BorderRadius.circular(
-          22,
+          20,
         ),
 
         boxShadow: [
@@ -1087,7 +1076,9 @@ class _CartScreenState
 
             color:
                 Colors.black
-                    .withOpacity(0.04),
+                    .withOpacity(
+              0.04,
+            ),
 
             blurRadius: 14,
 
@@ -1103,7 +1094,8 @@ class _CartScreenState
       child: Column(
 
         crossAxisAlignment:
-            CrossAxisAlignment.start,
+            CrossAxisAlignment
+                .start,
 
         children: [
 
@@ -1169,11 +1161,8 @@ class _CartScreenState
 
             title,
 
-            overflow:
-                TextOverflow
-                    .ellipsis,
-
-            style: TextStyle(
+            style:
+                TextStyle(
 
               color:
                   Colors.grey

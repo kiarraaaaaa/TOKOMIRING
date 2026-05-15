@@ -1,6 +1,6 @@
 // =====================================================
 // lib/widgets/cards/product_card.dart
-// MODERN COMPACT RESPONSIVE VERSION
+// ULTRA COMPACT PREMIUM MARKETPLACE VERSION
 // =====================================================
 
 import 'dart:convert';
@@ -16,7 +16,8 @@ import '../../models/product_model.dart';
 import '../../providers/cart_provider.dart';
 import '../../providers/product_provider.dart';
 
-class ProductCard extends StatefulWidget {
+class ProductCard
+    extends StatefulWidget {
 
   final ProductModel product;
 
@@ -28,8 +29,9 @@ class ProductCard extends StatefulWidget {
   });
 
   @override
-  State<ProductCard> createState() =>
-      _ProductCardState();
+  State<ProductCard>
+      createState() =>
+          _ProductCardState();
 }
 
 class _ProductCardState
@@ -81,8 +83,9 @@ class _ProductCardState
     );
 
     await Future.delayed(
+
       const Duration(
-        milliseconds: 650,
+        milliseconds: 550,
       ),
     );
 
@@ -104,19 +107,24 @@ class _ProductCardState
       SnackBar(
 
         behavior:
-            SnackBarBehavior.floating,
+            SnackBarBehavior
+                .floating,
 
         backgroundColor:
             AppColors.primary,
 
         margin:
-            const EdgeInsets.all(14),
+            const EdgeInsets.all(
+          14,
+        ),
 
         shape:
             RoundedRectangleBorder(
 
           borderRadius:
-              BorderRadius.circular(16),
+              BorderRadius.circular(
+            14,
+          ),
         ),
 
         content: Row(
@@ -124,12 +132,18 @@ class _ProductCardState
           children: [
 
             const Icon(
+
               Icons.check_circle,
-              color: Colors.white,
-              size: 20,
+
+              color:
+                  Colors.white,
+
+              size: 18,
             ),
 
-            const SizedBox(width: 10),
+            const SizedBox(
+              width: 10,
+            ),
 
             Expanded(
 
@@ -138,10 +152,16 @@ class _ProductCardState
                 '${widget.product.name} added to cart',
 
                 overflow:
-                    TextOverflow.ellipsis,
+                    TextOverflow
+                        .ellipsis,
 
-                style: const TextStyle(
-                  color: Colors.white,
+                style:
+                    const TextStyle(
+
+                  color:
+                      Colors.white,
+
+                  fontSize: 12,
                 ),
               ),
             ),
@@ -149,7 +169,9 @@ class _ProductCardState
         ),
 
         duration:
-            const Duration(seconds: 1),
+            const Duration(
+          seconds: 1,
+        ),
       ),
     );
   }
@@ -178,14 +200,16 @@ class _ProductCardState
         screenWidth >= 700;
 
     final imageHeight =
+
         isDesktop
-            ? 125.0
+            ? 108.0
             : isTablet
-                ? 115.0
-                : 100.0;
+                ? 100.0
+                : 92.0;
 
     final isFavorite =
-        productProvider.isFavorite(
+        productProvider
+            .isFavorite(
       widget.product,
     );
 
@@ -207,7 +231,8 @@ class _ProductCardState
         });
       },
 
-      child: AnimatedContainer(
+      child:
+          AnimatedContainer(
 
         duration:
             const Duration(
@@ -218,7 +243,7 @@ class _ProductCardState
             Matrix4.identity()
               ..translate(
                 0.0,
-                hovered ? -3 : 0,
+                hovered ? -2 : 0,
               ),
 
         decoration:
@@ -228,24 +253,49 @@ class _ProductCardState
               Colors.white,
 
           borderRadius:
-              BorderRadius.circular(24),
+              BorderRadius.circular(
+            20,
+          ),
+
+          border: Border.all(
+
+            color:
+
+                hovered
+
+                    ? AppColors
+                        .primary
+                        .withOpacity(
+                      0.10,
+                    )
+
+                    : Colors
+                        .transparent,
+          ),
 
           boxShadow: [
 
             BoxShadow(
 
               color:
-                  Colors.black.withOpacity(
-                hovered ? 0.07 : 0.04,
+                  Colors.black
+                      .withOpacity(
+                hovered
+                    ? 0.06
+                    : 0.035,
               ),
 
               blurRadius:
-                  hovered ? 24 : 14,
+                  hovered
+                      ? 18
+                      : 10,
 
               offset:
                   Offset(
                 0,
-                hovered ? 12 : 6,
+                hovered
+                    ? 10
+                    : 5,
               ),
             ),
           ],
@@ -254,7 +304,8 @@ class _ProductCardState
         child: Column(
 
           crossAxisAlignment:
-              CrossAxisAlignment.start,
+              CrossAxisAlignment
+                  .start,
 
           children: [
 
@@ -264,7 +315,8 @@ class _ProductCardState
 
             SizedBox(
 
-              height: imageHeight,
+              height:
+                  imageHeight,
 
               child: Stack(
 
@@ -272,75 +324,102 @@ class _ProductCardState
 
                   Positioned.fill(
 
-                    child: ClipRRect(
+                    child:
+                        ClipRRect(
 
                       borderRadius:
                           const BorderRadius.only(
 
                         topLeft:
-                            Radius.circular(24),
+                            Radius.circular(
+                          20,
+                        ),
 
                         topRight:
-                            Radius.circular(24),
+                            Radius.circular(
+                          20,
+                        ),
                       ),
 
                       child:
-                          widget.product.imageBase64.isEmpty
+                          widget
+                                  .product
+                                  .imageBase64
+                                  .isEmpty
 
                               ? Container(
 
                                   color:
-                                      Colors.grey.shade200,
+                                      Colors.grey
+                                          .shade200,
 
-                                  child: Icon(
+                                  child:
+                                      Icon(
 
-                                    Icons.image_outlined,
+                                    Icons
+                                        .image_outlined,
 
                                     size:
-                                        isTablet ? 50 : 38,
+                                        32,
 
                                     color:
-                                        Colors.grey.shade500,
+                                        Colors.grey
+                                            .shade500,
                                   ),
                                 )
 
                               : Hero(
 
                                   tag:
-                                      widget.product.id,
+                                      widget
+                                          .product
+                                          .id,
 
-                                  child: Image.memory(
+                                  child:
+                                      Image.memory(
 
                                     base64Decode(
-                                      widget.product.imageBase64,
+                                      widget
+                                          .product
+                                          .imageBase64,
                                     ),
 
-                                    fit: BoxFit.cover,
+                                    fit:
+                                        BoxFit.cover,
 
                                     filterQuality:
-                                        FilterQuality.medium,
+                                        FilterQuality
+                                            .medium,
 
                                     errorBuilder:
                                         (
+
                                       context,
+
                                       error,
+
                                       stackTrace,
+
                                     ) {
 
                                       return Container(
 
                                         color:
-                                            Colors.grey.shade200,
+                                            Colors.grey
+                                                .shade200,
 
                                         child:
                                             Icon(
 
-                                          Icons.broken_image_outlined,
+                                          Icons
+                                              .broken_image_outlined,
 
-                                          size: 40,
+                                          size:
+                                              30,
 
                                           color:
-                                              Colors.grey.shade500,
+                                              Colors.grey
+                                                  .shade500,
                                         ),
                                       );
                                     },
@@ -364,10 +443,14 @@ class _ProductCardState
                             const BorderRadius.only(
 
                           topLeft:
-                              Radius.circular(24),
+                              Radius.circular(
+                            20,
+                          ),
 
                           topRight:
-                              Radius.circular(24),
+                              Radius.circular(
+                            20,
+                          ),
                         ),
 
                         gradient:
@@ -381,9 +464,13 @@ class _ProductCardState
 
                           colors: [
 
-                            Colors.black.withOpacity(0.18),
+                            Colors.black
+                                .withOpacity(
+                              0.14,
+                            ),
 
-                            Colors.transparent,
+                            Colors
+                                .transparent,
                           ],
                         ),
                       ),
@@ -396,33 +483,40 @@ class _ProductCardState
 
                   Positioned(
 
-                    top: 10,
+                    top: 8,
 
-                    left: 10,
+                    left: 8,
 
                     child: Container(
 
                       padding:
                           const EdgeInsets.symmetric(
 
-                        horizontal: 10,
+                        horizontal: 8,
 
-                        vertical: 5,
+                        vertical: 4,
                       ),
 
                       decoration:
                           BoxDecoration(
 
                         color:
-                            Colors.black.withOpacity(0.58),
+                            Colors.black
+                                .withOpacity(
+                          0.55,
+                        ),
 
                         borderRadius:
-                            BorderRadius.circular(20),
+                            BorderRadius.circular(
+                          18,
+                        ),
                       ),
 
                       child: Text(
 
-                        widget.product.category,
+                        widget
+                            .product
+                            .category,
 
                         style:
                             const TextStyle(
@@ -430,7 +524,7 @@ class _ProductCardState
                           color:
                               Colors.white,
 
-                          fontSize: 9,
+                          fontSize: 8,
 
                           fontWeight:
                               FontWeight.bold,
@@ -445,30 +539,36 @@ class _ProductCardState
 
                   Positioned(
 
-                    top: 10,
+                    top: 8,
 
-                    right: 10,
+                    right: 8,
 
-                    child: GestureDetector(
+                    child:
+                        GestureDetector(
 
                       onTap: () {
 
-                        productProvider.toggleFavorite(
-                          widget.product,
+                        productProvider
+                            .toggleFavorite(
+                          widget
+                              .product,
                         );
                       },
 
                       child: Container(
 
-                        width: 32,
+                        width: 28,
 
-                        height: 32,
+                        height: 28,
 
                         decoration:
                             BoxDecoration(
 
                           color:
-                              Colors.white.withOpacity(0.9),
+                              Colors.white
+                                  .withOpacity(
+                            0.92,
+                          ),
 
                           shape:
                               BoxShape.circle,
@@ -477,15 +577,21 @@ class _ProductCardState
                         child: Icon(
 
                           isFavorite
+
                               ? Icons.favorite
+
                               : Icons.favorite_border,
 
                           color:
-                              isFavorite
-                                  ? Colors.red
-                                  : Colors.black54,
 
-                          size: 16,
+                              isFavorite
+
+                                  ? Colors.red
+
+                                  : Colors
+                                      .black54,
+
+                          size: 14,
                         ),
                       ),
                     ),
@@ -497,18 +603,18 @@ class _ProductCardState
 
                   Positioned(
 
-                    left: 10,
+                    left: 8,
 
-                    bottom: 10,
+                    bottom: 8,
 
                     child: Container(
 
                       padding:
                           const EdgeInsets.symmetric(
 
-                        horizontal: 10,
+                        horizontal: 8,
 
-                        vertical: 5,
+                        vertical: 4,
                       ),
 
                       decoration:
@@ -518,15 +624,21 @@ class _ProductCardState
                             getStockColor(),
 
                         borderRadius:
-                            BorderRadius.circular(20),
+                            BorderRadius.circular(
+                          18,
+                        ),
                       ),
 
                       child: Text(
 
                         widget.product.stock <= 0
+
                             ? 'Sold Out'
+
                             : widget.product.stock <= 5
+
                                 ? 'Low'
+
                                 : 'Ready',
 
                         style:
@@ -535,7 +647,7 @@ class _ProductCardState
                           color:
                               Colors.white,
 
-                          fontSize: 9,
+                          fontSize: 8,
 
                           fontWeight:
                               FontWeight.bold,
@@ -556,12 +668,15 @@ class _ProductCardState
               child: Padding(
 
                 padding:
-                    const EdgeInsets.all(12),
+                    const EdgeInsets.all(
+                  10,
+                ),
 
                 child: Column(
 
                   crossAxisAlignment:
-                      CrossAxisAlignment.start,
+                      CrossAxisAlignment
+                          .start,
 
                   children: [
 
@@ -576,21 +691,28 @@ class _ProductCardState
                       maxLines: 2,
 
                       overflow:
-                          TextOverflow.ellipsis,
+                          TextOverflow
+                              .ellipsis,
 
-                      style: TextStyle(
+                      style:
+                          TextStyle(
 
                         fontSize:
-                            isTablet ? 14 : 13,
+
+                            isTablet
+                                ? 13
+                                : 12,
 
                         fontWeight:
                             FontWeight.w700,
 
-                        height: 1.3,
+                        height: 1.25,
                       ),
                     ),
 
-                    const SizedBox(height: 8),
+                    const SizedBox(
+                      height: 6,
+                    ),
 
                     // =================================
                     // PRICE
@@ -603,22 +725,26 @@ class _ProductCardState
                       ),
 
                       overflow:
-                          TextOverflow.ellipsis,
+                          TextOverflow
+                              .ellipsis,
 
                       style:
                           const TextStyle(
 
-                        fontSize: 16,
+                        fontSize: 15,
 
                         fontWeight:
                             FontWeight.bold,
 
                         color:
-                            AppColors.success,
+                            AppColors
+                                .success,
                       ),
                     ),
 
-                    const SizedBox(height: 10),
+                    const SizedBox(
+                      height: 8,
+                    ),
 
                     // =================================
                     // STOCK
@@ -629,9 +755,9 @@ class _ProductCardState
                       padding:
                           const EdgeInsets.symmetric(
 
-                        horizontal: 10,
+                        horizontal: 8,
 
-                        vertical: 7,
+                        vertical: 6,
                       ),
 
                       decoration:
@@ -639,10 +765,14 @@ class _ProductCardState
 
                         color:
                             getStockColor()
-                                .withOpacity(0.08),
+                                .withOpacity(
+                          0.08,
+                        ),
 
                         borderRadius:
-                            BorderRadius.circular(12),
+                            BorderRadius.circular(
+                          10,
+                        ),
                       ),
 
                       child: Row(
@@ -651,28 +781,33 @@ class _ProductCardState
 
                           Icon(
 
-                            Icons.inventory_2_rounded,
+                            Icons
+                                .inventory_2_rounded,
 
-                            size: 15,
+                            size: 13,
 
                             color:
                                 getStockColor(),
                           ),
 
-                          const SizedBox(width: 6),
+                          const SizedBox(
+                            width: 5,
+                          ),
 
                           Expanded(
 
                             child: Text(
 
-                              'Stock: ${widget.product.stock}',
+                              'Stock ${widget.product.stock}',
 
                               overflow:
-                                  TextOverflow.ellipsis,
+                                  TextOverflow
+                                      .ellipsis,
 
-                              style: TextStyle(
+                              style:
+                                  TextStyle(
 
-                                fontSize: 11,
+                                fontSize: 10,
 
                                 color:
                                     getStockColor(),
@@ -694,11 +829,13 @@ class _ProductCardState
 
                     SizedBox(
 
-                      width: double.infinity,
+                      width:
+                          double.infinity,
 
-                      height: 40,
+                      height: 36,
 
-                      child: ElevatedButton.icon(
+                      child:
+                          ElevatedButton.icon(
 
                         style:
                             ElevatedButton.styleFrom(
@@ -706,24 +843,35 @@ class _ProductCardState
                           elevation: 0,
 
                           backgroundColor:
+
                               widget.product.stock <= 0
+
                                   ? Colors.grey
-                                  : AppColors.primary,
+
+                                  : AppColors
+                                      .primary,
 
                           foregroundColor:
                               Colors.white,
+
+                          padding:
+                              const EdgeInsets.symmetric(
+
+                            horizontal: 10,
+                          ),
 
                           shape:
                               RoundedRectangleBorder(
 
                             borderRadius:
                                 BorderRadius.circular(
-                              14,
+                              12,
                             ),
                           ),
                         ),
 
                         onPressed:
+
                             widget.product.stock <= 0
 
                                 ? null
@@ -736,46 +884,58 @@ class _ProductCardState
                                   },
 
                         icon:
+
                             adding
 
                                 ? const SizedBox(
 
-                                    width: 16,
+                                    width:
+                                        14,
 
-                                    height: 16,
+                                    height:
+                                        14,
 
                                     child:
                                         CircularProgressIndicator(
 
                                       color:
-                                          Colors.white,
+                                          Colors
+                                              .white,
 
-                                      strokeWidth: 2,
+                                      strokeWidth:
+                                          2,
                                     ),
                                   )
 
                                 : const Icon(
 
-                                    Icons.shopping_cart_rounded,
+                                    Icons
+                                        .shopping_cart_rounded,
 
-                                    size: 18,
+                                    size:
+                                        15,
                                   ),
 
                         label: Text(
 
                           widget.product.stock <= 0
+
                               ? 'Unavailable'
+
                               : adding
-                                  ? 'Adding...'
-                                  : 'Add To Cart',
+
+                                  ? 'Adding'
+
+                                  : 'Add',
 
                           overflow:
-                              TextOverflow.ellipsis,
+                              TextOverflow
+                                  .ellipsis,
 
                           style:
                               const TextStyle(
 
-                            fontSize: 12,
+                            fontSize: 11,
 
                             fontWeight:
                                 FontWeight.bold,
