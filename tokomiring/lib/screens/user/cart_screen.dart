@@ -1,4 +1,7 @@
+// =====================================================
 // lib/screens/user/cart_screen.dart
+// CLEAN MODERN RESPONSIVE VERSION
+// =====================================================
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -7,6 +10,7 @@ import '../../core/constants/app_colors.dart';
 import '../../core/utils/app_format.dart';
 
 import '../../providers/cart_provider.dart';
+import '../../providers/product_provider.dart';
 
 import '../../routes/app_routes.dart';
 
@@ -36,10 +40,6 @@ class _CartScreenState
   late Animation<double>
       _fadeAnimation;
 
-  // =====================================================
-  // INIT
-  // =====================================================
-
   @override
   void initState() {
 
@@ -52,7 +52,7 @@ class _CartScreenState
 
       duration:
           const Duration(
-        milliseconds: 500,
+        milliseconds: 450,
       ),
     );
 
@@ -66,26 +66,57 @@ class _CartScreenState
           Curves.easeOut,
     );
 
-    _animationController
-        .forward();
+    _animationController.forward();
   }
-
-  // =====================================================
-  // DISPOSE
-  // =====================================================
 
   @override
   void dispose() {
 
-    _animationController
-        .dispose();
+    _animationController.dispose();
 
     super.dispose();
   }
 
-  // =====================================================
+  // =========================================
+  // STOCK VALIDATION
+  // =========================================
+
+  bool _hasInvalidStock(
+
+    CartProvider cartProvider,
+
+    ProductProvider productProvider,
+  ) {
+
+    for (final item
+        in cartProvider.items) {
+
+      final product =
+          productProvider
+              .getProductById(
+        item.productId,
+      );
+
+      if (product == null) {
+        return true;
+      }
+
+      if (product.stock <= 0) {
+        return true;
+      }
+
+      if (item.quantity >
+          product.stock) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  // =========================================
   // BUILD
-  // =====================================================
+  // =========================================
 
   @override
   Widget build(
@@ -93,27 +124,35 @@ class _CartScreenState
   ) {
 
     final cartProvider =
-        context.watch<
-            CartProvider>();
+        context.watch<CartProvider>();
+
+    final productProvider =
+        context.watch<ProductProvider>();
 
     final screenWidth =
         MediaQuery.of(context)
             .size
             .width;
 
-    final isTablet =
-        screenWidth >= 700;
+    final isMobile =
+        screenWidth < 700;
+
+    final hasInvalidStock =
+        _hasInvalidStock(
+
+      cartProvider,
+
+      productProvider,
+    );
 
     return Scaffold(
 
       backgroundColor:
-          const Color(
-        0xffF5F7FB,
-      ),
+          const Color(0xffF4F7FC),
 
-      // ===================================================
+      // =====================================
       // APPBAR
-      // ===================================================
+      // =====================================
 
       appBar: AppBar(
 
@@ -127,14 +166,14 @@ class _CartScreenState
 
         centerTitle: false,
 
-        titleSpacing: 20,
+        titleSpacing: 18,
 
-        title: const Column(
+        title: Column(
 
           crossAxisAlignment:
               CrossAxisAlignment.start,
 
-          children: [
+          children: const [
 
             Text(
 
@@ -145,7 +184,7 @@ class _CartScreenState
                 color:
                     Colors.black,
 
-                fontSize: 24,
+                fontSize: 20,
 
                 fontWeight:
                     FontWeight.bold,
@@ -158,22 +197,23 @@ class _CartScreenState
 
             Text(
 
-              'Premium marketplace checkout',
+              'Premium checkout experience',
 
               style: TextStyle(
 
-                color: Colors.grey,
+                color:
+                    Colors.grey,
 
-                fontSize: 13,
+                fontSize: 12,
               ),
             ),
           ],
         ),
       ),
 
-      // ===================================================
+      // =====================================
       // EMPTY
-      // ===================================================
+      // =====================================
 
       body:
           cartProvider.isEmpty
@@ -195,16 +235,21 @@ class _CartScreenState
                       child: Column(
 
                         mainAxisAlignment:
-                            MainAxisAlignment
-                                .center,
+                            MainAxisAlignment.center,
 
                         children: [
 
                           Container(
 
-                            width: 180,
+                            width:
+                                isMobile
+                                    ? 140
+                                    : 180,
 
-                            height: 180,
+                            height:
+                                isMobile
+                                    ? 140
+                                    : 180,
 
                             decoration:
                                 BoxDecoration(
@@ -217,17 +262,11 @@ class _CartScreenState
 
                                 colors: [
 
-                                  AppColors
-                                      .primary
-                                      .withOpacity(
-                                    0.15,
-                                  ),
+                                  AppColors.primary
+                                      .withOpacity(0.12),
 
-                                  AppColors
-                                      .primary
-                                      .withOpacity(
-                                    0.05,
-                                  ),
+                                  AppColors.primary
+                                      .withOpacity(0.04),
                                 ],
                               ),
                             ),
@@ -238,16 +277,15 @@ class _CartScreenState
                               Icons
                                   .shopping_bag_outlined,
 
-                              size: 90,
+                              size: 72,
 
                               color:
-                                  AppColors
-                                      .primary,
+                                  AppColors.primary,
                             ),
                           ),
 
                           const SizedBox(
-                            height: 30,
+                            height: 24,
                           ),
 
                           const Text(
@@ -259,7 +297,7 @@ class _CartScreenState
 
                             style: TextStyle(
 
-                              fontSize: 28,
+                              fontSize: 24,
 
                               fontWeight:
                                   FontWeight.bold,
@@ -267,7 +305,7 @@ class _CartScreenState
                           ),
 
                           const SizedBox(
-                            height: 14,
+                            height: 10,
                           ),
 
                           Text(
@@ -280,11 +318,9 @@ class _CartScreenState
                             style: TextStyle(
 
                               color:
-                                  Colors
-                                      .grey
-                                      .shade600,
+                                  Colors.grey.shade600,
 
-                              fontSize: 16,
+                              fontSize: 14,
                             ),
                           ),
                         ],
@@ -293,9 +329,9 @@ class _CartScreenState
                   ),
                 )
 
-              // =================================================
-              // CART CONTENT
-              // =================================================
+              // =====================================
+              // CONTENT
+              // =====================================
 
               : FadeTransition(
 
@@ -306,15 +342,15 @@ class _CartScreenState
 
                     children: [
 
-                      // =========================================
-                      // CONTENT
-                      // =========================================
-
                       Padding(
 
                         padding:
-                            const EdgeInsets.only(
-                          bottom: 240,
+                            EdgeInsets.only(
+
+                          bottom:
+                              isMobile
+                                  ? 220
+                                  : 240,
                         ),
 
                         child: SingleChildScrollView(
@@ -323,87 +359,171 @@ class _CartScreenState
                               const BouncingScrollPhysics(),
 
                           padding:
-                              const EdgeInsets.all(
-                            20,
+                              EdgeInsets.all(
+                            isMobile
+                                ? 14
+                                : 20,
                           ),
 
                           child: Column(
 
                             crossAxisAlignment:
-                                CrossAxisAlignment
-                                    .start,
+                                CrossAxisAlignment.start,
 
                             children: [
 
-                              // =================================
+                              // ===============================
+                              // WARNING
+                              // ===============================
+
+                              if (hasInvalidStock)
+
+                                Container(
+
+                                  width:
+                                      double.infinity,
+
+                                  margin:
+                                      const EdgeInsets.only(
+                                    bottom: 18,
+                                  ),
+
+                                  padding:
+                                      const EdgeInsets.all(
+                                    14,
+                                  ),
+
+                                  decoration:
+                                      BoxDecoration(
+
+                                    color:
+                                        Colors.red
+                                            .withOpacity(0.08),
+
+                                    borderRadius:
+                                        BorderRadius.circular(
+                                      18,
+                                    ),
+                                  ),
+
+                                  child: const Row(
+
+                                    children: [
+
+                                      Icon(
+
+                                        Icons
+                                            .warning_amber_rounded,
+
+                                        color:
+                                            Colors.red,
+
+                                        size: 20,
+                                      ),
+
+                                      SizedBox(
+                                        width: 10,
+                                      ),
+
+                                      Expanded(
+
+                                        child: Text(
+
+                                          'Some products exceed available stock.',
+
+                                          style:
+                                              TextStyle(
+
+                                            color:
+                                                Colors.red,
+
+                                            fontWeight:
+                                                FontWeight.w600,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+
+                              // ===============================
                               // ANALYTICS
-                              // =================================
+                              // ===============================
 
-                              Wrap(
+                              SingleChildScrollView(
 
-                                spacing: 16,
+                                scrollDirection:
+                                    Axis.horizontal,
 
-                                runSpacing: 16,
+                                child: Row(
 
-                                children: [
+                                  children: [
 
-                                  _buildAnalyticsCard(
+                                    _buildAnalyticsCard(
 
-                                    title:
-                                        'Items',
+                                      title:
+                                          'Items',
 
-                                    value:
-                                        '${cartProvider.totalItems}',
+                                      value:
+                                          '${cartProvider.totalItems}',
 
-                                    icon:
-                                        Icons.shopping_cart,
+                                      icon:
+                                          Icons.shopping_cart,
 
-                                    color:
-                                        Colors.blue,
-                                  ),
-
-                                  _buildAnalyticsCard(
-
-                                    title:
-                                        'Products',
-
-                                    value:
-                                        '${cartProvider.totalUniqueProducts}',
-
-                                    icon:
-                                        Icons.inventory_2,
-
-                                    color:
-                                        Colors.orange,
-                                  ),
-
-                                  _buildAnalyticsCard(
-
-                                    title:
-                                        'Subtotal',
-
-                                    value:
-                                        AppFormat.currency(
-                                      cartProvider
-                                          .totalPrice,
+                                      color:
+                                          Colors.blue,
                                     ),
 
-                                    icon:
-                                        Icons.payments,
+                                    const SizedBox(
+                                      width: 14,
+                                    ),
 
-                                    color:
-                                        Colors.green,
-                                  ),
-                                ],
+                                    _buildAnalyticsCard(
+
+                                      title:
+                                          'Products',
+
+                                      value:
+                                          '${cartProvider.totalUniqueProducts}',
+
+                                      icon:
+                                          Icons.inventory_2,
+
+                                      color:
+                                          Colors.orange,
+                                    ),
+
+                                    const SizedBox(
+                                      width: 14,
+                                    ),
+
+                                    _buildAnalyticsCard(
+
+                                      title:
+                                          'Subtotal',
+
+                                      value:
+                                          AppFormat.currency(
+                                        cartProvider.totalPrice,
+                                      ),
+
+                                      icon:
+                                          Icons.payments,
+
+                                      color:
+                                          Colors.green,
+                                    ),
+                                  ],
+                                ),
                               ),
 
                               const SizedBox(
-                                height: 30,
+                                height: 26,
                               ),
 
-                              // =================================
+                              // ===============================
                               // TITLE
-                              // =================================
+                              // ===============================
 
                               Row(
 
@@ -426,8 +546,7 @@ class _CartScreenState
                                       style:
                                           TextStyle(
 
-                                        fontSize:
-                                            24,
+                                        fontSize: 20,
 
                                         fontWeight:
                                             FontWeight.bold,
@@ -437,27 +556,28 @@ class _CartScreenState
 
                                   Text(
 
-                                    '${cartProvider.totalItems} Items',
+                                    '${cartProvider.totalItems} items',
 
                                     style:
                                         TextStyle(
 
                                       color:
-                                          Colors
-                                              .grey
+                                          Colors.grey
                                               .shade600,
+
+                                      fontSize: 12,
                                     ),
                                   ),
                                 ],
                               ),
 
                               const SizedBox(
-                                height: 20,
+                                height: 18,
                               ),
 
-                              // =================================
+                              // ===============================
                               // LIST
-                              // =================================
+                              // ===============================
 
                               ListView.separated(
 
@@ -479,8 +599,7 @@ class _CartScreenState
                                     ) {
 
                                   return const SizedBox(
-                                    height:
-                                        18,
+                                    height: 14,
                                   );
                                 },
 
@@ -495,19 +614,113 @@ class _CartScreenState
                                               .items[
                                           index];
 
-                                  return AnimatedContainer(
+                                  final product =
+                                      productProvider
+                                          .getProductById(
+                                    item.productId,
+                                  );
 
-                                    duration:
-                                        const Duration(
-                                      milliseconds:
-                                          250,
-                                    ),
+                                  final isSoldOut =
+                                      product ==
+                                              null ||
 
-                                    child:
-                                        CartItemCard(
-                                      item:
-                                          item,
-                                    ),
+                                          product.stock <=
+                                              0;
+
+                                  final exceedStock =
+                                      product !=
+                                              null &&
+                                          item.quantity >
+                                              product.stock;
+
+                                  return Column(
+
+                                    children: [
+
+                                      if (isSoldOut ||
+                                          exceedStock)
+
+                                        Container(
+
+                                          width:
+                                              double.infinity,
+
+                                          margin:
+                                              const EdgeInsets.only(
+                                            bottom: 8,
+                                          ),
+
+                                          padding:
+                                              const EdgeInsets.symmetric(
+
+                                            horizontal: 12,
+
+                                            vertical: 10,
+                                          ),
+
+                                          decoration:
+                                              BoxDecoration(
+
+                                            color:
+                                                Colors.red
+                                                    .withOpacity(0.08),
+
+                                            borderRadius:
+                                                BorderRadius.circular(
+                                              14,
+                                            ),
+                                          ),
+
+                                          child:
+                                              Row(
+
+                                            children: [
+
+                                              const Icon(
+
+                                                Icons.warning_rounded,
+
+                                                color:
+                                                    Colors.red,
+
+                                                size: 16,
+                                              ),
+
+                                              const SizedBox(
+                                                width: 8,
+                                              ),
+
+                                              Expanded(
+
+                                                child: Text(
+
+                                                  isSoldOut
+
+                                                      ? '${item.productName} sold out'
+
+                                                      : 'Available stock only ${product.stock}',
+
+                                                  style:
+                                                      const TextStyle(
+
+                                                    color:
+                                                        Colors.red,
+
+                                                    fontSize: 12,
+
+                                                    fontWeight:
+                                                        FontWeight.w600,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+
+                                      CartItemCard(
+                                        item: item,
+                                      ),
+                                    ],
                                   );
                                 },
                               ),
@@ -516,281 +729,254 @@ class _CartScreenState
                         ),
                       ),
 
-                      // =========================================
+                      // =====================================
                       // FLOATING SUMMARY
-                      // =========================================
+                      // =====================================
 
                       Positioned(
 
-                        left: 20,
+                        left: 14,
 
-                        right: 20,
+                        right: 14,
 
-                        bottom: 20,
+                        bottom: 14,
 
-                        child:
-                            AnimatedContainer(
+                        child: Center(
 
-                          duration:
-                              const Duration(
-                            milliseconds:
-                                250,
-                          ),
+                          child: Container(
 
-                          constraints:
-                              BoxConstraints(
-
-                            maxWidth:
-                                isTablet
-                                    ? 600
-                                    : double
-                                        .infinity,
-                          ),
-
-                          padding:
-                              const EdgeInsets.all(
-                            24,
-                          ),
-
-                          decoration:
-                              BoxDecoration(
-
-                            color:
-                                Colors.white,
-
-                            borderRadius:
-                                BorderRadius.circular(
-                              30,
+                            constraints:
+                                const BoxConstraints(
+                              maxWidth: 540,
                             ),
 
-                            boxShadow: [
+                            padding:
+                                EdgeInsets.all(
+                              isMobile
+                                  ? 18
+                                  : 22,
+                            ),
 
-                              BoxShadow(
+                            decoration:
+                                BoxDecoration(
 
-                                color:
-                                    Colors
-                                        .black
-                                        .withOpacity(
-                                  0.08,
+                              color:
+                                  Colors.white,
+
+                              borderRadius:
+                                  BorderRadius.circular(
+                                26,
+                              ),
+
+                              boxShadow: [
+
+                                BoxShadow(
+
+                                  color:
+                                      Colors.black
+                                          .withOpacity(0.06),
+
+                                  blurRadius: 24,
+
+                                  offset:
+                                      const Offset(
+                                    0,
+                                    10,
+                                  ),
+                                ),
+                              ],
+                            ),
+
+                            child: Column(
+
+                              mainAxisSize:
+                                  MainAxisSize.min,
+
+                              children: [
+
+                                _buildPriceRow(
+
+                                  title:
+                                      'Subtotal',
+
+                                  value:
+                                      AppFormat.currency(
+                                    cartProvider.totalPrice,
+                                  ),
                                 ),
 
-                                blurRadius:
-                                    30,
-
-                                offset:
-                                    const Offset(
-                                  0,
-                                  10,
-                                ),
-                              ),
-                            ],
-                          ),
-
-                          child: Column(
-
-                            mainAxisSize:
-                                MainAxisSize.min,
-
-                            children: [
-
-                              // =============================
-                              // SUBTOTAL
-                              // =============================
-
-                              _buildPriceRow(
-
-                                title:
-                                    'Subtotal',
-
-                                value:
-                                    AppFormat.currency(
-                                  cartProvider
-                                      .totalPrice,
-                                ),
-                              ),
-
-                              const SizedBox(
-                                height: 14,
-                              ),
-
-                              // =============================
-                              // SHIPPING
-                              // =============================
-
-                              _buildPriceRow(
-
-                                title:
-                                    'Shipping',
-
-                                value:
-                                    'Free',
-                              ),
-
-                              const Padding(
-
-                                padding:
-                                    EdgeInsets.symmetric(
-                                  vertical:
-                                      18,
+                                const SizedBox(
+                                  height: 12,
                                 ),
 
-                                child: Divider(),
-                              ),
+                                _buildPriceRow(
 
-                              // =============================
-                              // TOTAL
-                              // =============================
+                                  title:
+                                      'Shipping',
 
-                              Row(
+                                  value:
+                                      'Free',
+                                ),
 
-                                mainAxisAlignment:
-                                    MainAxisAlignment
-                                        .spaceBetween,
+                                const Padding(
 
-                                children: [
-
-                                  const Text(
-
-                                    'Grand Total',
-
-                                    style:
-                                        TextStyle(
-
-                                      fontSize:
-                                          20,
-
-                                      fontWeight:
-                                          FontWeight.bold,
-                                    ),
+                                  padding:
+                                      EdgeInsets.symmetric(
+                                    vertical: 16,
                                   ),
 
-                                  Flexible(
+                                  child: Divider(),
+                                ),
 
-                                    child: Text(
+                                Row(
 
-                                      AppFormat.currency(
-                                        cartProvider
-                                            .totalPrice,
-                                      ),
+                                  mainAxisAlignment:
+                                      MainAxisAlignment
+                                          .spaceBetween,
 
-                                      overflow:
-                                          TextOverflow
-                                              .ellipsis,
+                                  children: [
 
-                                      textAlign:
-                                          TextAlign
-                                              .right,
+                                    const Text(
+
+                                      'Grand Total',
 
                                       style:
-                                          const TextStyle(
+                                          TextStyle(
 
-                                        fontSize:
-                                            24,
-
-                                        color:
-                                            AppColors
-                                                .primary,
+                                        fontSize: 18,
 
                                         fontWeight:
                                             FontWeight.bold,
                                       ),
                                     ),
-                                  ),
-                                ],
-                              ),
 
-                              const SizedBox(
-                                height: 24,
-                              ),
+                                    Flexible(
 
-                              // =============================
-                              // BUTTON
-                              // =============================
+                                      child: Text(
 
-                              SizedBox(
+                                        AppFormat.currency(
+                                          cartProvider.totalPrice,
+                                        ),
 
-                                width:
-                                    double.infinity,
+                                        overflow:
+                                            TextOverflow
+                                                .ellipsis,
 
-                                height: 60,
-
-                                child:
-                                    ElevatedButton(
-
-                                  style:
-                                      ElevatedButton.styleFrom(
-
-                                    backgroundColor:
-                                        AppColors
-                                            .primary,
-
-                                    foregroundColor:
-                                        Colors
-                                            .white,
-
-                                    elevation:
-                                        0,
-
-                                    shape:
-                                        RoundedRectangleBorder(
-
-                                      borderRadius:
-                                          BorderRadius.circular(
-                                        20,
-                                      ),
-                                    ),
-                                  ),
-
-                                  onPressed: () {
-
-                                    Navigator
-                                        .pushNamed(
-
-                                      context,
-
-                                      AppRoutes
-                                          .checkout,
-                                    );
-                                  },
-
-                                  child:
-                                      const Row(
-
-                                    mainAxisAlignment:
-                                        MainAxisAlignment
-                                            .center,
-
-                                    children: [
-
-                                      Icon(
-                                        Icons
-                                            .shopping_bag,
-                                      ),
-
-                                      SizedBox(
-                                        width:
-                                            10,
-                                      ),
-
-                                      Text(
-
-                                        'Proceed Checkout',
+                                        textAlign:
+                                            TextAlign.right,
 
                                         style:
-                                            TextStyle(
+                                            const TextStyle(
 
-                                          fontSize:
-                                              18,
+                                          fontSize: 22,
+
+                                          color:
+                                              AppColors.primary,
 
                                           fontWeight:
                                               FontWeight.bold,
                                         ),
                                       ),
-                                    ],
+                                    ),
+                                  ],
+                                ),
+
+                                const SizedBox(
+                                  height: 20,
+                                ),
+
+                                SizedBox(
+
+                                  width:
+                                      double.infinity,
+
+                                  height:
+                                      isMobile
+                                          ? 50
+                                          : 56,
+
+                                  child:
+                                      ElevatedButton(
+
+                                    style:
+                                        ElevatedButton.styleFrom(
+
+                                      elevation: 0,
+
+                                      backgroundColor:
+                                          hasInvalidStock
+
+                                              ? Colors.grey
+
+                                              : AppColors.primary,
+
+                                      foregroundColor:
+                                          Colors.white,
+
+                                      shape:
+                                          RoundedRectangleBorder(
+
+                                        borderRadius:
+                                            BorderRadius.circular(
+                                          18,
+                                        ),
+                                      ),
+                                    ),
+
+                                    onPressed:
+                                        hasInvalidStock
+
+                                            ? null
+
+                                            : () {
+
+                                                Navigator.pushNamed(
+
+                                                  context,
+
+                                                  AppRoutes.checkout,
+                                                );
+                                              },
+
+                                    child: Row(
+
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+
+                                      children: [
+
+                                        const Icon(
+                                          Icons.shopping_bag,
+                                          size: 18,
+                                        ),
+
+                                        const SizedBox(
+                                          width: 8,
+                                        ),
+
+                                        Text(
+
+                                          hasInvalidStock
+
+                                              ? 'Stock Not Available'
+
+                                              : 'Proceed Checkout',
+
+                                          style:
+                                              const TextStyle(
+
+                                            fontSize: 15,
+
+                                            fontWeight:
+                                                FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -800,16 +986,15 @@ class _CartScreenState
     );
   }
 
-  // =====================================================
+  // =========================================
   // PRICE ROW
-  // =====================================================
+  // =========================================
 
   Widget _buildPriceRow({
 
     required String title,
 
     required String value,
-
   }) {
 
     return Row(
@@ -830,7 +1015,7 @@ class _CartScreenState
                 Colors.grey
                     .shade700,
 
-            fontSize: 15,
+            fontSize: 14,
           ),
         ),
 
@@ -853,7 +1038,7 @@ class _CartScreenState
               fontWeight:
                   FontWeight.bold,
 
-              fontSize: 16,
+              fontSize: 15,
             ),
           ),
         ),
@@ -861,9 +1046,9 @@ class _CartScreenState
     );
   }
 
-  // =====================================================
+  // =========================================
   // ANALYTICS CARD
-  // =====================================================
+  // =========================================
 
   Widget _buildAnalyticsCard({
 
@@ -874,16 +1059,15 @@ class _CartScreenState
     required IconData icon,
 
     required Color color,
-
   }) {
 
     return Container(
 
-      width: 170,
+      width: 155,
 
       padding:
           const EdgeInsets.all(
-        18,
+        16,
       ),
 
       decoration:
@@ -894,7 +1078,7 @@ class _CartScreenState
 
         borderRadius:
             BorderRadius.circular(
-          24,
+          22,
         ),
 
         boxShadow: [
@@ -903,17 +1087,14 @@ class _CartScreenState
 
             color:
                 Colors.black
-                    .withOpacity(
-              0.04,
-            ),
+                    .withOpacity(0.04),
 
-            blurRadius:
-                15,
+            blurRadius: 14,
 
             offset:
                 const Offset(
               0,
-              8,
+              6,
             ),
           ),
         ],
@@ -922,8 +1103,7 @@ class _CartScreenState
       child: Column(
 
         crossAxisAlignment:
-            CrossAxisAlignment
-                .start,
+            CrossAxisAlignment.start,
 
         children: [
 
@@ -931,7 +1111,7 @@ class _CartScreenState
 
             padding:
                 const EdgeInsets.all(
-              12,
+              10,
             ),
 
             decoration:
@@ -939,12 +1119,12 @@ class _CartScreenState
 
               color:
                   color.withOpacity(
-                0.12,
+                0.10,
               ),
 
               borderRadius:
                   BorderRadius.circular(
-                18,
+                14,
               ),
             ),
 
@@ -954,11 +1134,13 @@ class _CartScreenState
 
               color:
                   color,
+
+              size: 18,
             ),
           ),
 
           const SizedBox(
-            height: 18,
+            height: 14,
           ),
 
           Text(
@@ -972,7 +1154,7 @@ class _CartScreenState
             style:
                 const TextStyle(
 
-              fontSize: 22,
+              fontSize: 18,
 
               fontWeight:
                   FontWeight.bold,
@@ -994,9 +1176,10 @@ class _CartScreenState
             style: TextStyle(
 
               color:
-                  Colors
-                      .grey
+                  Colors.grey
                       .shade600,
+
+              fontSize: 12,
             ),
           ),
         ],

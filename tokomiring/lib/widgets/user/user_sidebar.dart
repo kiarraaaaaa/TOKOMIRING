@@ -1,4 +1,7 @@
+// =====================================================
 // lib/widgets/user/user_sidebar.dart
+// FINAL ULTRA PREMIUM RESPONSIVE VERSION
+// =====================================================
 
 import 'dart:convert';
 
@@ -46,24 +49,27 @@ class _UserSidebarState
   ) {
 
     final authProvider =
-        context.watch<
-            AuthProvider>();
+        context.watch<AuthProvider>();
 
     final currentUser =
         authProvider.user;
 
     final memberName =
-        currentUser?.displayName?.trim().isNotEmpty ==
+        currentUser?.displayName
+                    ?.trim()
+                    .isNotEmpty ==
                 true
-            ? currentUser!.displayName!
-            : currentUser?.name.trim().isNotEmpty ==
-                    true
-                ? currentUser!.name
-                : 'Member';
 
-    final memberRole =
-        currentUser?.roleLabel ??
-            'Member';
+            ? currentUser!.displayName!
+
+            : currentUser?.name
+                        .trim()
+                        .isNotEmpty ==
+                    true
+
+                ? currentUser!.name
+
+                : 'Member';
 
     final photoUrl =
         currentUser?.safePhotoUrl ??
@@ -74,22 +80,22 @@ class _UserSidebarState
             .size
             .width;
 
-    final bool isTablet =
+    final isTablet =
         width < 1200;
 
-    final bool isMobile =
+    final isMobile =
         width < 820;
 
-    double sidebarWidth = 176;
+    double sidebarWidth = 220;
 
     if (collapsed &&
         !isMobile) {
 
-      sidebarWidth = 68;
+      sidebarWidth = 82;
 
     } else if (isTablet) {
 
-      sidebarWidth = 156;
+      sidebarWidth = 190;
     }
 
     return AnimatedContainer(
@@ -99,7 +105,8 @@ class _UserSidebarState
         milliseconds: 220,
       ),
 
-      width: sidebarWidth,
+      width:
+          sidebarWidth,
 
       decoration:
           const BoxDecoration(
@@ -129,40 +136,47 @@ class _UserSidebarState
       child: SafeArea(
 
         child: Column(
+
           children: [
 
-            // =============================================
+            // =====================================
             // HEADER
-            // =============================================
+            // =====================================
 
             Padding(
 
               padding:
                   const EdgeInsets.fromLTRB(
-                8,
-                10,
-                8,
-                4,
+                14,
+                18,
+                14,
+                12,
               ),
 
               child: Row(
+
                 children: [
 
-                  Container(
+                  AnimatedContainer(
+
+                    duration:
+                        const Duration(
+                      milliseconds: 220,
+                    ),
 
                     width:
                         collapsed
-                            ? 34
-                            : 36,
+                            ? 44
+                            : 48,
 
                     height:
                         collapsed
-                            ? 34
-                            : 36,
+                            ? 44
+                            : 48,
 
                     padding:
                         const EdgeInsets.all(
-                      4,
+                      7,
                     ),
 
                     decoration:
@@ -176,7 +190,7 @@ class _UserSidebarState
 
                       borderRadius:
                           BorderRadius.circular(
-                        10,
+                        16,
                       ),
                     ),
 
@@ -185,14 +199,15 @@ class _UserSidebarState
 
                       borderRadius:
                           BorderRadius.circular(
-                        8,
+                        12,
                       ),
 
                       child: Image.asset(
 
                         'assets/images/tokomiring.png',
 
-                        fit: BoxFit.cover,
+                        fit:
+                            BoxFit.cover,
                       ),
                     ),
                   ),
@@ -201,7 +216,7 @@ class _UserSidebarState
                       isMobile) ...[
 
                     const SizedBox(
-                      width: 7,
+                      width: 12,
                     ),
 
                     Expanded(
@@ -211,9 +226,6 @@ class _UserSidebarState
                         crossAxisAlignment:
                             CrossAxisAlignment
                                 .start,
-
-                        mainAxisSize:
-                            MainAxisSize.min,
 
                         children: const [
 
@@ -236,17 +248,17 @@ class _UserSidebarState
                               fontWeight:
                                   FontWeight.bold,
 
-                              fontSize: 10,
+                              fontSize: 13,
                             ),
                           ),
 
                           SizedBox(
-                            height: 1,
+                            height: 2,
                           ),
 
                           Text(
 
-                            'Member Dashboard',
+                            'Premium Dashboard',
 
                             overflow:
                                 TextOverflow
@@ -260,7 +272,7 @@ class _UserSidebarState
                               color:
                                   Colors.white70,
 
-                              fontSize: 7.5,
+                              fontSize: 10,
                             ),
                           ),
                         ],
@@ -274,7 +286,7 @@ class _UserSidebarState
 
                       borderRadius:
                           BorderRadius.circular(
-                        8,
+                        12,
                       ),
 
                       onTap: () {
@@ -288,9 +300,9 @@ class _UserSidebarState
 
                       child: Container(
 
-                        width: 26,
+                        width: 36,
 
-                        height: 26,
+                        height: 36,
 
                         decoration:
                             BoxDecoration(
@@ -303,7 +315,7 @@ class _UserSidebarState
 
                           borderRadius:
                               BorderRadius.circular(
-                            8,
+                            12,
                           ),
                         ),
 
@@ -315,7 +327,7 @@ class _UserSidebarState
 
                               : Icons.menu_open_rounded,
 
-                          size: 14,
+                          size: 18,
 
                           color:
                               Colors.white,
@@ -326,30 +338,25 @@ class _UserSidebarState
               ),
             ),
 
-            const SizedBox(
-              height: 4,
-            ),
-
-            // =============================================
+            // =====================================
             // MENU
-            // =============================================
+            // =====================================
 
             Expanded(
 
-              child:
-                  ListView(
+              child: ListView(
 
                 physics:
                     const BouncingScrollPhysics(),
 
                 padding:
                     const EdgeInsets.symmetric(
-                  horizontal: 7,
+                  horizontal: 12,
                 ),
 
                 children: [
 
-                  sidebarItem(
+                  buildSidebarItem(
                     icon:
                         Icons.dashboard_rounded,
                     title:
@@ -357,7 +364,7 @@ class _UserSidebarState
                     index: 0,
                   ),
 
-                  sidebarItem(
+                  buildSidebarItem(
                     icon:
                         Icons.shopping_bag_rounded,
                     title:
@@ -365,7 +372,7 @@ class _UserSidebarState
                     index: 1,
                   ),
 
-                  sidebarItem(
+                  buildSidebarItem(
                     icon:
                         Icons.shopping_cart_rounded,
                     title:
@@ -373,7 +380,7 @@ class _UserSidebarState
                     index: 2,
                   ),
 
-                  sidebarItem(
+                  buildSidebarItem(
                     icon:
                         Icons.receipt_long_rounded,
                     title:
@@ -381,7 +388,7 @@ class _UserSidebarState
                     index: 3,
                   ),
 
-                  sidebarItem(
+                  buildSidebarItem(
                     icon:
                         Icons.favorite_rounded,
                     title:
@@ -389,7 +396,7 @@ class _UserSidebarState
                     index: 4,
                   ),
 
-                  sidebarItem(
+                  buildSidebarItem(
                     icon:
                         Icons.notifications_rounded,
                     title:
@@ -397,7 +404,7 @@ class _UserSidebarState
                     index: 5,
                   ),
 
-                  sidebarItem(
+                  buildSidebarItem(
                     icon:
                         Icons.person_rounded,
                     title:
@@ -408,28 +415,29 @@ class _UserSidebarState
               ),
             ),
 
-            // =============================================
+            // =====================================
             // PROFILE
-            // =============================================
+            // =====================================
 
             Padding(
 
               padding:
                   const EdgeInsets.fromLTRB(
-                8,
-                4,
-                8,
-                8,
+                12,
+                10,
+                12,
+                16,
               ),
 
               child: Column(
+
                 children: [
 
                   InkWell(
 
                     borderRadius:
                         BorderRadius.circular(
-                      12,
+                      20,
                     ),
 
                     onTap: () {
@@ -442,11 +450,8 @@ class _UserSidebarState
                     child: Container(
 
                       padding:
-                          const EdgeInsets.symmetric(
-
-                        horizontal: 8,
-
-                        vertical: 8,
+                          const EdgeInsets.all(
+                        12,
                       ),
 
                       decoration:
@@ -460,7 +465,16 @@ class _UserSidebarState
 
                         borderRadius:
                             BorderRadius.circular(
-                          12,
+                          20,
+                        ),
+
+                        border: Border.all(
+
+                          color:
+                              Colors.white
+                                  .withOpacity(
+                            0.05,
+                          ),
                         ),
                       ),
 
@@ -477,6 +491,7 @@ class _UserSidebarState
                                 )
 
                               : Row(
+
                                   children: [
 
                                     buildAvatar(
@@ -484,26 +499,25 @@ class _UserSidebarState
                                     ),
 
                                     const SizedBox(
-                                      width: 7,
+                                      width: 12,
                                     ),
 
                                     Expanded(
+
                                       child: Column(
 
                                         crossAxisAlignment:
                                             CrossAxisAlignment
                                                 .start,
 
-                                        mainAxisSize:
-                                            MainAxisSize
-                                                .min,
-
                                         children: [
 
                                           Row(
+
                                             children: [
 
                                               Expanded(
+
                                                 child: Text(
 
                                                   memberName,
@@ -521,18 +535,18 @@ class _UserSidebarState
                                                     color:
                                                         Colors.white,
 
-                                                    fontWeight:
-                                                        FontWeight.w700,
-
                                                     fontSize:
-                                                        9.6,
+                                                        12,
+
+                                                    fontWeight:
+                                                        FontWeight.bold,
                                                   ),
                                                 ),
                                               ),
 
                                               const SizedBox(
                                                 width:
-                                                    3,
+                                                    6,
                                               ),
 
                                               premiumBadge(),
@@ -541,7 +555,7 @@ class _UserSidebarState
 
                                           const SizedBox(
                                             height:
-                                                1,
+                                                4,
                                           ),
 
                                           const Text(
@@ -562,7 +576,7 @@ class _UserSidebarState
                                                   Colors.white70,
 
                                               fontSize:
-                                                  7.3,
+                                                  10,
                                             ),
                                           ),
                                         ],
@@ -574,10 +588,10 @@ class _UserSidebarState
                   ),
 
                   const SizedBox(
-                    height: 8,
+                    height: 12,
                   ),
 
-                  logoutButton(
+                  buildLogoutButton(
                     isMobile,
                   ),
                 ],
@@ -589,22 +603,199 @@ class _UserSidebarState
     );
   }
 
+  // =========================================
+  // SIDEBAR ITEM
+  // =========================================
+
+  Widget buildSidebarItem({
+
+    required IconData icon,
+
+    required String title,
+
+    required int index,
+  }) {
+
+    final active =
+        widget.selectedIndex ==
+            index;
+
+    return Padding(
+
+      padding:
+          const EdgeInsets.only(
+        bottom: 8,
+      ),
+
+      child: InkWell(
+
+        borderRadius:
+            BorderRadius.circular(
+          18,
+        ),
+
+        onTap: () {
+
+          widget.onSelected(
+            index,
+          );
+        },
+
+        child:
+            AnimatedContainer(
+
+          duration:
+              const Duration(
+            milliseconds: 220,
+          ),
+
+          height:
+              collapsed
+                  ? 54
+                  : 52,
+
+          padding:
+              EdgeInsets.symmetric(
+
+            horizontal:
+                collapsed
+                    ? 0
+                    : 14,
+          ),
+
+          decoration:
+              BoxDecoration(
+
+            borderRadius:
+                BorderRadius.circular(
+              18,
+            ),
+
+            gradient:
+
+                active
+
+                    ? const LinearGradient(
+
+                        begin:
+                            Alignment.topLeft,
+
+                        end:
+                            Alignment.bottomRight,
+
+                        colors: [
+
+                          Color(
+                            0xff2563EB,
+                          ),
+
+                          Color(
+                            0xff7C3AED,
+                          ),
+                        ],
+                      )
+
+                    : null,
+
+            color:
+
+                active
+
+                    ? null
+
+                    : Colors.white
+                        .withOpacity(
+                      0.04,
+                    ),
+          ),
+
+          child:
+
+              collapsed
+
+                  ? Center(
+
+                      child: Icon(
+
+                        icon,
+
+                        size: 20,
+
+                        color:
+                            Colors.white,
+                      ),
+                    )
+
+                  : Row(
+
+                      children: [
+
+                        Icon(
+
+                          icon,
+
+                          size: 20,
+
+                          color:
+                              Colors.white,
+                        ),
+
+                        const SizedBox(
+                          width: 12,
+                        ),
+
+                        Expanded(
+
+                          child: Text(
+
+                            title,
+
+                            overflow:
+                                TextOverflow
+                                    .ellipsis,
+
+                            maxLines: 1,
+
+                            style:
+                                const TextStyle(
+
+                              color:
+                                  Colors.white,
+
+                              fontWeight:
+                                  FontWeight.w600,
+
+                              fontSize: 13,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+        ),
+      ),
+    );
+  }
+
+  // =====================================
+  // PREMIUM BADGE
+  // =====================================
+
   Widget premiumBadge() {
 
     return Container(
 
-      width: 14,
+      width: 16,
 
-      height: 14,
+      height: 16,
 
       decoration:
-          BoxDecoration(
+          const BoxDecoration(
 
         shape:
             BoxShape.circle,
 
         gradient:
-            const LinearGradient(
+            LinearGradient(
 
           colors: [
 
@@ -617,14 +808,6 @@ class _UserSidebarState
             ),
           ],
         ),
-
-        border: Border.all(
-
-          color:
-              Colors.white,
-
-          width: 1,
-        ),
       ),
 
       child:
@@ -634,7 +817,7 @@ class _UserSidebarState
 
           Icons.check,
 
-          size: 8,
+          size: 9,
 
           color:
               Colors.white,
@@ -643,10 +826,13 @@ class _UserSidebarState
     );
   }
 
+  // =====================================
+  // AVATAR
+  // =====================================
+
   Widget buildAvatar(
-    String base64Photo, {
-    double radius = 13,
-  }) {
+    String base64Photo,
+  ) {
 
     try {
 
@@ -666,16 +852,16 @@ class _UserSidebarState
               color:
                   Colors.white
                       .withOpacity(
-                0.18,
+                0.12,
               ),
 
-              width: 1,
+              width: 1.5,
             ),
           ),
 
           child: CircleAvatar(
 
-            radius: radius,
+            radius: 20,
 
             backgroundImage:
                 MemoryImage(
@@ -703,20 +889,20 @@ class _UserSidebarState
           color:
               Colors.white
                   .withOpacity(
-            0.15,
+            0.12,
           ),
 
-          width: 1,
+          width: 1.5,
         ),
       ),
 
       child:
-          CircleAvatar(
+          const CircleAvatar(
 
-        radius: radius,
+        radius: 20,
 
         backgroundColor:
-            const Color(
+            Color(
           0xffE2E8F0,
         ),
 
@@ -724,7 +910,7 @@ class _UserSidebarState
 
           Icons.person_rounded,
 
-          size: 13,
+          size: 18,
 
           color:
               Color(
@@ -735,157 +921,11 @@ class _UserSidebarState
     );
   }
 
-  Widget sidebarItem({
+  // =====================================
+  // LOGOUT
+  // =====================================
 
-    required IconData icon,
-
-    required String title,
-
-    required int index,
-  }) {
-
-    final active =
-        widget.selectedIndex ==
-            index;
-
-    return Padding(
-
-      padding:
-          const EdgeInsets.only(
-        bottom: 5,
-      ),
-
-      child: InkWell(
-
-        borderRadius:
-            BorderRadius.circular(
-          12,
-        ),
-
-        onTap: () {
-
-          widget.onSelected(
-            index,
-          );
-        },
-
-        child:
-            AnimatedContainer(
-
-          duration:
-              const Duration(
-            milliseconds: 220,
-          ),
-
-          height:
-              collapsed
-                  ? 42
-                  : 40,
-
-          padding:
-              EdgeInsets.symmetric(
-
-            horizontal:
-                collapsed
-                    ? 0
-                    : 10,
-          ),
-
-          decoration:
-              BoxDecoration(
-
-            borderRadius:
-                BorderRadius.circular(
-              12,
-            ),
-
-            gradient:
-
-                active
-
-                    ? const LinearGradient(
-
-                        colors: [
-
-                          Color(
-                            0xff2563EB,
-                          ),
-
-                          Color(
-                            0xff7C3AED,
-                          ),
-                        ],
-                      )
-
-                    : null,
-          ),
-
-          child:
-
-              collapsed
-
-                  ? Center(
-                      child: Icon(
-
-                        icon,
-
-                        size: 16,
-
-                        color:
-                            Colors.white,
-                      ),
-                    )
-
-                  : Row(
-                      children: [
-
-                        Icon(
-
-                          icon,
-
-                          size: 16,
-
-                          color:
-                              Colors.white,
-                        ),
-
-                        const SizedBox(
-                          width: 9,
-                        ),
-
-                        Expanded(
-                          child: Text(
-
-                            title,
-
-                            overflow:
-                                TextOverflow
-                                    .ellipsis,
-
-                            maxLines: 1,
-
-                            style:
-                                const TextStyle(
-
-                              color:
-                                  Colors.white,
-
-                              fontWeight:
-                                  FontWeight.w600,
-
-                              fontSize:
-                                  10,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-        ),
-      ),
-    );
-  }
-
-  Widget logoutButton(
+  Widget buildLogoutButton(
     bool isMobile,
   ) {
 
@@ -893,7 +933,7 @@ class _UserSidebarState
 
       borderRadius:
           BorderRadius.circular(
-        12,
+        18,
       ),
 
       onTap:
@@ -901,16 +941,13 @@ class _UserSidebarState
 
       child: Container(
 
-        width:
-            double.infinity,
-
         height:
             collapsed &&
                     !isMobile
 
-                ? 42
+                ? 52
 
-                : 40,
+                : 50,
 
         padding:
             EdgeInsets.symmetric(
@@ -918,7 +955,7 @@ class _UserSidebarState
           horizontal:
               collapsed
                   ? 0
-                  : 10,
+                  : 14,
         ),
 
         decoration:
@@ -927,12 +964,12 @@ class _UserSidebarState
           color:
               Colors.red
                   .withOpacity(
-            0.08,
+            0.10,
           ),
 
           borderRadius:
               BorderRadius.circular(
-            12,
+            18,
           ),
         ),
 
@@ -942,11 +979,12 @@ class _UserSidebarState
                     !isMobile
 
                 ? const Center(
+
                     child: Icon(
 
                       Icons.logout_rounded,
 
-                      size: 15,
+                      size: 18,
 
                       color:
                           Colors.red,
@@ -954,23 +992,25 @@ class _UserSidebarState
                   )
 
                 : const Row(
+
                     children: [
 
                       Icon(
 
                         Icons.logout_rounded,
 
-                        size: 15,
+                        size: 18,
 
                         color:
                             Colors.red,
                       ),
 
                       SizedBox(
-                        width: 8,
+                        width: 10,
                       ),
 
                       Expanded(
+
                         child: Text(
 
                           'Logout',
@@ -985,11 +1025,10 @@ class _UserSidebarState
                             color:
                                 Colors.red,
 
-                            fontSize:
-                                10,
-
                             fontWeight:
                                 FontWeight.bold,
+
+                            fontSize: 13,
                           ),
                         ),
                       ),

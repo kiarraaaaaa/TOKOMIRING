@@ -1,6 +1,7 @@
+// =====================================================
 // lib/screens/user/user_home_screen.dart
-
-import 'dart:convert';
+// ULTRA CLEAN PREMIUM RESPONSIVE VERSION
+// =====================================================
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -8,14 +9,16 @@ import 'package:provider/provider.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/utils/app_format.dart';
 
-import '../../providers/cart_provider.dart';
-import '../../providers/product_provider.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/cart_provider.dart';
 import '../../providers/order_provider.dart';
+import '../../providers/product_provider.dart';
 
+import '../../routes/app_routes.dart';
+
+import '../../widgets/cards/dashboard_card.dart';
 import '../../widgets/cards/product_card.dart';
 import '../../widgets/user/user_sidebar.dart';
-import '../../routes/app_routes.dart';
 
 import 'cart_screen.dart';
 
@@ -40,14 +43,14 @@ class _UserHomeScreenState
   late AnimationController
       _fadeController;
 
-  int _selectedIndex = 0;
-
   late Animation<double>
       _fadeAnimation;
 
-  // =====================================================
+  int _selectedIndex = 0;
+
+  // =========================================
   // INIT
-  // =====================================================
+  // =========================================
 
   @override
   void initState() {
@@ -61,7 +64,7 @@ class _UserHomeScreenState
 
       duration:
           const Duration(
-        milliseconds: 700,
+        milliseconds: 600,
       ),
     );
 
@@ -90,9 +93,9 @@ class _UserHomeScreenState
     });
   }
 
-  // =====================================================
+  // =========================================
   // DISPOSE
-  // =====================================================
+  // =========================================
 
   @override
   void dispose() {
@@ -102,9 +105,9 @@ class _UserHomeScreenState
     super.dispose();
   }
 
-  // =====================================================
+  // =========================================
   // BUILD
-  // =====================================================
+  // =========================================
 
   @override
   Widget build(
@@ -112,271 +115,100 @@ class _UserHomeScreenState
   ) {
 
     final productProvider =
-        context.watch<
-            ProductProvider>();
+        context.watch<ProductProvider>();
 
     final cartProvider =
-        context.watch<
-            CartProvider>();
+        context.watch<CartProvider>();
 
     final authProvider =
-        context.watch<
-            AuthProvider>();
+        context.watch<AuthProvider>();
 
     final orderProvider =
-        context.watch<
-            OrderProvider>();
+        context.watch<OrderProvider>();
 
-    final screenWidth =
+    final width =
         MediaQuery.of(context)
             .size
             .width;
 
-    // ===================================================
-    // RESPONSIVE GRID
-    // ===================================================
+    final isMobile =
+        width < 700;
 
-    int crossAxisCount = 2;
+    final isTablet =
+        width >= 700 &&
+            width < 1200;
 
-    double childAspectRatio =
-        0.72;
+    // =====================================
+    // PRODUCT DISPLAY
+    // =====================================
 
-    if (screenWidth >= 1400) {
+    final displayProducts =
 
-      crossAxisCount = 5;
+        productProvider.searchQuery
+                    .isEmpty &&
+                productProvider
+                        .selectedCategory ==
+                    'All'
 
-      childAspectRatio =
-          0.78;
+            ? (productProvider
+                    .popularProducts
+                    .isNotEmpty
+
+                ? productProvider
+                    .popularProducts
+
+                : productProvider
+                    .products)
+
+            : productProvider
+                .products;
+
+    // =====================================
+    // GRID
+    // =====================================
+
+    int gridCount = 2;
+
+    double aspectRatio = 0.72;
+
+    if (width >= 1700) {
+
+      gridCount = 6;
+
+      aspectRatio = 0.84;
     }
 
-    else if (screenWidth >= 1100) {
+    else if (width >= 1450) {
 
-      crossAxisCount = 4;
+      gridCount = 5;
 
-      childAspectRatio =
-          0.75;
+      aspectRatio = 0.82;
     }
 
-    else if (screenWidth >= 800) {
+    else if (width >= 1150) {
 
-      crossAxisCount = 3;
+      gridCount = 4;
 
-      childAspectRatio =
-          0.73;
+      aspectRatio = 0.80;
+    }
+
+    else if (width >= 850) {
+
+      gridCount = 3;
+
+      aspectRatio = 0.76;
     }
 
     return Scaffold(
 
       backgroundColor:
           const Color(
-        0xffF5F7FB,
+        0xffF4F7FC,
       ),
 
-      // ===================================================
-      // APPBAR
-      // ===================================================
-
-      appBar: AppBar(
-
-        elevation: 0,
-
-        backgroundColor:
-            Colors.transparent,
-
-        surfaceTintColor:
-            Colors.transparent,
-
-        automaticallyImplyLeading:
-            false,
-
-        titleSpacing: 20,
-
-        title: Row(
-
-          children: [
-
-            // =============================================
-            // AVATAR
-            // =============================================
-
-            Container(
-
-              width: 52,
-
-              height: 52,
-
-              decoration:
-                  BoxDecoration(
-
-                borderRadius:
-                    BorderRadius.circular(
-                  18,
-                ),
-
-                gradient:
-                    const LinearGradient(
-
-                  colors: [
-
-                    Color(
-                      0xff2563EB,
-                    ),
-
-                    Color(
-                      0xff1D4ED8,
-                    ),
-                  ],
-                ),
-              ),
-
-              child:
-                  authProvider
-                          .photoUrl
-                          .isNotEmpty
-
-                      ? ClipRRect(
-
-                          borderRadius:
-                              BorderRadius.circular(
-                            18,
-                          ),
-
-                          child:
-                              Image.memory(
-
-                            base64Decode(
-                              authProvider
-                                  .photoUrl,
-                            ),
-
-                            fit: BoxFit.cover,
-                          ),
-                        )
-
-                      : const Icon(
-
-                          Icons.person,
-
-                          color:
-                              Colors.white,
-
-                          size: 28,
-                        ),
-            ),
-
-            const SizedBox(
-              width: 14,
-            ),
-
-            // =============================================
-            // USER INFO
-            // =============================================
-
-            Expanded(
-
-              child: Column(
-
-                crossAxisAlignment:
-                    CrossAxisAlignment
-                        .start,
-
-                children: [
-
-                  Text(
-
-                    'Welcome Back 👋',
-
-                    overflow:
-                        TextOverflow
-                            .ellipsis,
-
-                    style: TextStyle(
-
-                      color:
-                          Colors
-                              .grey
-                              .shade600,
-
-                      fontSize:
-                          13,
-                    ),
-                  ),
-
-                  const SizedBox(
-                    height: 2,
-                  ),
-
-                  Text(
-
-                    authProvider
-                            .user
-                            ?.displayName ??
-
-                        'Member',
-
-                    overflow:
-                        TextOverflow
-                            .ellipsis,
-
-                    style:
-                        const TextStyle(
-
-                      color:
-                          Colors.black,
-
-                      fontSize:
-                          20,
-
-                      fontWeight:
-                          FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-
-        actions: [
-
-          // =============================================
-          // NOTIFICATION
-          // =============================================
-
-          Container(
-
-            margin:
-                const EdgeInsets.only(
-              right: 20,
-            ),
-
-            decoration:
-                BoxDecoration(
-
-              color:
-                  Colors.white,
-
-              borderRadius:
-                  BorderRadius.circular(
-                18,
-              ),
-            ),
-
-            child: IconButton(
-
-              onPressed: () {},
-
-              icon: const Icon(
-                Icons.notifications_none,
-              ),
-            ),
-          ),
-        ],
-      ),
-
-      // ===================================================
+      // =====================================
       // FLOATING CART
-      // ===================================================
+      // =====================================
 
       floatingActionButtonLocation:
           FloatingActionButtonLocation
@@ -404,41 +236,23 @@ class _UserHomeScreenState
                     );
                   },
 
-                  child:
-                      AnimatedContainer(
-
-                    duration:
-                        const Duration(
-                      milliseconds:
-                          250,
-                    ),
+                  child: Container(
 
                     width:
-                        screenWidth <
-                                600
-
-                            ? screenWidth -
-                                40
-
-                            : 430,
+                        isMobile
+                            ? width * 0.90
+                            : 320,
 
                     padding:
                         const EdgeInsets.symmetric(
 
-                      horizontal:
-                          22,
+                      horizontal: 16,
 
-                      vertical:
-                          18,
+                      vertical: 12,
                     ),
 
                     decoration:
                         BoxDecoration(
-
-                      borderRadius:
-                          BorderRadius.circular(
-                        28,
-                      ),
 
                       gradient:
                           const LinearGradient(
@@ -455,6 +269,11 @@ class _UserHomeScreenState
                         ],
                       ),
 
+                      borderRadius:
+                          BorderRadius.circular(
+                        22,
+                      ),
+
                       boxShadow: [
 
                         BoxShadow(
@@ -462,16 +281,15 @@ class _UserHomeScreenState
                           color:
                               Colors.blue
                                   .withOpacity(
-                            0.25,
+                            0.18,
                           ),
 
-                          blurRadius:
-                              25,
+                          blurRadius: 24,
 
                           offset:
                               const Offset(
                             0,
-                            12,
+                            10,
                           ),
                         ),
                       ],
@@ -485,7 +303,7 @@ class _UserHomeScreenState
 
                           padding:
                               const EdgeInsets.all(
-                            12,
+                            10,
                           ),
 
                           decoration:
@@ -494,7 +312,7 @@ class _UserHomeScreenState
                             color:
                                 Colors.white
                                     .withOpacity(
-                              0.15,
+                              0.14,
                             ),
 
                             shape:
@@ -511,25 +329,25 @@ class _UserHomeScreenState
                               const Icon(
 
                                 Icons
-                                    .shopping_cart,
+                                    .shopping_cart_rounded,
 
                                 color:
-                                    Colors
-                                        .white,
+                                    Colors.white,
+
+                                size: 20,
                               ),
 
                               Positioned(
 
-                                right: -5,
+                                top: -4,
 
-                                top: -5,
+                                right: -4,
 
-                                child:
-                                    Container(
+                                child: Container(
 
                                   padding:
                                       const EdgeInsets.all(
-                                    5,
+                                    4,
                                   ),
 
                                   decoration:
@@ -552,8 +370,7 @@ class _UserHomeScreenState
                                       color:
                                           Colors.white,
 
-                                      fontSize:
-                                          10,
+                                      fontSize: 9,
 
                                       fontWeight:
                                           FontWeight.bold,
@@ -566,7 +383,7 @@ class _UserHomeScreenState
                         ),
 
                         const SizedBox(
-                          width: 14,
+                          width: 12,
                         ),
 
                         Expanded(
@@ -591,24 +408,22 @@ class _UserHomeScreenState
                                     TextStyle(
 
                                   color:
-                                      Colors
-                                          .white,
+                                      Colors.white,
 
                                   fontWeight:
                                       FontWeight.bold,
 
-                                  fontSize:
-                                      16,
+                                  fontSize: 13,
                                 ),
                               ),
 
                               const SizedBox(
-                                height: 3,
+                                height: 2,
                               ),
 
                               Text(
 
-                                '${cartProvider.totalItems} items added',
+                                '${cartProvider.totalItems} items',
 
                                 overflow:
                                     TextOverflow
@@ -618,42 +433,45 @@ class _UserHomeScreenState
                                     TextStyle(
 
                                   color:
-                                      Colors
-                                          .white
+                                      Colors.white
                                           .withOpacity(
-                                    0.9,
+                                    0.84,
                                   ),
 
-                                  fontSize:
-                                      13,
+                                  fontSize: 11,
                                 ),
                               ),
                             ],
                           ),
                         ),
 
-                        Text(
+                        Flexible(
 
-                          AppFormat.currency(
-                            cartProvider
-                                .totalPrice,
-                          ),
+                          child: Text(
 
-                          overflow:
-                              TextOverflow
-                                  .ellipsis,
+                            AppFormat.currency(
+                              cartProvider
+                                  .totalPrice,
+                            ),
 
-                          style:
-                              const TextStyle(
+                            overflow:
+                                TextOverflow
+                                    .ellipsis,
 
-                            color:
-                                Colors.white,
+                            textAlign:
+                                TextAlign.right,
 
-                            fontWeight:
-                                FontWeight.bold,
+                            style:
+                                const TextStyle(
 
-                            fontSize:
-                                18,
+                              color:
+                                  Colors.white,
+
+                              fontWeight:
+                                  FontWeight.bold,
+
+                              fontSize: 14,
+                            ),
                           ),
                         ),
                       ],
@@ -661,42 +479,89 @@ class _UserHomeScreenState
                   ),
                 ),
 
-      // ===================================================
+      // =====================================
       // BODY
-      // ===================================================
+      // =====================================
 
       body: Row(
-        children: [
-          UserSidebar(
-            selectedIndex: _selectedIndex,
-            onSelected: (index) {
-              setState(() {
-                _selectedIndex = index;
-              });
 
-              if (index == 0) {
-                // Dashboard
-              } else if (index == 1) {
-                // Marketplace - stay on dashboard
-              } else if (index == 2) {
-                Navigator.pushNamed(
-                  context,
-                  AppRoutes.cart,
-                );
-              } else if (index == 3) {
-                Navigator.pushNamed(
-                  context,
-                  AppRoutes.userOrders,
-                );
-              } else if (index == 6) {
-                Navigator.pushNamed(
-                  context,
-                  AppRoutes.userProfile,
-                );
-              }
-            },
-          ),
+        children: [
+
+          // =================================
+          // SIDEBAR
+          // =================================
+
+          if (!isMobile)
+
+            UserSidebar(
+
+              selectedIndex:
+                  _selectedIndex,
+
+              onSelected: (index) {
+
+                setState(() {
+
+                  _selectedIndex =
+                      index;
+                });
+
+                switch (index) {
+
+                  case 2:
+
+                    Navigator.pushNamed(
+                      context,
+                      AppRoutes.cart,
+                    );
+
+                    break;
+
+                  case 3:
+
+                    Navigator.pushNamed(
+                      context,
+                      AppRoutes.userOrders,
+                    );
+
+                    break;
+
+                  case 4:
+
+                    Navigator.pushNamed(
+                      context,
+                      AppRoutes.userWishlist,
+                    );
+
+                    break;
+
+                  case 5:
+
+                    Navigator.pushNamed(
+                      context,
+                      AppRoutes.userNotifications,
+                    );
+
+                    break;
+
+                  case 6:
+
+                    Navigator.pushNamed(
+                      context,
+                      AppRoutes.userProfile,
+                    );
+
+                    break;
+                }
+              },
+            ),
+
+          // =================================
+          // CONTENT
+          // =================================
+
           Expanded(
+
             child: FadeTransition(
 
               opacity:
@@ -704,14 +569,17 @@ class _UserHomeScreenState
 
               child: SafeArea(
 
-                child: SingleChildScrollView(
+                child:
+                    SingleChildScrollView(
 
                   physics:
                       const BouncingScrollPhysics(),
 
                   padding:
-                      const EdgeInsets.all(
-                    20,
+                      EdgeInsets.all(
+                    isMobile
+                        ? 14
+                        : 20,
                   ),
 
                   child: Column(
@@ -722,424 +590,103 @@ class _UserHomeScreenState
 
                     children: [
 
-                // =========================================
-                // PROMO BANNER
-                // =========================================
-
-                Container(
-
-                  width:
-                      double.infinity,
-
-                  padding:
-                      const EdgeInsets.all(
-                    24,
-                  ),
-
-                  decoration:
-                      BoxDecoration(
-
-                    borderRadius:
-                        BorderRadius.circular(
-                      30,
-                    ),
-
-                    gradient:
-                        const LinearGradient(
-
-                      begin:
-                          Alignment
-                              .topLeft,
-
-                      end:
-                          Alignment
-                              .bottomRight,
-
-                      colors: [
-
-                        Color(
-                          0xff2563EB,
-                        ),
-
-                        Color(
-                          0xff1E40AF,
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  child: Column(
-
-                    crossAxisAlignment:
-                        CrossAxisAlignment
-                            .start,
-
-                    children: [
+                      // ===========================
+                      // HEADER
+                      // ===========================
 
                       Container(
 
                         padding:
-                            const EdgeInsets.symmetric(
-
-                          horizontal:
-                              14,
-
-                          vertical: 8,
+                            EdgeInsets.all(
+                          isMobile
+                              ? 16
+                              : 20,
                         ),
 
                         decoration:
                             BoxDecoration(
 
                           color:
-                              Colors.white
-                                  .withOpacity(
-                            0.15,
-                          ),
+                              Colors.white,
 
                           borderRadius:
                               BorderRadius.circular(
-                            30,
-                          ),
-                        ),
-
-                        child: const Text(
-
-                          'PREMIUM MEMBER',
-
-                          style: TextStyle(
-
-                            color:
-                                Colors.white,
-
-                            fontWeight:
-                                FontWeight.bold,
-
-                            fontSize: 12,
-                          ),
-                        ),
-                      ),
-
-                      const SizedBox(
-                        height: 20,
-                      ),
-
-                      const Text(
-
-                        'Discover Amazing Products',
-
-                        style: TextStyle(
-
-                          color:
-                              Colors.white,
-
-                          fontSize: 28,
-
-                          fontWeight:
-                              FontWeight.bold,
-                        ),
-                      ),
-
-                      const SizedBox(
-                        height: 10,
-                      ),
-
-                      Text(
-
-                        'Realtime ecommerce dashboard with premium shopping experience.',
-
-                        style: TextStyle(
-
-                          color:
-                              Colors.white
-                                  .withOpacity(
-                            0.9,
+                            24,
                           ),
 
-                          fontSize: 15,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                          boxShadow: [
 
-                const SizedBox(
-                  height: 24,
-                ),
+                            BoxShadow(
 
+                              color:
+                                  Colors.black
+                                      .withOpacity(
+                                0.04,
+                              ),
 
-                // =========================================
-                // SEARCH
-                // =========================================
+                              blurRadius: 18,
 
-                Container(
-
-                  decoration:
-                      BoxDecoration(
-
-                    color:
-                        Colors.white,
-
-                    borderRadius:
-                        BorderRadius.circular(
-                      22,
-                    ),
-                  ),
-
-                  child: TextField(
-
-                    onChanged:
-                        productProvider
-                            .searchProducts,
-
-                    decoration:
-                        InputDecoration(
-
-                      hintText:
-                          'Search products...',
-
-                      prefixIcon:
-                          const Icon(
-                        Icons.search,
-                      ),
-
-                      border:
-                          InputBorder.none,
-
-                      contentPadding:
-                          const EdgeInsets.symmetric(
-                        horizontal:
-                            18,
-
-                        vertical:
-                            18,
-                      ),
-                    ),
-                  ),
-                ),
-
-                const SizedBox(
-                  height: 20,
-                ),
-
-                // =========================================
-                // CATEGORY
-                // =========================================
-
-                SizedBox(
-
-                  height: 50,
-
-                  child: ListView.builder(
-
-                    scrollDirection:
-                        Axis.horizontal,
-
-                    itemCount:
-                        productProvider
-                            .categories
-                            .length,
-
-                    itemBuilder:
-                        (
-                          context,
-                          index,
-                        ) {
-
-                      final category =
-                          productProvider
-                                  .categories[
-                              index];
-
-                      final selected =
-                          productProvider
-                                  .selectedCategory ==
-
-                              category;
-
-                      return Padding(
-
-                        padding:
-                            const EdgeInsets.only(
-                          right: 12,
-                        ),
-
-                        child: ChoiceChip(
-
-                          label:
-                              Text(
-                            category,
-                          ),
-
-                          selected:
-                              selected,
-
-                          showCheckmark:
-                              false,
-
-                          selectedColor:
-                              AppColors.primary,
-
-                          backgroundColor:
-                              Colors.white,
-
-                          labelStyle:
-                              TextStyle(
-
-                            color:
-                                selected
-
-                                    ? Colors.white
-
-                                    : Colors.black,
-
-                            fontWeight:
-                                FontWeight.w600,
-                          ),
-
-                          shape:
-                              RoundedRectangleBorder(
-
-                            borderRadius:
-                                BorderRadius.circular(
-                              18,
+                              offset:
+                                  const Offset(
+                                0,
+                                8,
+                              ),
                             ),
-                          ),
-
-                          onSelected: (_) {
-
-                            productProvider
-                                .selectCategory(
-                              category,
-                            );
-                          },
-                        ),
-                      );
-                    },
-                  ),
-                ),
-
-                const SizedBox(
-                  height: 28,
-                ),
-
-                // =========================================
-                // TITLE
-                // =========================================
-
-                Row(
-
-                  mainAxisAlignment:
-                      MainAxisAlignment
-                          .spaceBetween,
-
-                  children: [
-
-                    const Expanded(
-
-                      child: Text(
-
-                        'Latest Products',
-
-                        overflow:
-                            TextOverflow
-                                .ellipsis,
-
-                        style: TextStyle(
-
-                          fontSize: 24,
-
-                          fontWeight:
-                              FontWeight.bold,
-                        ),
-                      ),
-                    ),
-
-                    Text(
-
-                      '${productProvider.products.length} Items',
-
-                      style: TextStyle(
-
-                        color:
-                            Colors
-                                .grey
-                                .shade600,
-                      ),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(
-                  height: 20,
-                ),
-
-                // =========================================
-                // PRODUCTS
-                // =========================================
-
-                productProvider
-                        .isLoading
-
-                    ? const Padding(
-
-                        padding:
-                            EdgeInsets.all(
-                          50,
+                          ],
                         ),
 
-                        child: Center(
+                        child: Row(
 
-                          child:
-                              CircularProgressIndicator(),
-                        ),
-                      )
+                          children: [
 
-                    : productProvider
-                            .products
-                            .isEmpty
-
-                        ? Padding(
-
-                            padding:
-                                const EdgeInsets.symmetric(
-                              vertical:
-                                  80,
-                            ),
-
-                            child: Center(
+                            Expanded(
 
                               child: Column(
 
+                                crossAxisAlignment:
+                                    CrossAxisAlignment
+                                        .start,
+
                                 children: [
 
-                                  Icon(
+                                  Text(
 
-                                    Icons
-                                        .inventory_2_outlined,
+                                    'Welcome Back 👋',
 
-                                    size:
-                                        90,
+                                    style:
+                                        TextStyle(
 
-                                    color:
-                                        Colors
-                                            .grey
-                                            .shade400,
+                                      color:
+                                          Colors.grey
+                                              .shade600,
+
+                                      fontSize: 12,
+                                    ),
                                   ),
 
                                   const SizedBox(
-                                    height:
-                                        18,
+                                    height: 4,
                                   ),
 
-                                  const Text(
+                                  Text(
 
-                                    'No Products Found',
+                                    authProvider
+                                            .user
+                                            ?.displayName ??
+
+                                        'User',
+
+                                    overflow:
+                                        TextOverflow
+                                            .ellipsis,
 
                                     style:
                                         TextStyle(
 
                                       fontSize:
-                                          24,
+                                          isMobile
+                                              ? 22
+                                              : 26,
 
                                       fontWeight:
                                           FontWeight.bold,
@@ -1148,205 +695,679 @@ class _UserHomeScreenState
                                 ],
                               ),
                             ),
-                          )
 
-                        : GridView.builder(
+                            Container(
 
-                            shrinkWrap:
-                                true,
+                              padding:
+                                  const EdgeInsets.all(
+                                12,
+                              ),
 
-                            physics:
-                                const NeverScrollableScrollPhysics(),
+                              decoration:
+                                  BoxDecoration(
 
-                            itemCount:
-                                productProvider
-                                    .products
-                                    .length,
+                                color:
+                                    Colors.grey
+                                        .shade100,
 
-                            gridDelegate:
-                                SliverGridDelegateWithFixedCrossAxisCount(
+                                borderRadius:
+                                    BorderRadius.circular(
+                                  16,
+                                ),
+                              ),
 
-                              crossAxisCount:
-                                  crossAxisCount,
+                              child:
+                                  const Icon(
 
-                              crossAxisSpacing:
-                                  18,
+                                Icons
+                                    .notifications_none_rounded,
 
-                              mainAxisSpacing:
-                                  18,
-
-                              childAspectRatio:
-                                  childAspectRatio,
+                                size: 22,
+                              ),
                             ),
+                          ],
+                        ),
+                      ),
 
-                            itemBuilder:
-                                (
-                                  context,
-                                  index,
-                                ) {
+                      const SizedBox(
+                        height: 20,
+                      ),
 
-                              final product =
-                                  productProvider
-                                          .products[
-                                      index];
+                      // ===========================
+                      // HERO
+                      // ===========================
 
-                              return ProductCard(
-                                product:
-                                    product,
-                              );
-                            },
+                      Container(
+
+                        width:
+                            double.infinity,
+
+                        padding:
+                            EdgeInsets.all(
+                          isMobile
+                              ? 22
+                              : 28,
+                        ),
+
+                        decoration:
+                            BoxDecoration(
+
+                          borderRadius:
+                              BorderRadius.circular(
+                            30,
                           ),
 
-                const SizedBox(
-                  height: 120,
+                          gradient:
+                              const LinearGradient(
+
+                            begin:
+                                Alignment.topLeft,
+
+                            end:
+                                Alignment.bottomRight,
+
+                            colors: [
+
+                              Color(
+                                0xff2563EB,
+                              ),
+
+                              Color(
+                                0xff1E40AF,
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        child: Column(
+
+                          crossAxisAlignment:
+                              CrossAxisAlignment
+                                  .start,
+
+                          children: [
+
+                            Container(
+
+                              padding:
+                                  const EdgeInsets.symmetric(
+
+                                horizontal: 12,
+
+                                vertical: 7,
+                              ),
+
+                              decoration:
+                                  BoxDecoration(
+
+                                color:
+                                    Colors.white
+                                        .withOpacity(
+                                  0.14,
+                                ),
+
+                                borderRadius:
+                                    BorderRadius.circular(
+                                  24,
+                                ),
+                              ),
+
+                              child:
+                                  const Text(
+
+                                'PREMIUM DASHBOARD',
+
+                                style:
+                                    TextStyle(
+
+                                  color:
+                                      Colors.white,
+
+                                  fontWeight:
+                                      FontWeight.bold,
+
+                                  fontSize: 11,
+                                ),
+                              ),
+                            ),
+
+                            const SizedBox(
+                              height: 20,
+                            ),
+
+                            Text(
+
+                              'Modern Ecommerce Experience',
+
+                              style:
+                                  TextStyle(
+
+                                color:
+                                    Colors.white,
+
+                                fontWeight:
+                                    FontWeight.bold,
+
+                                fontSize:
+                                    isMobile
+                                        ? 24
+                                        : 34,
+                              ),
+                            ),
+
+                            const SizedBox(
+                              height: 10,
+                            ),
+
+                            Text(
+
+                              'Responsive shopping marketplace with realtime analytics and premium UI.',
+
+                              style:
+                                  TextStyle(
+
+                                color:
+                                    Colors.white
+                                        .withOpacity(
+                                  0.88,
+                                ),
+
+                                fontSize:
+                                    isMobile
+                                        ? 12
+                                        : 14,
+
+                                height: 1.5,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      const SizedBox(
+                        height: 22,
+                      ),
+
+                      // ===========================
+                      // ANALYTICS
+                      // ===========================
+
+                      GridView.count(
+
+                        shrinkWrap: true,
+
+                        physics:
+                            const NeverScrollableScrollPhysics(),
+
+                        crossAxisCount:
+
+                            isMobile
+                                ? 2
+                                : isTablet
+                                    ? 2
+                                    : 4,
+
+                        crossAxisSpacing:
+                            14,
+
+                        mainAxisSpacing:
+                            14,
+
+                        childAspectRatio:
+
+                            isMobile
+                                ? 1.40
+                                : 1.65,
+
+                        children: [
+
+                          DashboardCard(
+
+                            title:
+                                'Products',
+
+                            value:
+                                '${productProvider.products.length}',
+
+                            icon:
+                                Icons.inventory_2_rounded,
+
+                            color:
+                                Colors.blue,
+
+                            subtitle:
+                                'Available products',
+                          ),
+
+                          DashboardCard(
+
+                            title:
+                                'Orders',
+
+                            value:
+                                '${orderProvider.orders.length}',
+
+                            icon:
+                                Icons.receipt_long_rounded,
+
+                            color:
+                                Colors.orange,
+
+                            subtitle:
+                                'Total orders',
+                          ),
+
+                          DashboardCard(
+
+                            title:
+                                'Cart',
+
+                            value:
+                                '${cartProvider.totalItems}',
+
+                            icon:
+                                Icons.shopping_cart_rounded,
+
+                            color:
+                                Colors.green,
+
+                            subtitle:
+                                'Items in cart',
+                          ),
+
+                          DashboardCard(
+
+                            title:
+                                'Favorites',
+
+                            value:
+                                '${productProvider.favorites.length}',
+
+                            icon:
+                                Icons.favorite_rounded,
+
+                            color:
+                                Colors.pink,
+
+                            subtitle:
+                                'Wishlist items',
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(
+                        height: 24,
+                      ),
+
+                      // ===========================
+                      // SEARCH
+                      // ===========================
+
+                      Container(
+
+                        decoration:
+                            BoxDecoration(
+
+                          color:
+                              Colors.white,
+
+                          borderRadius:
+                              BorderRadius.circular(
+                            18,
+                          ),
+
+                          boxShadow: [
+
+                            BoxShadow(
+
+                              color:
+                                  Colors.black
+                                      .withOpacity(
+                                0.03,
+                              ),
+
+                              blurRadius: 12,
+
+                              offset:
+                                  const Offset(
+                                0,
+                                5,
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        child: TextField(
+
+                          onChanged:
+                              productProvider
+                                  .searchProducts,
+
+                          decoration:
+                              const InputDecoration(
+
+                            hintText:
+                                'Search product...',
+
+                            prefixIcon:
+                                Icon(
+                              Icons.search,
+                            ),
+
+                            border:
+                                InputBorder.none,
+
+                            contentPadding:
+                                EdgeInsets.symmetric(
+
+                              horizontal: 16,
+
+                              vertical: 15,
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(
+                        height: 18,
+                      ),
+
+                      // ===========================
+                      // CATEGORY
+                      // ===========================
+
+                      SizedBox(
+
+                        height: 42,
+
+                        child:
+                            ListView.builder(
+
+                          scrollDirection:
+                              Axis.horizontal,
+
+                          itemCount:
+                              productProvider
+                                  .categories
+                                  .length,
+
+                          itemBuilder:
+                              (
+                            context,
+                            index,
+                          ) {
+
+                            final category =
+                                productProvider
+                                        .categories[
+                                    index];
+
+                            final selected =
+                                productProvider
+                                        .selectedCategory ==
+                                    category;
+
+                            return Padding(
+
+                              padding:
+                                  const EdgeInsets.only(
+                                right: 10,
+                              ),
+
+                              child: ChoiceChip(
+
+                                label:
+                                    Text(
+                                  category,
+                                ),
+
+                                selected:
+                                    selected,
+
+                                showCheckmark:
+                                    false,
+
+                                selectedColor:
+                                    AppColors
+                                        .primary,
+
+                                backgroundColor:
+                                    Colors.white,
+
+                                labelStyle:
+                                    TextStyle(
+
+                                  color:
+                                      selected
+
+                                          ? Colors.white
+
+                                          : Colors.black87,
+
+                                  fontWeight:
+                                      FontWeight.w600,
+
+                                  fontSize:
+                                      12,
+                                ),
+
+                                shape:
+                                    RoundedRectangleBorder(
+
+                                  borderRadius:
+                                      BorderRadius.circular(
+                                    14,
+                                  ),
+                                ),
+
+                                onSelected:
+                                    (_) {
+
+                                  productProvider
+                                      .selectCategory(
+                                    category,
+                                  );
+                                },
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+
+                      const SizedBox(
+                        height: 24,
+                      ),
+
+                      // ===========================
+                      // TITLE
+                      // ===========================
+
+                      Row(
+
+                        mainAxisAlignment:
+                            MainAxisAlignment
+                                .spaceBetween,
+
+                        children: [
+
+                          const Expanded(
+
+                            child: Text(
+
+                              'Recommended Products',
+
+                              overflow:
+                                  TextOverflow
+                                      .ellipsis,
+
+                              style:
+                                  TextStyle(
+
+                                fontSize: 22,
+
+                                fontWeight:
+                                    FontWeight.bold,
+                              ),
+                            ),
+                          ),
+
+                          const SizedBox(
+                            width: 12,
+                          ),
+
+                          Text(
+
+                            '${displayProducts.length} items',
+
+                            overflow:
+                                TextOverflow
+                                    .ellipsis,
+
+                            style:
+                                TextStyle(
+
+                              color:
+                                  Colors.grey
+                                      .shade600,
+
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(
+                        height: 18,
+                      ),
+
+                      // ===========================
+                      // PRODUCTS
+                      // ===========================
+
+                      productProvider
+                              .isLoading
+
+                          ? const Padding(
+
+                              padding:
+                                  EdgeInsets.all(
+                                60,
+                              ),
+
+                              child: Center(
+
+                                child:
+                                    CircularProgressIndicator(),
+                              ),
+                            )
+
+                          : displayProducts
+                                  .isEmpty
+
+                              ? Padding(
+
+                                  padding:
+                                      const EdgeInsets.symmetric(
+                                    vertical:
+                                        90,
+                                  ),
+
+                                  child: Center(
+
+                                    child:
+                                        Column(
+
+                                      children: [
+
+                                        Icon(
+
+                                          Icons
+                                              .inventory_2_outlined,
+
+                                          size:
+                                              82,
+
+                                          color:
+                                              Colors.grey
+                                                  .shade400,
+                                        ),
+
+                                        const SizedBox(
+                                          height:
+                                              16,
+                                        ),
+
+                                        const Text(
+
+                                          'No Products Found',
+
+                                          style:
+                                              TextStyle(
+
+                                            fontSize:
+                                                22,
+
+                                            fontWeight:
+                                                FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                )
+
+                              : GridView.builder(
+
+                                  shrinkWrap:
+                                      true,
+
+                                  physics:
+                                      const NeverScrollableScrollPhysics(),
+
+                                  itemCount:
+                                      displayProducts
+                                          .length,
+
+                                  gridDelegate:
+                                      SliverGridDelegateWithFixedCrossAxisCount(
+
+                                    crossAxisCount:
+                                        gridCount,
+
+                                    crossAxisSpacing:
+                                        16,
+
+                                    mainAxisSpacing:
+                                        16,
+
+                                    childAspectRatio:
+                                        aspectRatio,
+                                  ),
+
+                                  itemBuilder:
+                                      (
+                                    context,
+                                    index,
+                                  ) {
+
+                                    final product =
+                                        displayProducts[
+                                            index];
+
+                                    return ProductCard(
+                                      product:
+                                          product,
+                                    );
+                                  },
+                                ),
+
+                      const SizedBox(
+                        height: 120,
+                      ),
+                    ],
+                  ),
                 ),
-              ],
-            ),
-          ),
-        ),
-      ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // =====================================================
-  // ANALYTICS CARD
-  // =====================================================
-
-  Widget _buildAnalyticsCard({
-
-    required String title,
-
-    required String value,
-
-    required IconData icon,
-
-    required Color color,
-
-  }) {
-
-    return Container(
-
-      width: 180,
-
-      padding:
-          const EdgeInsets.all(
-        20,
-      ),
-
-      decoration:
-          BoxDecoration(
-
-        color:
-            Colors.white,
-
-        borderRadius:
-            BorderRadius.circular(
-          26,
-        ),
-
-        boxShadow: [
-
-          BoxShadow(
-
-            color:
-                Colors.black
-                    .withOpacity(
-              0.04,
-            ),
-
-            blurRadius:
-                15,
-
-            offset:
-                const Offset(
-              0,
-              8,
-            ),
-          ),
-        ],
-      ),
-
-      child: Column(
-
-        crossAxisAlignment:
-            CrossAxisAlignment
-                .start,
-
-        children: [
-
-          Container(
-
-            padding:
-                const EdgeInsets.all(
-              12,
-            ),
-
-            decoration:
-                BoxDecoration(
-
-              color:
-                  color.withOpacity(
-                0.12,
               ),
-
-              borderRadius:
-                  BorderRadius.circular(
-                18,
-              ),
-            ),
-
-            child: Icon(
-
-              icon,
-
-              color:
-                  color,
-            ),
-          ),
-
-          const SizedBox(
-            height: 18,
-          ),
-
-          Text(
-
-            value,
-
-            overflow:
-                TextOverflow
-                    .ellipsis,
-
-            style:
-                const TextStyle(
-
-              fontSize: 28,
-
-              fontWeight:
-                  FontWeight.bold,
-            ),
-          ),
-
-          const SizedBox(
-            height: 4,
-          ),
-
-          Text(
-
-            title,
-
-            overflow:
-                TextOverflow
-                    .ellipsis,
-
-            style: TextStyle(
-
-              color:
-                  Colors
-                      .grey
-                      .shade600,
             ),
           ),
         ],

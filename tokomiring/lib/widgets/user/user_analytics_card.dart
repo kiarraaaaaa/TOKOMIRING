@@ -1,4 +1,7 @@
+// =====================================================
 // lib/widgets/user/user_analytics_card.dart
+// CLEAN MODERN RESPONSIVE VERSION
+// =====================================================
 
 import 'package:flutter/material.dart';
 
@@ -81,466 +84,414 @@ class _UserAnalyticsCardState
         });
       },
 
-      child:
-          AnimatedScale(
+      child: AnimatedContainer(
 
         duration:
             const Duration(
           milliseconds: 220,
         ),
 
-        scale:
-            hovered
-                ? 1.02
-                : 1,
+        transform:
+            Matrix4.identity()
+              ..translate(
+                0.0,
+                hovered ? -3 : 0,
+              ),
 
-        child:
-            InkWell(
+        width:
+            isMobile
+                ? double.infinity
+                : 220,
+
+        padding:
+            EdgeInsets.all(
+          isMobile ? 16 : 18,
+        ),
+
+        decoration:
+            BoxDecoration(
+
+          gradient:
+              widget.gradient ??
+
+                  LinearGradient(
+
+                    begin:
+                        Alignment.topLeft,
+
+                    end:
+                        Alignment.bottomRight,
+
+                    colors: [
+
+                      widget.color,
+
+                      widget.color
+                          .withOpacity(
+                        0.82,
+                      ),
+                    ],
+                  ),
 
           borderRadius:
               BorderRadius.circular(
-            28,
+            24,
           ),
 
-          onTap:
-              widget.onTap,
+          boxShadow: [
 
-          child:
-              AnimatedContainer(
+            BoxShadow(
 
-            duration:
-                const Duration(
-              milliseconds:
-                  220,
-            ),
-
-            width:
-                isMobile
-                    ? double.infinity
-                    : 240,
-
-            padding:
-                EdgeInsets.all(
-              isMobile
-                  ? 18
-                  : 22,
-            ),
-
-            decoration:
-                BoxDecoration(
-
-              gradient:
-
-                  widget.gradient ??
-
-                      LinearGradient(
-
-                        begin:
-                            Alignment
-                                .topLeft,
-
-                        end:
-                            Alignment
-                                .bottomRight,
-
-                        colors: [
-
-                          widget.color,
-
-                          widget.color
-                              .withOpacity(
-                            0.78,
-                          ),
-                        ],
-                      ),
-
-              borderRadius:
-                  BorderRadius.circular(
-                28,
+              color:
+                  widget.color
+                      .withOpacity(
+                hovered
+                    ? 0.24
+                    : 0.16,
               ),
 
-              boxShadow: [
+              blurRadius:
+                  hovered
+                      ? 22
+                      : 14,
 
-                BoxShadow(
-
-                  color:
-                      widget.color
-                          .withOpacity(
-                    hovered
-                        ? 0.30
-                        : 0.18,
-                  ),
-
-                  blurRadius:
-                      hovered
-                          ? 28
-                          : 18,
-
-                  offset:
-                      Offset(
-                    0,
-                    hovered
-                        ? 14
-                        : 8,
-                  ),
-                ),
-              ],
+              offset:
+                  Offset(
+                0,
+                hovered
+                    ? 12
+                    : 7,
+              ),
             ),
+          ],
+        ),
 
-            child: Column(
+        child: Column(
 
-              crossAxisAlignment:
-                  CrossAxisAlignment
-                      .start,
+          crossAxisAlignment:
+              CrossAxisAlignment
+                  .start,
+
+          children: [
+
+            // =====================================
+            // TOP
+            // =====================================
+
+            Row(
 
               children: [
 
-                // =========================================
-                // TOP
-                // =========================================
+                Expanded(
 
-                Row(
+                  child: Container(
 
-                  children: [
+                    padding:
+                        const EdgeInsets.symmetric(
 
-                    Expanded(
+                      horizontal: 10,
 
-                      child: Container(
-
-                        padding:
-                            const EdgeInsets.symmetric(
-
-                          horizontal:
-                              12,
-
-                          vertical:
-                              8,
-                        ),
-
-                        decoration:
-                            BoxDecoration(
-
-                          color:
-                              Colors.white
-                                  .withOpacity(
-                            0.16,
-                          ),
-
-                          borderRadius:
-                              BorderRadius.circular(
-                            30,
-                          ),
-                        ),
-
-                        child: Text(
-
-                          widget.title,
-
-                          overflow:
-                              TextOverflow
-                                  .ellipsis,
-
-                          maxLines: 1,
-
-                          style:
-                              const TextStyle(
-
-                            color:
-                                Colors.white,
-
-                            fontWeight:
-                                FontWeight.bold,
-
-                            fontSize:
-                                12,
-                          ),
-                        ),
-                      ),
+                      vertical: 6,
                     ),
 
-                    const SizedBox(
-                      width: 12,
-                    ),
-
-                    AnimatedContainer(
-
-                      duration:
-                          const Duration(
-                        milliseconds:
-                            220,
-                      ),
-
-                      padding:
-                          const EdgeInsets.all(
-                        14,
-                      ),
-
-                      decoration:
-                          BoxDecoration(
-
-                        color:
-                            Colors.white
-                                .withOpacity(
-                          hovered
-                              ? 0.22
-                              : 0.14,
-                        ),
-
-                        borderRadius:
-                            BorderRadius.circular(
-                          20,
-                        ),
-
-                        border: Border.all(
-
-                          color:
-                              Colors.white
-                                  .withOpacity(
-                            0.12,
-                          ),
-                        ),
-                      ),
-
-                      child: Icon(
-
-                        widget.icon,
-
-                        color:
-                            Colors.white,
-
-                        size:
-                            isMobile
-                                ? 22
-                                : 26,
-                      ),
-                    ),
-                  ],
-                ),
-
-                SizedBox(
-                  height:
-                      isMobile
-                          ? 22
-                          : 28,
-                ),
-
-                // =========================================
-                // VALUE
-                // =========================================
-
-                AnimatedSwitcher(
-
-                  duration:
-                      const Duration(
-                    milliseconds:
-                        220,
-                  ),
-
-                  child: Text(
-
-                    widget.value,
-
-                    key: ValueKey(
-                      widget.value,
-                    ),
-
-                    maxLines: 1,
-
-                    overflow:
-                        TextOverflow
-                            .ellipsis,
-
-                    style:
-                        TextStyle(
-
-                      color:
-                          Colors.white,
-
-                      fontSize:
-                          isMobile
-                              ? 28
-                              : 34,
-
-                      fontWeight:
-                          FontWeight.bold,
-
-                      height: 1,
-                    ),
-                  ),
-                ),
-
-                if (widget.subtitle !=
-                    null) ...[
-
-                  const SizedBox(
-                    height: 12,
-                  ),
-
-                  Text(
-
-                    widget.subtitle!,
-
-                    maxLines: 2,
-
-                    overflow:
-                        TextOverflow
-                            .ellipsis,
-
-                    style:
-                        TextStyle(
+                    decoration:
+                        BoxDecoration(
 
                       color:
                           Colors.white
                               .withOpacity(
-                        0.82,
+                        0.14,
                       ),
 
-                      fontSize:
-                          isMobile
-                              ? 12
-                              : 13,
-
-                      height: 1.4,
-                    ),
-                  ),
-                ],
-
-                SizedBox(
-                  height:
-                      isMobile
-                          ? 18
-                          : 24,
-                ),
-
-                // =========================================
-                // BOTTOM
-                // =========================================
-
-                Row(
-
-                  children: [
-
-                    Container(
-
-                      padding:
-                          const EdgeInsets.symmetric(
-
-                        horizontal:
-                            12,
-
-                        vertical:
-                            8,
-                      ),
-
-                      decoration:
-                          BoxDecoration(
-
-                        color:
-                            Colors.white
-                                .withOpacity(
-                          0.12,
-                        ),
-
-                        borderRadius:
-                            BorderRadius.circular(
-                          30,
-                        ),
-                      ),
-
-                      child: Row(
-
-                        mainAxisSize:
-                            MainAxisSize.min,
-
-                        children: const [
-
-                          Icon(
-
-                            Icons
-                                .trending_up_rounded,
-
-                            size: 16,
-
-                            color:
-                                Colors.white,
-                          ),
-
-                          SizedBox(
-                            width: 6,
-                          ),
-
-                          Text(
-
-                            'Realtime',
-
-                            style:
-                                TextStyle(
-
-                              color:
-                                  Colors.white,
-
-                              fontWeight:
-                                  FontWeight.bold,
-
-                              fontSize:
-                                  11,
-                            ),
-                          ),
-                        ],
+                      borderRadius:
+                          BorderRadius.circular(
+                        18,
                       ),
                     ),
 
-                    const Spacer(),
+                    child: Text(
 
-                    AnimatedContainer(
+                      widget.title,
 
-                      duration:
-                          const Duration(
-                        milliseconds:
-                            220,
-                      ),
+                      maxLines: 1,
 
-                      width:
-                          hovered
-                              ? 44
-                              : 38,
+                      overflow:
+                          TextOverflow.ellipsis,
 
-                      height:
-                          hovered
-                              ? 44
-                              : 38,
-
-                      decoration:
-                          BoxDecoration(
-
-                        color:
-                            Colors.white
-                                .withOpacity(
-                          hovered
-                              ? 0.22
-                              : 0.14,
-                        ),
-
-                        shape:
-                            BoxShape.circle,
-                      ),
-
-                      child: const Icon(
-
-                        Icons
-                            .arrow_forward_rounded,
+                      style:
+                          const TextStyle(
 
                         color:
                             Colors.white,
 
-                        size: 20,
+                        fontWeight:
+                            FontWeight.bold,
+
+                        fontSize: 11,
                       ),
                     ),
-                  ],
+                  ),
+                ),
+
+                const SizedBox(
+                  width: 10,
+                ),
+
+                Container(
+
+                  padding:
+                      const EdgeInsets.all(
+                    10,
+                  ),
+
+                  decoration:
+                      BoxDecoration(
+
+                    color:
+                        Colors.white
+                            .withOpacity(
+                      0.14,
+                    ),
+
+                    borderRadius:
+                        BorderRadius.circular(
+                      16,
+                    ),
+                  ),
+
+                  child: Icon(
+
+                    widget.icon,
+
+                    color:
+                        Colors.white,
+
+                    size:
+                        isMobile
+                            ? 18
+                            : 20,
+                  ),
                 ),
               ],
             ),
-          ),
+
+            SizedBox(
+              height:
+                  isMobile
+                      ? 18
+                      : 22,
+            ),
+
+            // =====================================
+            // VALUE
+            // =====================================
+
+            AnimatedSwitcher(
+
+              duration:
+                  const Duration(
+                milliseconds: 220,
+              ),
+
+              child: Text(
+
+                widget.value,
+
+                key:
+                    ValueKey(
+                  widget.value,
+                ),
+
+                maxLines: 1,
+
+                overflow:
+                    TextOverflow.ellipsis,
+
+                style:
+                    TextStyle(
+
+                  color:
+                      Colors.white,
+
+                  fontSize:
+                      isMobile
+                          ? 24
+                          : 30,
+
+                  fontWeight:
+                      FontWeight.bold,
+
+                  height: 1,
+                ),
+              ),
+            ),
+
+            if (widget.subtitle !=
+                null) ...[
+
+              const SizedBox(
+                height: 8,
+              ),
+
+              Text(
+
+                widget.subtitle!,
+
+                maxLines: 2,
+
+                overflow:
+                    TextOverflow.ellipsis,
+
+                style:
+                    TextStyle(
+
+                  color:
+                      Colors.white
+                          .withOpacity(
+                    0.80,
+                  ),
+
+                  fontSize:
+                      isMobile
+                          ? 11
+                          : 12,
+
+                  height: 1.35,
+                ),
+              ),
+            ],
+
+            SizedBox(
+              height:
+                  isMobile
+                      ? 14
+                      : 18,
+            ),
+
+            // =====================================
+            // BOTTOM
+            // =====================================
+
+            Row(
+
+              children: [
+
+                Container(
+
+                  padding:
+                      const EdgeInsets.symmetric(
+
+                    horizontal: 10,
+
+                    vertical: 6,
+                  ),
+
+                  decoration:
+                      BoxDecoration(
+
+                    color:
+                        Colors.white
+                            .withOpacity(
+                      0.12,
+                    ),
+
+                    borderRadius:
+                        BorderRadius.circular(
+                      18,
+                    ),
+                  ),
+
+                  child: Row(
+
+                    mainAxisSize:
+                        MainAxisSize.min,
+
+                    children: const [
+
+                      Icon(
+
+                        Icons
+                            .trending_up_rounded,
+
+                        size: 14,
+
+                        color:
+                            Colors.white,
+                      ),
+
+                      SizedBox(
+                        width: 5,
+                      ),
+
+                      Text(
+
+                        'Realtime',
+
+                        style:
+                            TextStyle(
+
+                          color:
+                              Colors.white,
+
+                          fontWeight:
+                              FontWeight.bold,
+
+                          fontSize:
+                              10,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const Spacer(),
+
+                AnimatedContainer(
+
+                  duration:
+                      const Duration(
+                    milliseconds: 220,
+                  ),
+
+                  width:
+                      hovered
+                          ? 40
+                          : 34,
+
+                  height:
+                      hovered
+                          ? 40
+                          : 34,
+
+                  decoration:
+                      BoxDecoration(
+
+                    color:
+                        Colors.white
+                            .withOpacity(
+                      hovered
+                          ? 0.18
+                          : 0.12,
+                    ),
+
+                    shape:
+                        BoxShape.circle,
+                  ),
+
+                  child: const Icon(
+
+                    Icons
+                        .arrow_forward_rounded,
+
+                    color:
+                        Colors.white,
+
+                    size: 18,
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );

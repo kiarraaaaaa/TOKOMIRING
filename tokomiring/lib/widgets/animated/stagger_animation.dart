@@ -1,4 +1,7 @@
+// =====================================================
 // lib/widgets/animations/stagger_animation.dart
+// CLEAN SMOOTH OPTIMIZED VERSION
+// =====================================================
 
 import 'package:flutter/material.dart';
 
@@ -34,13 +37,13 @@ class StaggerAnimation
 
     this.duration =
         const Duration(
-      milliseconds: 500,
+      milliseconds: 450,
     ),
 
     this.beginOffset =
         const Offset(
       0,
-      0.08,
+      0.05,
     ),
 
     this.curve =
@@ -52,7 +55,7 @@ class StaggerAnimation
 
     this.scale = false,
 
-    this.beginScale = 0.96,
+    this.beginScale = 0.97,
   });
 
   @override
@@ -78,9 +81,9 @@ class _StaggerAnimationState
   late Animation<double>
       _scaleAnimation;
 
-  // =====================================================
+  // =========================================
   // INIT
-  // =====================================================
+  // =========================================
 
   @override
   void initState() {
@@ -96,7 +99,7 @@ class _StaggerAnimationState
           widget.duration,
     );
 
-    final curvedAnimation =
+    final curved =
         CurvedAnimation(
 
       parent:
@@ -113,9 +116,7 @@ class _StaggerAnimationState
 
       end: 1,
 
-    ).animate(
-      curvedAnimation,
-    );
+    ).animate(curved);
 
     _slideAnimation =
         Tween<Offset>(
@@ -126,9 +127,7 @@ class _StaggerAnimationState
       end:
           Offset.zero,
 
-    ).animate(
-      curvedAnimation,
-    );
+    ).animate(curved);
 
     _scaleAnimation =
         Tween<double>(
@@ -138,19 +137,17 @@ class _StaggerAnimationState
 
       end: 1,
 
-    ).animate(
-      curvedAnimation,
-    );
+    ).animate(curved);
 
-    startAnimation();
+    _startAnimation();
   }
 
-  // =====================================================
+  // =========================================
   // START
-  // =====================================================
+  // =========================================
 
   Future<void>
-      startAnimation()
+      _startAnimation()
       async {
 
     if (widget.delay >
@@ -161,16 +158,14 @@ class _StaggerAnimationState
       );
     }
 
-    if (!mounted) {
-      return;
-    }
+    if (!mounted) return;
 
     _controller.forward();
   }
 
-  // =====================================================
+  // =========================================
   // DISPOSE
-  // =====================================================
+  // =========================================
 
   @override
   void dispose() {
@@ -180,9 +175,9 @@ class _StaggerAnimationState
     super.dispose();
   }
 
-  // =====================================================
+  // =========================================
   // BUILD
-  // =====================================================
+  // =========================================
 
   @override
   Widget build(
@@ -192,9 +187,9 @@ class _StaggerAnimationState
     Widget current =
         widget.child;
 
-    // ===============================================
+    // =======================================
     // SCALE
-    // ===============================================
+    // =======================================
 
     if (widget.scale) {
 
@@ -209,9 +204,9 @@ class _StaggerAnimationState
       );
     }
 
-    // ===============================================
+    // =======================================
     // SLIDE
-    // ===============================================
+    // =======================================
 
     if (widget.slide) {
 
@@ -226,9 +221,9 @@ class _StaggerAnimationState
       );
     }
 
-    // ===============================================
+    // =======================================
     // FADE
-    // ===============================================
+    // =======================================
 
     if (widget.fade) {
 
@@ -243,6 +238,8 @@ class _StaggerAnimationState
       );
     }
 
-    return current;
+    return RepaintBoundary(
+      child: current,
+    );
   }
 }

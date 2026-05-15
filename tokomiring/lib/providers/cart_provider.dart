@@ -1,4 +1,7 @@
+// =====================================================
 // lib/providers/cart_provider.dart
+// CLEAN OPTIMIZED RESPONSIVE VERSION
+// =====================================================
 
 import 'package:flutter/material.dart';
 
@@ -17,57 +20,37 @@ class CartItemModel {
     required this.quantity,
   });
 
-  // =====================================================
+  // =========================================
   // SUBTOTAL
-  // =====================================================
+  // =========================================
 
   double get subtotal =>
 
-      product.price *
-          quantity;
+      product.price * quantity;
 
-  // =====================================================
-  // PRODUCT ID
-  // =====================================================
+  // =========================================
+  // PRODUCT INFO
+  // =========================================
 
-  String get productId =>
+  String get productId => product.id;
 
-      product.id;
-
-  // =====================================================
-  // PRODUCT NAME
-  // =====================================================
-
-  String get productName =>
-
-      product.name;
-
-  // =====================================================
-  // PRODUCT IMAGE
-  // =====================================================
+  String get productName => product.name;
 
   String get productImage =>
-
       product.imageBase64;
 
-  // =====================================================
-  // PRODUCT PRICE
-  // =====================================================
-
   double get productPrice =>
-
       product.price;
 
-  // =====================================================
+  // =========================================
   // COPY WITH
-  // =====================================================
+  // =========================================
 
   CartItemModel copyWith({
 
     ProductModel? product,
 
     int? quantity,
-
   }) {
 
     return CartItemModel(
@@ -84,9 +67,9 @@ class CartItemModel {
 class CartProvider
     extends ChangeNotifier {
 
-  // =====================================================
-  // CART ITEMS
-  // =====================================================
+  // =========================================
+  // ITEMS
+  // =========================================
 
   final List<CartItemModel>
       _items = [];
@@ -97,51 +80,49 @@ class CartProvider
         _items,
       );
 
-  // =====================================================
+  // =========================================
   // TOTAL ITEMS
-  // =====================================================
+  // =========================================
 
   int get totalItems {
 
-    int total = 0;
+    return _items.fold(
 
-    for (final item
-        in _items) {
+      0,
 
-      total += item.quantity;
-    }
+      (total, item) =>
 
-    return total;
+          total + item.quantity,
+    );
   }
 
-  // =====================================================
+  // =========================================
   // TOTAL PRICE
-  // =====================================================
+  // =========================================
 
   double get totalPrice {
 
-    double total = 0;
+    return _items.fold(
 
-    for (final item
-        in _items) {
+      0,
 
-      total += item.subtotal;
-    }
+      (total, item) =>
 
-    return total;
+          total + item.subtotal,
+    );
   }
 
-  // =====================================================
-  // TOTAL UNIQUE PRODUCTS
-  // =====================================================
+  // =========================================
+  // UNIQUE PRODUCTS
+  // =========================================
 
   int get totalUniqueProducts =>
 
       _items.length;
 
-  // =====================================================
-  // EMPTY CHECK
-  // =====================================================
+  // =========================================
+  // EMPTY
+  // =========================================
 
   bool get isEmpty =>
 
@@ -151,16 +132,15 @@ class CartProvider
 
       _items.isNotEmpty;
 
-  // =====================================================
+  // =========================================
   // ADD TO CART
-  // =====================================================
+  // =========================================
 
   void addToCart(
     ProductModel product,
   ) {
 
     if (product.stock <= 0) {
-
       return;
     }
 
@@ -173,6 +153,10 @@ class CartProvider
           product.id,
     );
 
+    // ===============================
+    // EXISTING ITEM
+    // ===============================
+
     if (index >= 0) {
 
       final currentItem =
@@ -182,31 +166,33 @@ class CartProvider
           product.stock) {
 
         currentItem.quantity++;
-
-        notifyListeners();
       }
+
+      notifyListeners();
 
       return;
     }
+
+    // ===============================
+    // NEW ITEM
+    // ===============================
 
     _items.add(
 
       CartItemModel(
 
-        product:
-            product,
+        product: product,
 
-        quantity:
-            1,
+        quantity: 1,
       ),
     );
 
     notifyListeners();
   }
 
-  // =====================================================
+  // =========================================
   // REMOVE ITEM
-  // =====================================================
+  // =========================================
 
   void removeFromCart(
     String productId,
@@ -223,29 +209,20 @@ class CartProvider
     notifyListeners();
   }
 
-  // =====================================================
+  // =========================================
   // INCREASE QUANTITY
-  // =====================================================
+  // =========================================
 
   void increaseQuantity(
     String productId,
   ) {
 
-    final index =
-        _items.indexWhere(
+    final item =
+        getItem(productId);
 
-      (item) =>
-
-          item.product.id ==
-          productId,
-    );
-
-    if (index < 0) {
+    if (item == null) {
       return;
     }
-
-    final item =
-        _items[index];
 
     if (item.quantity <
         item.product.stock) {
@@ -256,9 +233,9 @@ class CartProvider
     }
   }
 
-  // =====================================================
+  // =========================================
   // DECREASE QUANTITY
-  // =====================================================
+  // =========================================
 
   void decreaseQuantity(
     String productId,
@@ -292,39 +269,29 @@ class CartProvider
     notifyListeners();
   }
 
-  // =====================================================
+  // =========================================
   // UPDATE QUANTITY
-  // =====================================================
+  // =========================================
 
   void updateQuantity({
 
     required String productId,
 
     required int quantity,
-
   }) {
 
-    final index =
-        _items.indexWhere(
+    final item =
+        getItem(productId);
 
-      (item) =>
-
-          item.product.id ==
-          productId,
-    );
-
-    if (index < 0) {
+    if (item == null) {
       return;
     }
 
-    final item =
-        _items[index];
-
     if (quantity <= 0) {
 
-      _items.removeAt(index);
-
-      notifyListeners();
+      removeFromCart(
+        productId,
+      );
 
       return;
     }
@@ -342,14 +309,13 @@ class CartProvider
     notifyListeners();
   }
 
-  // =====================================================
+  // =========================================
   // REPLACE PRODUCT
-  // =====================================================
+  // =========================================
 
   void replaceProduct({
 
     required ProductModel product,
-
   }) {
 
     final index =
@@ -372,22 +338,22 @@ class CartProvider
     _items[index] =
         CartItemModel(
 
-      product:
-          product,
+      product: product,
 
       quantity:
-          oldQty >
-                  product.stock
+          oldQty > product.stock
+
               ? product.stock
+
               : oldQty,
     );
 
     notifyListeners();
   }
 
-  // =====================================================
-  // CHECK PRODUCT
-  // =====================================================
+  // =========================================
+  // CHECK ITEM
+  // =========================================
 
   bool isInCart(
     String productId,
@@ -402,35 +368,23 @@ class CartProvider
     );
   }
 
-  // =====================================================
+  // =========================================
   // GET QUANTITY
-  // =====================================================
+  // =========================================
 
   int getQuantity(
     String productId,
   ) {
 
-    final index =
-        _items.indexWhere(
+    final item =
+        getItem(productId);
 
-      (item) =>
-
-          item.product.id ==
-          productId,
-    );
-
-    if (index >= 0) {
-
-      return _items[index]
-          .quantity;
-    }
-
-    return 0;
+    return item?.quantity ?? 0;
   }
 
-  // =====================================================
+  // =========================================
   // GET ITEM
-  // =====================================================
+  // =========================================
 
   CartItemModel? getItem(
     String productId,
@@ -452,9 +406,9 @@ class CartProvider
     }
   }
 
-  // =====================================================
+  // =========================================
   // CLEAR CART
-  // =====================================================
+  // =========================================
 
   void clearCart() {
 
@@ -463,9 +417,9 @@ class CartProvider
     notifyListeners();
   }
 
-  // =====================================================
-  // CART MAP
-  // =====================================================
+  // =========================================
+  // MAP
+  // =========================================
 
   List<Map<String, dynamic>>
       toMap() {
@@ -483,8 +437,7 @@ class CartProvider
               item.product.name,
 
           'productImage':
-              item.product
-                  .imageBase64,
+              item.product.imageBase64,
 
           'productPrice':
               item.product.price,
@@ -499,49 +452,38 @@ class CartProvider
     ).toList();
   }
 
-  // =====================================================
-  // CART TOTAL SUBTOTAL
-  // =====================================================
+  // =========================================
+  // SUBTOTAL
+  // =========================================
 
   double calculateSubtotal() {
 
-    double total = 0;
-
-    for (final item
-        in _items) {
-
-      total += item.subtotal;
-    }
-
-    return total;
+    return totalPrice;
   }
 
-  // =====================================================
+  // =========================================
   // SHIPPING
-  // =====================================================
+  // =========================================
 
   double calculateShipping({
 
     double shippingCost = 10000,
-
   }) {
 
     if (_items.isEmpty) {
-
       return 0;
     }
 
     return shippingCost;
   }
 
-  // =====================================================
+  // =========================================
   // GRAND TOTAL
-  // =====================================================
+  // =========================================
 
   double calculateGrandTotal({
 
     double shippingCost = 10000,
-
   }) {
 
     return calculateSubtotal() +
@@ -552,9 +494,9 @@ class CartProvider
         );
   }
 
-  // =====================================================
+  // =========================================
   // DEBUG
-  // =====================================================
+  // =========================================
 
   @override
   String toString() {

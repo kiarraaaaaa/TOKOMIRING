@@ -22,6 +22,8 @@ import '../screens/user/cart_screen.dart';
 import '../screens/user/checkout_screen.dart';
 import '../screens/user/user_order_screen.dart';
 import '../screens/user/user_profile_screen.dart';
+import '../screens/user/user_wishlist_screen.dart';
+import '../screens/user/user_notification_screen.dart';
 
 // =====================================================
 // ADMIN
@@ -74,6 +76,12 @@ class AppRoutes {
 
   static const String userProfile =
       '/user-profile';
+
+  static const String userWishlist =
+      '/user-wishlist';
+
+  static const String userNotifications =
+      '/user-notifications';
 
   // =====================================================
   // ADMIN
@@ -177,6 +185,18 @@ class AppRoutes {
 
         return _buildRoute(
           const UserProfileScreen(),
+        );
+
+      case userWishlist:
+
+        return _buildRoute(
+          const UserWishlistScreen(),
+        );
+
+      case userNotifications:
+
+        return _buildRoute(
+          const UserNotificationScreen(),
         );
 
       // =================================================

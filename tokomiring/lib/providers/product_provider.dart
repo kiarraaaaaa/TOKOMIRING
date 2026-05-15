@@ -1,4 +1,7 @@
+// =====================================================
 // lib/providers/product_provider.dart
+// CLEAN OPTIMIZED PREMIUM VERSION
+// =====================================================
 
 import 'dart:async';
 
@@ -10,32 +13,29 @@ import '../services/database_service.dart';
 class ProductProvider
     extends ChangeNotifier {
 
-  // =====================================================
+  // =========================================
   // SERVICES
-  // =====================================================
+  // =========================================
 
   final DatabaseService
       _databaseService =
       DatabaseService();
 
-  // =====================================================
+  // =========================================
   // VARIABLES
-  // =====================================================
+  // =========================================
 
-  List<ProductModel> _products =
-      [];
+  List<ProductModel>
+      _products = [];
 
   List<ProductModel>
       _filteredProducts = [];
 
-  bool _isLoading =
-      false;
+  bool _isLoading = false;
 
-  bool _initialized =
-      false;
+  bool _initialized = false;
 
-  bool _isSearching =
-      false;
+  bool _isSearching = false;
 
   String? _errorMessage;
 
@@ -47,9 +47,12 @@ class ProductProvider
   StreamSubscription?
       _productSubscription;
 
-  // =====================================================
+  final Set<String>
+      _wishlistIds = {};
+
+  // =========================================
   // GETTERS
-  // =====================================================
+  // =========================================
 
   List<ProductModel> get products =>
 
@@ -82,11 +85,12 @@ class ProductProvider
   String get searchQuery =>
       _searchQuery;
 
-  // =====================================================
+  // =========================================
   // CATEGORIES
-  // =====================================================
+  // =========================================
 
-  final List<String> categories = [
+  final List<String>
+      categories = [
 
     'All',
 
@@ -103,51 +107,139 @@ class ProductProvider
     'Others',
   ];
 
-  // =====================================================
-  // TOTAL PRODUCTS
-  // =====================================================
+  // =========================================
+  // FAVORITES
+  // =========================================
+
+  List<ProductModel>
+      get favoriteProducts {
+
+    return _products.where(
+
+      (product) {
+
+        return _wishlistIds
+            .contains(
+          product.id,
+        );
+      },
+    ).toList();
+  }
+
+  List<ProductModel>
+      get favorites =>
+
+          favoriteProducts;
+
+  bool isFavorite(
+    ProductModel product,
+  ) {
+
+    return _wishlistIds
+        .contains(
+      product.id,
+    );
+  }
+
+  void toggleFavorite(
+    ProductModel product,
+  ) {
+
+    if (_wishlistIds
+        .contains(
+      product.id,
+    )) {
+
+      _wishlistIds.remove(
+        product.id,
+      );
+
+    } else {
+
+      _wishlistIds.add(
+        product.id,
+      );
+    }
+
+    notifyListeners();
+  }
+
+  void clearWishlist() {
+
+    _wishlistIds.clear();
+
+    notifyListeners();
+  }
+
+  // =========================================
+  // ANALYTICS
+  // =========================================
 
   int get totalProducts =>
 
       _products.length;
 
-  // =====================================================
-  // TOTAL STOCK
-  // =====================================================
-
   int get totalStock {
 
-    int total = 0;
+    return _products.fold(
 
-    for (final product
-        in _products) {
+      0,
 
-      total += product.stock;
-    }
+      (
+        total,
+        product,
+      ) {
 
-    return total;
+        return total +
+            product.stock;
+      },
+    );
   }
-
-  // =====================================================
-  // TOTAL SOLD
-  // =====================================================
 
   int get totalSoldItems {
 
-    int total = 0;
+    return _products.fold(
 
-    for (final product
-        in _products) {
+      0,
 
-      total += product.sold;
-    }
+      (
+        total,
+        product,
+      ) {
 
-    return total;
+        return total +
+            product.sold;
+      },
+    );
   }
 
-  // =====================================================
-  // TOP SELLING
-  // =====================================================
+  int get totalFavorites =>
+
+      _wishlistIds.length;
+
+  double get totalInventoryValue {
+
+    return _products.fold(
+
+      0,
+
+      (
+        total,
+        product,
+      ) {
+
+        return total +
+            (
+              product.price *
+              product.stock
+            );
+      },
+    );
+  }
+
+  // =========================================
+  // PRODUCT FILTERS
+  // =========================================
 
   List<ProductModel>
       get topSellingProducts {
@@ -161,7 +253,8 @@ class ProductProvider
 
       (a, b) {
 
-        return b.sold.compareTo(
+        return b.sold
+            .compareTo(
           a.sold,
         );
       },
@@ -169,10 +262,6 @@ class ProductProvider
 
     return copied;
   }
-
-  // =====================================================
-  // POPULAR
-  // =====================================================
 
   List<ProductModel>
       get popularProducts {
@@ -186,10 +275,6 @@ class ProductProvider
       },
     ).toList();
   }
-
-  // =====================================================
-  // AVAILABLE
-  // =====================================================
 
   List<ProductModel>
       get availableProducts {
@@ -205,9 +290,18 @@ class ProductProvider
     ).toList();
   }
 
-  // =====================================================
-  // LOW STOCK
-  // =====================================================
+  List<ProductModel>
+      get soldOutProducts {
+
+    return _products.where(
+
+      (product) {
+
+        return product.stock <=
+            0;
+      },
+    ).toList();
+  }
 
   List<ProductModel>
       get lowStockProducts {
@@ -216,15 +310,17 @@ class ProductProvider
 
       (product) {
 
-        return product.stock <=
-            5;
+        return product.stock >
+                0 &&
+            product.stock <=
+                5;
       },
     ).toList();
   }
 
-  // =====================================================
+  // =========================================
   // INITIALIZE
-  // =====================================================
+  // =========================================
 
   void initializeProducts() {
 
@@ -265,8 +361,6 @@ class ProductProvider
         _applyFilters();
 
         _setLoading(false);
-
-        notifyListeners();
       },
 
       onError: (error) {
@@ -275,18 +369,17 @@ class ProductProvider
             error.toString();
 
         _setLoading(false);
-
-        notifyListeners();
       },
     );
   }
 
-  // =====================================================
+  // =========================================
   // REFRESH
-  // =====================================================
+  // =========================================
 
   Future<void>
-      refreshProducts() async {
+      refreshProducts()
+      async {
 
     try {
 
@@ -323,8 +416,6 @@ class ProductProvider
 
           _setLoading(false);
 
-          notifyListeners();
-
           if (!completer
               .isCompleted) {
 
@@ -338,8 +429,6 @@ class ProductProvider
               error.toString();
 
           _setLoading(false);
-
-          notifyListeners();
 
           if (!completer
               .isCompleted) {
@@ -360,14 +449,12 @@ class ProductProvider
           e.toString();
 
       _setLoading(false);
-
-      notifyListeners();
     }
   }
 
-  // =====================================================
-  // APPLY FILTERS
-  // =====================================================
+  // =========================================
+  // APPLY FILTER
+  // =========================================
 
   void _applyFilters() {
 
@@ -377,9 +464,9 @@ class ProductProvider
       _products,
     );
 
-    // ===============================================
+    // ===============================
     // CATEGORY
-    // ===============================================
+    // ===============================
 
     if (_selectedCategory !=
         'All') {
@@ -399,9 +486,9 @@ class ProductProvider
       ).toList();
     }
 
-    // ===============================================
+    // ===============================
     // SEARCH
-    // ===============================================
+    // ===============================
 
     if (_searchQuery
         .trim()
@@ -443,31 +530,29 @@ class ProductProvider
     notifyListeners();
   }
 
-  // =====================================================
+  // =========================================
   // SEARCH
-  // =====================================================
+  // =========================================
 
   void searchProducts(
     String query,
   ) {
 
-    _isSearching =
-        true;
+    _isSearching = true;
 
     _searchQuery =
         query.trim();
 
     _applyFilters();
 
-    _isSearching =
-        false;
+    _isSearching = false;
 
     notifyListeners();
   }
 
-  // =====================================================
+  // =========================================
   // CATEGORY
-  // =====================================================
+  // =========================================
 
   void selectCategory(
     String category,
@@ -479,9 +564,9 @@ class ProductProvider
     _applyFilters();
   }
 
-  // =====================================================
+  // =========================================
   // CLEAR FILTERS
-  // =====================================================
+  // =========================================
 
   void clearFilters() {
 
@@ -493,9 +578,9 @@ class ProductProvider
     _applyFilters();
   }
 
-  // =====================================================
+  // =========================================
   // PRODUCT BY ID
-  // =====================================================
+  // =========================================
 
   ProductModel? getProductById(
     String productId,
@@ -518,9 +603,33 @@ class ProductProvider
     }
   }
 
-  // =====================================================
+  // =========================================
+  // STOCK CHECK
+  // =========================================
+
+  bool hasEnoughStock({
+
+    required String productId,
+
+    required int quantity,
+  }) {
+
+    final product =
+        getProductById(
+      productId,
+    );
+
+    if (product == null) {
+      return false;
+    }
+
+    return product.stock >=
+        quantity;
+  }
+
+  // =========================================
   // ADD PRODUCT
-  // =====================================================
+  // =========================================
 
   Future<bool> addProduct(
     ProductModel product,
@@ -556,8 +665,6 @@ class ProductProvider
 
       _applyFilters();
 
-      notifyListeners();
-
       return true;
 
     } catch (e) {
@@ -575,9 +682,9 @@ class ProductProvider
     }
   }
 
-  // =====================================================
+  // =========================================
   // UPDATE PRODUCT
-  // =====================================================
+  // =========================================
 
   Future<bool> updateProduct(
     ProductModel product,
@@ -612,8 +719,6 @@ class ProductProvider
 
       _applyFilters();
 
-      notifyListeners();
-
       return true;
 
     } catch (e) {
@@ -631,9 +736,9 @@ class ProductProvider
     }
   }
 
-  // =====================================================
+  // =========================================
   // DELETE PRODUCT
-  // =====================================================
+  // =========================================
 
   Future<bool> deleteProduct(
     String productId,
@@ -661,8 +766,6 @@ class ProductProvider
 
       _applyFilters();
 
-      notifyListeners();
-
       return true;
 
     } catch (e) {
@@ -680,19 +783,23 @@ class ProductProvider
     }
   }
 
-  // =====================================================
+  // =========================================
   // UPDATE STOCK
-  // =====================================================
+  // =========================================
 
   Future<bool> updateStock({
 
     required String productId,
 
     required int stock,
-
   }) async {
 
     try {
+
+      final safeStock =
+          stock < 0
+              ? 0
+              : stock;
 
       await _databaseService
           .updateStock(
@@ -701,7 +808,7 @@ class ProductProvider
             productId,
 
         stock:
-            stock,
+            safeStock,
       );
 
       final index =
@@ -719,13 +826,13 @@ class ProductProvider
         _products[index] =
             _products[index]
                 .copyWith(
-          stock: stock,
+
+          stock:
+              safeStock,
         );
       }
 
       _applyFilters();
-
-      notifyListeners();
 
       return true;
 
@@ -740,9 +847,210 @@ class ProductProvider
     }
   }
 
-  // =====================================================
+  // =========================================
+  // REDUCE STOCK
+  // =========================================
+
+  Future<bool> reduceStock({
+
+    required String productId,
+
+    required int quantity,
+  }) async {
+
+    try {
+
+      final product =
+          getProductById(
+        productId,
+      );
+
+      if (product == null) {
+
+        _errorMessage =
+            'Product not found';
+
+        notifyListeners();
+
+        return false;
+      }
+
+      if (quantity <= 0) {
+
+        _errorMessage =
+            'Invalid quantity';
+
+        notifyListeners();
+
+        return false;
+      }
+
+      if (product.stock <
+          quantity) {
+
+        _errorMessage =
+            'Stock not enough';
+
+        notifyListeners();
+
+        return false;
+      }
+
+      final newStock =
+          product.stock -
+              quantity;
+
+      final newSold =
+          product.sold +
+              quantity;
+
+      await _databaseService
+          .updateProductStockAndSold(
+
+        productId:
+            productId,
+
+        stock:
+            newStock,
+
+        sold:
+            newSold,
+      );
+
+      final index =
+          _products.indexWhere(
+
+        (p) {
+
+          return p.id ==
+              productId;
+        },
+      );
+
+      if (index != -1) {
+
+        _products[index] =
+            _products[index]
+                .copyWith(
+
+          stock:
+              newStock,
+
+          sold:
+              newSold,
+
+          isAvailable:
+              newStock > 0,
+        );
+      }
+
+      _applyFilters();
+
+      return true;
+
+    } catch (e) {
+
+      _errorMessage =
+          e.toString();
+
+      notifyListeners();
+
+      return false;
+    }
+  }
+
+  // =========================================
+  // RESTORE STOCK
+  // =========================================
+
+  Future<bool> restoreStock({
+
+    required String productId,
+
+    required int quantity,
+  }) async {
+
+    try {
+
+      final product =
+          getProductById(
+        productId,
+      );
+
+      if (product == null) {
+        return false;
+      }
+
+      final newStock =
+          product.stock +
+              quantity;
+
+      int newSold =
+          product.sold -
+              quantity;
+
+      if (newSold < 0) {
+        newSold = 0;
+      }
+
+      await _databaseService
+          .updateProductStockAndSold(
+
+        productId:
+            productId,
+
+        stock:
+            newStock,
+
+        sold:
+            newSold,
+      );
+
+      final index =
+          _products.indexWhere(
+
+        (p) {
+
+          return p.id ==
+              productId;
+        },
+      );
+
+      if (index != -1) {
+
+        _products[index] =
+            _products[index]
+                .copyWith(
+
+          stock:
+              newStock,
+
+          sold:
+              newSold,
+
+          isAvailable:
+              true,
+        );
+      }
+
+      _applyFilters();
+
+      return true;
+
+    } catch (e) {
+
+      _errorMessage =
+          e.toString();
+
+      notifyListeners();
+
+      return false;
+    }
+  }
+
+  // =========================================
   // PRIVATE
-  // =====================================================
+  // =========================================
 
   void _setLoading(
     bool value,
@@ -760,9 +1068,9 @@ class ProductProvider
         null;
   }
 
-  // =====================================================
+  // =========================================
   // DISPOSE
-  // =====================================================
+  // =========================================
 
   @override
   void dispose() {

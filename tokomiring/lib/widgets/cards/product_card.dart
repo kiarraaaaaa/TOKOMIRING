@@ -1,6 +1,6 @@
 // =====================================================
 // lib/widgets/cards/product_card.dart
-// PREMIUM ECOMMERCE VERSION
+// MODERN COMPACT RESPONSIVE VERSION
 // =====================================================
 
 import 'dart:convert';
@@ -14,9 +14,9 @@ import '../../core/utils/app_format.dart';
 import '../../models/product_model.dart';
 
 import '../../providers/cart_provider.dart';
+import '../../providers/product_provider.dart';
 
-class ProductCard
-    extends StatefulWidget {
+class ProductCard extends StatefulWidget {
 
   final ProductModel product;
 
@@ -28,9 +28,8 @@ class ProductCard
   });
 
   @override
-  State<ProductCard>
-      createState() =>
-          _ProductCardState();
+  State<ProductCard> createState() =>
+      _ProductCardState();
 }
 
 class _ProductCardState
@@ -40,9 +39,9 @@ class _ProductCardState
 
   bool adding = false;
 
-  // =====================================================
+  // =========================================
   // STOCK COLOR
-  // =====================================================
+  // =========================================
 
   Color getStockColor() {
 
@@ -59,17 +58,15 @@ class _ProductCardState
     return AppColors.success;
   }
 
-  // =====================================================
+  // =========================================
   // ADD TO CART
-  // =====================================================
+  // =========================================
 
   Future<void> addToCart(
     BuildContext context,
   ) async {
 
-    if (adding) {
-      return;
-    }
+    if (adding) return;
 
     setState(() {
 
@@ -77,8 +74,7 @@ class _ProductCardState
     });
 
     final cartProvider =
-        context.read<
-            CartProvider>();
+        context.read<CartProvider>();
 
     cartProvider.addToCart(
       widget.product,
@@ -86,13 +82,11 @@ class _ProductCardState
 
     await Future.delayed(
       const Duration(
-        milliseconds: 700,
+        milliseconds: 650,
       ),
     );
 
-    if (!mounted) {
-      return;
-    }
+    if (!mounted) return;
 
     setState(() {
 
@@ -110,24 +104,19 @@ class _ProductCardState
       SnackBar(
 
         behavior:
-            SnackBarBehavior
-                .floating,
-
-        margin:
-            const EdgeInsets.all(
-          16,
-        ),
+            SnackBarBehavior.floating,
 
         backgroundColor:
             AppColors.primary,
+
+        margin:
+            const EdgeInsets.all(14),
 
         shape:
             RoundedRectangleBorder(
 
           borderRadius:
-              BorderRadius.circular(
-            18,
-          ),
+              BorderRadius.circular(16),
         ),
 
         content: Row(
@@ -135,16 +124,12 @@ class _ProductCardState
           children: [
 
             const Icon(
-
               Icons.check_circle,
-
-              color:
-                  Colors.white,
+              color: Colors.white,
+              size: 20,
             ),
 
-            const SizedBox(
-              width: 10,
-            ),
+            const SizedBox(width: 10),
 
             Expanded(
 
@@ -153,37 +138,56 @@ class _ProductCardState
                 '${widget.product.name} added to cart',
 
                 overflow:
-                    TextOverflow
-                        .ellipsis,
+                    TextOverflow.ellipsis,
+
+                style: const TextStyle(
+                  color: Colors.white,
+                ),
               ),
             ),
           ],
         ),
 
         duration:
-            const Duration(
-          seconds: 1,
-        ),
+            const Duration(seconds: 1),
       ),
     );
   }
 
-  // =====================================================
+  // =========================================
   // BUILD
-  // =====================================================
+  // =========================================
 
   @override
   Widget build(
     BuildContext context,
   ) {
 
+    final productProvider =
+        context.watch<ProductProvider>();
+
     final screenWidth =
         MediaQuery.of(context)
             .size
             .width;
 
+    final isDesktop =
+        screenWidth >= 1200;
+
     final isTablet =
         screenWidth >= 700;
+
+    final imageHeight =
+        isDesktop
+            ? 125.0
+            : isTablet
+                ? 115.0
+                : 100.0;
+
+    final isFavorite =
+        productProvider.isFavorite(
+      widget.product,
+    );
 
     return MouseRegion(
 
@@ -203,390 +207,575 @@ class _ProductCardState
         });
       },
 
-      child:
-          AnimatedScale(
+      child: AnimatedContainer(
 
         duration:
             const Duration(
           milliseconds: 220,
         ),
 
-        scale:
-            hovered
-                ? 1.02
-                : 1,
-
-        child:
-            AnimatedContainer(
-
-          duration:
-              const Duration(
-            milliseconds: 220,
-          ),
-
-          decoration:
-              BoxDecoration(
-
-            color:
-                Colors.white,
-
-            borderRadius:
-                BorderRadius.circular(
-              30,
-            ),
-
-            boxShadow: [
-
-              BoxShadow(
-
-                color:
-                    hovered
-
-                        ? Colors.black
-                            .withOpacity(
-                          0.08,
-                        )
-
-                        : Colors.black
-                            .withOpacity(
-                          0.04,
-                        ),
-
-                blurRadius:
-                    hovered
-                        ? 28
-                        : 18,
-
-                offset:
-                    Offset(
-                  0,
-                  hovered
-                      ? 14
-                      : 8,
-                ),
+        transform:
+            Matrix4.identity()
+              ..translate(
+                0.0,
+                hovered ? -3 : 0,
               ),
-            ],
-          ),
 
-          child: Column(
+        decoration:
+            BoxDecoration(
 
-            crossAxisAlignment:
-                CrossAxisAlignment
-                    .start,
+          color:
+              Colors.white,
 
-            children: [
+          borderRadius:
+              BorderRadius.circular(24),
 
-              // =============================================
-              // IMAGE
-              // =============================================
+          boxShadow: [
 
-              Expanded(
+            BoxShadow(
 
-                flex: 5,
+              color:
+                  Colors.black.withOpacity(
+                hovered ? 0.07 : 0.04,
+              ),
 
-                child: Stack(
+              blurRadius:
+                  hovered ? 24 : 14,
 
-                  children: [
+              offset:
+                  Offset(
+                0,
+                hovered ? 12 : 6,
+              ),
+            ),
+          ],
+        ),
 
-                    // =========================================
-                    // IMAGE
-                    // =========================================
+        child: Column(
 
-                    Positioned.fill(
+          crossAxisAlignment:
+              CrossAxisAlignment.start,
 
-                      child: ClipRRect(
+          children: [
+
+            // =====================================
+            // IMAGE
+            // =====================================
+
+            SizedBox(
+
+              height: imageHeight,
+
+              child: Stack(
+
+                children: [
+
+                  Positioned.fill(
+
+                    child: ClipRRect(
+
+                      borderRadius:
+                          const BorderRadius.only(
+
+                        topLeft:
+                            Radius.circular(24),
+
+                        topRight:
+                            Radius.circular(24),
+                      ),
+
+                      child:
+                          widget.product.imageBase64.isEmpty
+
+                              ? Container(
+
+                                  color:
+                                      Colors.grey.shade200,
+
+                                  child: Icon(
+
+                                    Icons.image_outlined,
+
+                                    size:
+                                        isTablet ? 50 : 38,
+
+                                    color:
+                                        Colors.grey.shade500,
+                                  ),
+                                )
+
+                              : Hero(
+
+                                  tag:
+                                      widget.product.id,
+
+                                  child: Image.memory(
+
+                                    base64Decode(
+                                      widget.product.imageBase64,
+                                    ),
+
+                                    fit: BoxFit.cover,
+
+                                    filterQuality:
+                                        FilterQuality.medium,
+
+                                    errorBuilder:
+                                        (
+                                      context,
+                                      error,
+                                      stackTrace,
+                                    ) {
+
+                                      return Container(
+
+                                        color:
+                                            Colors.grey.shade200,
+
+                                        child:
+                                            Icon(
+
+                                          Icons.broken_image_outlined,
+
+                                          size: 40,
+
+                                          color:
+                                              Colors.grey.shade500,
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                    ),
+                  ),
+
+                  // =================================
+                  // OVERLAY
+                  // =================================
+
+                  Positioned.fill(
+
+                    child: Container(
+
+                      decoration:
+                          BoxDecoration(
 
                         borderRadius:
                             const BorderRadius.only(
 
                           topLeft:
-                              Radius.circular(
-                            30,
-                          ),
+                              Radius.circular(24),
 
                           topRight:
-                              Radius.circular(
-                            30,
+                              Radius.circular(24),
+                        ),
+
+                        gradient:
+                            LinearGradient(
+
+                          begin:
+                              Alignment.bottomCenter,
+
+                          end:
+                              Alignment.topCenter,
+
+                          colors: [
+
+                            Colors.black.withOpacity(0.18),
+
+                            Colors.transparent,
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  // =================================
+                  // CATEGORY
+                  // =================================
+
+                  Positioned(
+
+                    top: 10,
+
+                    left: 10,
+
+                    child: Container(
+
+                      padding:
+                          const EdgeInsets.symmetric(
+
+                        horizontal: 10,
+
+                        vertical: 5,
+                      ),
+
+                      decoration:
+                          BoxDecoration(
+
+                        color:
+                            Colors.black.withOpacity(0.58),
+
+                        borderRadius:
+                            BorderRadius.circular(20),
+                      ),
+
+                      child: Text(
+
+                        widget.product.category,
+
+                        style:
+                            const TextStyle(
+
+                          color:
+                              Colors.white,
+
+                          fontSize: 9,
+
+                          fontWeight:
+                              FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  // =================================
+                  // FAVORITE
+                  // =================================
+
+                  Positioned(
+
+                    top: 10,
+
+                    right: 10,
+
+                    child: GestureDetector(
+
+                      onTap: () {
+
+                        productProvider.toggleFavorite(
+                          widget.product,
+                        );
+                      },
+
+                      child: Container(
+
+                        width: 32,
+
+                        height: 32,
+
+                        decoration:
+                            BoxDecoration(
+
+                          color:
+                              Colors.white.withOpacity(0.9),
+
+                          shape:
+                              BoxShape.circle,
+                        ),
+
+                        child: Icon(
+
+                          isFavorite
+                              ? Icons.favorite
+                              : Icons.favorite_border,
+
+                          color:
+                              isFavorite
+                                  ? Colors.red
+                                  : Colors.black54,
+
+                          size: 16,
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  // =================================
+                  // STOCK BADGE
+                  // =================================
+
+                  Positioned(
+
+                    left: 10,
+
+                    bottom: 10,
+
+                    child: Container(
+
+                      padding:
+                          const EdgeInsets.symmetric(
+
+                        horizontal: 10,
+
+                        vertical: 5,
+                      ),
+
+                      decoration:
+                          BoxDecoration(
+
+                        color:
+                            getStockColor(),
+
+                        borderRadius:
+                            BorderRadius.circular(20),
+                      ),
+
+                      child: Text(
+
+                        widget.product.stock <= 0
+                            ? 'Sold Out'
+                            : widget.product.stock <= 5
+                                ? 'Low'
+                                : 'Ready',
+
+                        style:
+                            const TextStyle(
+
+                          color:
+                              Colors.white,
+
+                          fontSize: 9,
+
+                          fontWeight:
+                              FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // =====================================
+            // CONTENT
+            // =====================================
+
+            Expanded(
+
+              child: Padding(
+
+                padding:
+                    const EdgeInsets.all(12),
+
+                child: Column(
+
+                  crossAxisAlignment:
+                      CrossAxisAlignment.start,
+
+                  children: [
+
+                    // =================================
+                    // NAME
+                    // =================================
+
+                    Text(
+
+                      widget.product.name,
+
+                      maxLines: 2,
+
+                      overflow:
+                          TextOverflow.ellipsis,
+
+                      style: TextStyle(
+
+                        fontSize:
+                            isTablet ? 14 : 13,
+
+                        fontWeight:
+                            FontWeight.w700,
+
+                        height: 1.3,
+                      ),
+                    ),
+
+                    const SizedBox(height: 8),
+
+                    // =================================
+                    // PRICE
+                    // =================================
+
+                    Text(
+
+                      AppFormat.currency(
+                        widget.product.price,
+                      ),
+
+                      overflow:
+                          TextOverflow.ellipsis,
+
+                      style:
+                          const TextStyle(
+
+                        fontSize: 16,
+
+                        fontWeight:
+                            FontWeight.bold,
+
+                        color:
+                            AppColors.success,
+                      ),
+                    ),
+
+                    const SizedBox(height: 10),
+
+                    // =================================
+                    // STOCK
+                    // =================================
+
+                    Container(
+
+                      padding:
+                          const EdgeInsets.symmetric(
+
+                        horizontal: 10,
+
+                        vertical: 7,
+                      ),
+
+                      decoration:
+                          BoxDecoration(
+
+                        color:
+                            getStockColor()
+                                .withOpacity(0.08),
+
+                        borderRadius:
+                            BorderRadius.circular(12),
+                      ),
+
+                      child: Row(
+
+                        children: [
+
+                          Icon(
+
+                            Icons.inventory_2_rounded,
+
+                            size: 15,
+
+                            color:
+                                getStockColor(),
+                          ),
+
+                          const SizedBox(width: 6),
+
+                          Expanded(
+
+                            child: Text(
+
+                              'Stock: ${widget.product.stock}',
+
+                              overflow:
+                                  TextOverflow.ellipsis,
+
+                              style: TextStyle(
+
+                                fontSize: 11,
+
+                                color:
+                                    getStockColor(),
+
+                                fontWeight:
+                                    FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    const Spacer(),
+
+                    // =================================
+                    // BUTTON
+                    // =================================
+
+                    SizedBox(
+
+                      width: double.infinity,
+
+                      height: 40,
+
+                      child: ElevatedButton.icon(
+
+                        style:
+                            ElevatedButton.styleFrom(
+
+                          elevation: 0,
+
+                          backgroundColor:
+                              widget.product.stock <= 0
+                                  ? Colors.grey
+                                  : AppColors.primary,
+
+                          foregroundColor:
+                              Colors.white,
+
+                          shape:
+                              RoundedRectangleBorder(
+
+                            borderRadius:
+                                BorderRadius.circular(
+                              14,
+                            ),
                           ),
                         ),
 
-                        child:
-                            widget.product.imageBase64
-                                    .isEmpty
+                        onPressed:
+                            widget.product.stock <= 0
 
-                                ? Container(
+                                ? null
 
-                                    color:
-                                        Colors
-                                            .grey
-                                            .shade200,
+                                : () {
+
+                                    addToCart(
+                                      context,
+                                    );
+                                  },
+
+                        icon:
+                            adding
+
+                                ? const SizedBox(
+
+                                    width: 16,
+
+                                    height: 16,
 
                                     child:
-                                        Icon(
-
-                                      Icons
-                                          .image_outlined,
-
-                                      size:
-                                          isTablet
-                                              ? 70
-                                              : 50,
+                                        CircularProgressIndicator(
 
                                       color:
-                                          Colors
-                                              .grey
-                                              .shade500,
+                                          Colors.white,
+
+                                      strokeWidth: 2,
                                     ),
                                   )
 
-                                : Hero(
+                                : const Icon(
 
-                                    tag:
-                                        widget
-                                            .product
-                                            .id,
+                                    Icons.shopping_cart_rounded,
 
-                                    child:
-                                        Image.memory(
-
-                                      base64Decode(
-
-                                        widget
-                                            .product
-                                            .imageBase64,
-                                      ),
-
-                                      fit:
-                                          BoxFit.cover,
-
-                                      filterQuality:
-                                          FilterQuality
-                                              .high,
-
-                                      errorBuilder: (
-
-                                        context,
-
-                                        error,
-
-                                        stackTrace,
-
-                                      ) {
-
-                                        return Container(
-
-                                          color:
-                                              Colors.grey
-                                                  .shade200,
-
-                                          child:
-                                              Icon(
-
-                                            Icons
-                                                .broken_image_outlined,
-
-                                            size:
-                                                50,
-
-                                            color:
-                                                Colors.grey
-                                                    .shade500,
-                                          ),
-                                        );
-                                      },
-                                    ),
+                                    size: 18,
                                   ),
-                      ),
-                    ),
 
-                    // =========================================
-                    // PREMIUM OVERLAY
-                    // =========================================
+                        label: Text(
 
-                    Positioned.fill(
+                          widget.product.stock <= 0
+                              ? 'Unavailable'
+                              : adding
+                                  ? 'Adding...'
+                                  : 'Add To Cart',
 
-                      child: Container(
-
-                        decoration:
-                            BoxDecoration(
-
-                          borderRadius:
-                              const BorderRadius.only(
-
-                            topLeft:
-                                Radius.circular(
-                              30,
-                            ),
-
-                            topRight:
-                                Radius.circular(
-                              30,
-                            ),
-                          ),
-
-                          gradient:
-                              LinearGradient(
-
-                            begin:
-                                Alignment
-                                    .bottomCenter,
-
-                            end:
-                                Alignment
-                                    .topCenter,
-
-                            colors: [
-
-                              Colors.black
-                                  .withOpacity(
-                                0.28,
-                              ),
-
-                              Colors.transparent,
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    // =========================================
-                    // CATEGORY
-                    // =========================================
-
-                    Positioned(
-
-                      top: 14,
-
-                      left: 14,
-
-                      child:
-                          AnimatedContainer(
-
-                        duration:
-                            const Duration(
-                          milliseconds:
-                              220,
-                        ),
-
-                        padding:
-                            const EdgeInsets.symmetric(
-
-                          horizontal:
-                              12,
-
-                          vertical:
-                              7,
-                        ),
-
-                        decoration:
-                            BoxDecoration(
-
-                          color:
-                              Colors.black
-                                  .withOpacity(
-                            0.6,
-                          ),
-
-                          borderRadius:
-                              BorderRadius.circular(
-                            30,
-                          ),
-                        ),
-
-                        child: Text(
-
-                          widget.product
-                              .category,
+                          overflow:
+                              TextOverflow.ellipsis,
 
                           style:
                               const TextStyle(
 
-                            color:
-                                Colors.white,
-
-                            fontSize:
-                                10,
-
-                            fontWeight:
-                                FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    // =========================================
-                    // STOCK BADGE
-                    // =========================================
-
-                    Positioned(
-
-                      top: 14,
-
-                      right: 14,
-
-                      child: Container(
-
-                        padding:
-                            const EdgeInsets.symmetric(
-
-                          horizontal:
-                              12,
-
-                          vertical:
-                              7,
-                        ),
-
-                        decoration:
-                            BoxDecoration(
-
-                          color:
-                              getStockColor(),
-
-                          borderRadius:
-                              BorderRadius.circular(
-                            30,
-                          ),
-
-                          boxShadow: [
-
-                            BoxShadow(
-
-                              color:
-                                  getStockColor()
-                                      .withOpacity(
-                                0.35,
-                              ),
-
-                              blurRadius:
-                                  10,
-                            ),
-                          ],
-                        ),
-
-                        child: Text(
-
-                          widget.product
-                                      .stock <=
-                                  0
-
-                              ? 'Sold Out'
-
-                              : widget.product
-                                          .stock <=
-                                      5
-
-                                  ? 'Low Stock'
-
-                                  : 'Ready',
-
-                          style:
-                              const TextStyle(
-
-                            color:
-                                Colors.white,
-
-                            fontSize:
-                                10,
+                            fontSize: 12,
 
                             fontWeight:
                                 FontWeight.bold,
@@ -597,310 +786,8 @@ class _ProductCardState
                   ],
                 ),
               ),
-
-              // =============================================
-              // CONTENT
-              // =============================================
-
-              Expanded(
-
-                flex: 4,
-
-                child: Padding(
-
-                  padding:
-                      const EdgeInsets.all(
-                    16,
-                  ),
-
-                  child: Column(
-
-                    crossAxisAlignment:
-                        CrossAxisAlignment
-                            .start,
-
-                    children: [
-
-                      // =======================================
-                      // NAME
-                      // =======================================
-
-                      Text(
-
-                        widget.product.name,
-
-                        maxLines: 2,
-
-                        overflow:
-                            TextOverflow
-                                .ellipsis,
-
-                        style:
-                            TextStyle(
-
-                          fontSize:
-                              isTablet
-                                  ? 18
-                                  : 16,
-
-                          fontWeight:
-                              FontWeight.bold,
-
-                          height: 1.3,
-                        ),
-                      ),
-
-                      const SizedBox(
-                        height: 10,
-                      ),
-
-                      // =======================================
-                      // PRICE
-                      // =======================================
-
-                      Text(
-
-                        AppFormat.currency(
-                          widget.product.price,
-                        ),
-
-                        overflow:
-                            TextOverflow
-                                .ellipsis,
-
-                        style:
-                            const TextStyle(
-
-                          fontSize: 22,
-
-                          fontWeight:
-                              FontWeight.bold,
-
-                          color:
-                              AppColors
-                                  .success,
-                        ),
-                      ),
-
-                      const SizedBox(
-                        height: 14,
-                      ),
-
-                      // =======================================
-                      // STOCK INFO
-                      // =======================================
-
-                      Container(
-
-                        padding:
-                            const EdgeInsets.symmetric(
-
-                          horizontal:
-                              14,
-
-                          vertical:
-                              10,
-                        ),
-
-                        decoration:
-                            BoxDecoration(
-
-                          color:
-                              getStockColor()
-                                  .withOpacity(
-                            0.1,
-                          ),
-
-                          borderRadius:
-                              BorderRadius.circular(
-                            16,
-                          ),
-                        ),
-
-                        child: Row(
-
-                          children: [
-
-                            Icon(
-
-                              Icons
-                                  .inventory_2_rounded,
-
-                              size: 18,
-
-                              color:
-                                  getStockColor(),
-                            ),
-
-                            const SizedBox(
-                              width: 8,
-                            ),
-
-                            Expanded(
-
-                              child: Text(
-
-                                'Stock: ${widget.product.stock}',
-
-                                overflow:
-                                    TextOverflow
-                                        .ellipsis,
-
-                                style:
-                                    TextStyle(
-
-                                  color:
-                                      getStockColor(),
-
-                                  fontWeight:
-                                      FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      const Spacer(),
-
-                      // =======================================
-                      // BUTTON
-                      // =======================================
-
-                      SizedBox(
-
-                        width:
-                            double.infinity,
-
-                        height: 50,
-
-                        child:
-                            AnimatedSwitcher(
-
-                          duration:
-                              const Duration(
-                            milliseconds:
-                                220,
-                          ),
-
-                          child:
-                              ElevatedButton.icon(
-
-                            key: ValueKey(
-                              adding,
-                            ),
-
-                            style:
-                                ElevatedButton.styleFrom(
-
-                              elevation: 0,
-
-                              backgroundColor:
-
-                                  widget.product
-                                              .stock <=
-                                          0
-
-                                      ? Colors.grey
-
-                                      : AppColors
-                                          .primary,
-
-                              foregroundColor:
-                                  Colors.white,
-
-                              shape:
-                                  RoundedRectangleBorder(
-
-                                borderRadius:
-                                    BorderRadius.circular(
-                                  18,
-                                ),
-                              ),
-                            ),
-
-                            onPressed:
-
-                                widget.product
-                                            .stock <=
-                                        0
-
-                                    ? null
-
-                                    : () {
-
-                                        addToCart(
-                                          context,
-                                        );
-                                      },
-
-                            icon:
-
-                                adding
-
-                                    ? const SizedBox(
-
-                                        width:
-                                            18,
-
-                                        height:
-                                            18,
-
-                                        child:
-                                            CircularProgressIndicator(
-
-                                          color:
-                                              Colors
-                                                  .white,
-
-                                          strokeWidth:
-                                              2,
-                                        ),
-                                      )
-
-                                    : Icon(
-
-                                        widget.product
-                                                    .stock <=
-                                                0
-
-                                            ? Icons
-                                                .block_rounded
-
-                                            : Icons
-                                                .shopping_cart_rounded,
-                                      ),
-
-                            label: Text(
-
-                              widget.product
-                                          .stock <=
-                                      0
-
-                                  ? 'Out Of Stock'
-
-                                  : adding
-
-                                      ? 'Adding...'
-
-                                      : 'Add To Cart',
-
-                              style:
-                                  const TextStyle(
-
-                                fontWeight:
-                                    FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

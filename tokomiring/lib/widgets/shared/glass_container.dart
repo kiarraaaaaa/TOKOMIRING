@@ -1,4 +1,7 @@
+// =====================================================
 // lib/widgets/shared/glass_container.dart
+// CLEAN MODERN RESPONSIVE VERSION
+// =====================================================
 
 import 'dart:ui';
 
@@ -45,11 +48,11 @@ class GlassContainer
 
     required this.child,
 
-    this.borderRadius = 28,
+    this.borderRadius = 24,
 
-    this.blur = 18,
+    this.blur = 14,
 
-    this.opacity = 0.14,
+    this.opacity = 0.10,
 
     this.padding,
 
@@ -89,12 +92,10 @@ class _GlassContainerState
   ) {
 
     final borderColor =
-
         widget.borderColor ??
 
-            Colors.white
-                .withOpacity(
-              0.14,
+            Colors.white.withOpacity(
+              0.12,
             );
 
     return MouseRegion(
@@ -123,174 +124,152 @@ class _GlassContainerState
         });
       },
 
-      child:
-          AnimatedScale(
+      child: AnimatedContainer(
 
         duration:
             const Duration(
           milliseconds: 220,
         ),
 
-        scale:
-            hovered
-                ? 1.01
-                : 1,
-
-        child:
-            AnimatedContainer(
-
-          duration:
-              const Duration(
-            milliseconds: 220,
-          ),
-
-          width:
-              widget.width,
-
-          height:
-              widget.height,
-
-          margin:
-              widget.margin,
-
-          decoration:
-              BoxDecoration(
-
-            borderRadius:
-                BorderRadius.circular(
-              widget
-                  .borderRadius,
-            ),
-
-            boxShadow:
-
-                widget.boxShadow ??
-
-                    [
-
-                      BoxShadow(
-
-                        color:
-                            Colors.black
-                                .withOpacity(
-
-                          hovered
-                              ? 0.10
-                              : 0.05,
-                        ),
-
-                        blurRadius:
-
-                            hovered
-                                ? 28
-                                : 18,
-
-                        offset:
-                            Offset(
-
-                          0,
-
-                          hovered
-                              ? 14
-                              : 8,
-                        ),
-                      ),
-                    ],
-          ),
-
-          child:
-              ClipRRect(
-
-            borderRadius:
-                BorderRadius.circular(
-              widget
-                  .borderRadius,
-            ),
-
-            child:
-                BackdropFilter(
-
-              filter: ImageFilter.blur(
-
-                sigmaX:
-                    widget.blur,
-
-                sigmaY:
-                    widget.blur,
+        transform:
+            Matrix4.identity()
+              ..translate(
+                0.0,
+                hovered ? -2 : 0,
               ),
 
-              child:
-                  Material(
+        width:
+            widget.width,
 
-                color:
-                    Colors.transparent,
+        height:
+            widget.height,
 
-                child:
-                    InkWell(
+        margin:
+            widget.margin,
 
-                  onTap:
-                      widget.onTap,
+        decoration:
+            BoxDecoration(
 
-                  child:
-                      Container(
+          borderRadius:
+              BorderRadius.circular(
+            widget.borderRadius,
+          ),
 
-                    padding:
-                        widget.padding,
+          boxShadow:
 
-                    decoration:
-                        BoxDecoration(
+              widget.boxShadow ??
 
-                      gradient:
+                  [
 
-                          widget.gradient ??
+                    BoxShadow(
 
-                              LinearGradient(
+                      color:
+                          Colors.black
+                              .withOpacity(
 
-                                begin:
-                                    Alignment
-                                        .topLeft,
-
-                                end:
-                                    Alignment
-                                        .bottomRight,
-
-                                colors: [
-
-                                  Colors.white
-                                      .withOpacity(
-
-                                    widget.opacity +
-                                        0.08,
-                                  ),
-
-                                  Colors.white
-                                      .withOpacity(
-
-                                    widget.opacity,
-                                  ),
-                                ],
-                              ),
-
-                      borderRadius:
-                          BorderRadius.circular(
-                        widget
-                            .borderRadius,
+                        hovered
+                            ? 0.08
+                            : 0.04,
                       ),
 
-                      border: Border.all(
+                      blurRadius:
+                          hovered
+                              ? 22
+                              : 14,
 
-                        color:
-                            borderColor,
-
-                        width:
-                            widget
-                                .borderWidth,
+                      offset:
+                          Offset(
+                        0,
+                        hovered
+                            ? 10
+                            : 6,
                       ),
                     ),
+                  ],
+        ),
 
-                    child:
-                        widget.child,
+        child: ClipRRect(
+
+          borderRadius:
+              BorderRadius.circular(
+            widget.borderRadius,
+          ),
+
+          child: BackdropFilter(
+
+            filter: ImageFilter.blur(
+
+              sigmaX:
+                  widget.blur,
+
+              sigmaY:
+                  widget.blur,
+            ),
+
+            child: Material(
+
+              color:
+                  Colors.transparent,
+
+              child: InkWell(
+
+                onTap:
+                    widget.onTap,
+
+                child: Container(
+
+                  padding:
+                      widget.padding,
+
+                  decoration:
+                      BoxDecoration(
+
+                    gradient:
+
+                        widget.gradient ??
+
+                            LinearGradient(
+
+                              begin:
+                                  Alignment.topLeft,
+
+                              end:
+                                  Alignment.bottomRight,
+
+                              colors: [
+
+                                Colors.white
+                                    .withOpacity(
+
+                                  widget.opacity +
+                                      0.05,
+                                ),
+
+                                Colors.white
+                                    .withOpacity(
+
+                                  widget.opacity,
+                                ),
+                              ],
+                            ),
+
+                    borderRadius:
+                        BorderRadius.circular(
+                      widget.borderRadius,
+                    ),
+
+                    border: Border.all(
+
+                      color:
+                          borderColor,
+
+                      width:
+                          widget.borderWidth,
+                    ),
                   ),
+
+                  child:
+                      widget.child,
                 ),
               ),
             ),

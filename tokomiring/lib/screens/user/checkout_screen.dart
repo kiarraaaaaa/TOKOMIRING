@@ -1,4 +1,7 @@
+// =====================================================
 // lib/screens/user/checkout_screen.dart
+// CLEAN PREMIUM RESPONSIVE VERSION
+// =====================================================
 
 import 'dart:convert';
 
@@ -33,9 +36,9 @@ class _CheckoutScreenState
     with
         SingleTickerProviderStateMixin {
 
-  // =====================================================
+  // =========================================
   // FORM
-  // =====================================================
+  // =========================================
 
   final GlobalKey<FormState>
       _formKey =
@@ -50,16 +53,16 @@ class _CheckoutScreenState
   final addressController =
       TextEditingController();
 
-  // =====================================================
+  // =========================================
   // PAYMENT
-  // =====================================================
+  // =========================================
 
   String paymentMethod =
       'Cash';
 
-  // =====================================================
+  // =========================================
   // ANIMATION
-  // =====================================================
+  // =========================================
 
   late AnimationController
       _animationController;
@@ -67,9 +70,9 @@ class _CheckoutScreenState
   late Animation<double>
       _fadeAnimation;
 
-  // =====================================================
+  // =========================================
   // INIT
-  // =====================================================
+  // =========================================
 
   @override
   void initState() {
@@ -83,7 +86,7 @@ class _CheckoutScreenState
 
       duration:
           const Duration(
-        milliseconds: 500,
+        milliseconds: 450,
       ),
     );
 
@@ -126,11 +129,12 @@ class _CheckoutScreenState
     );
   }
 
-  // =====================================================
-  // STOCK VALIDATION
-  // =====================================================
+  // =========================================
+  // VALIDATION
+  // =========================================
 
   bool hasInvalidStock(
+
     ProductProvider
         productProvider,
 
@@ -148,18 +152,15 @@ class _CheckoutScreenState
       );
 
       if (product == null) {
-
         return true;
       }
 
       if (product.stock <= 0) {
-
         return true;
       }
 
       if (item.quantity >
           product.stock) {
-
         return true;
       }
     }
@@ -167,11 +168,12 @@ class _CheckoutScreenState
     return false;
   }
 
-  // =====================================================
+  // =========================================
   // CREATE ORDER
-  // =====================================================
+  // =========================================
 
-  Future<void> createOrder()
+  Future<void>
+      createOrder()
       async {
 
     if (!_formKey.currentState!
@@ -196,9 +198,9 @@ class _CheckoutScreenState
         context.read<
             ProductProvider>();
 
-    // ===================================================
+    // ===============================
     // VALIDATE STOCK
-    // ===================================================
+    // ===============================
 
     if (hasInvalidStock(
 
@@ -218,7 +220,7 @@ class _CheckoutScreenState
 
           content: Text(
 
-            'Some products are sold out or stock is insufficient',
+            'Some products exceed available stock',
           ),
         ),
       );
@@ -226,9 +228,9 @@ class _CheckoutScreenState
       return;
     }
 
-    // ===================================================
-    // SAVE USER DATA REALTIME
-    // ===================================================
+    // ===============================
+    // UPDATE USER DATA
+    // ===============================
 
     await authProvider
         .updateAddress(
@@ -244,9 +246,9 @@ class _CheckoutScreenState
           .trim(),
     );
 
-    // ===================================================
-    // CREATE ORDER
-    // ===================================================
+    // ===============================
+    // CREATE ORDER MODEL
+    // ===============================
 
     final order =
         OrderModel(
@@ -327,9 +329,9 @@ class _CheckoutScreenState
           null,
     );
 
-    // ===================================================
+    // ===============================
     // CREATE ORDER
-    // ===================================================
+    // ===============================
 
     final success =
         await orderProvider
@@ -341,9 +343,9 @@ class _CheckoutScreenState
       return;
     }
 
-    // ===================================================
+    // ===============================
     // SUCCESS
-    // ===================================================
+    // ===============================
 
     if (success) {
 
@@ -369,9 +371,9 @@ class _CheckoutScreenState
       );
     }
 
-    // ===================================================
+    // ===============================
     // FAILED
-    // ===================================================
+    // ===============================
 
     else {
 
@@ -396,9 +398,9 @@ class _CheckoutScreenState
     }
   }
 
-  // =====================================================
+  // =========================================
   // BUILD
-  // =====================================================
+  // =========================================
 
   @override
   Widget build(
@@ -426,8 +428,8 @@ class _CheckoutScreenState
             .size
             .width;
 
-    final isTablet =
-        screenWidth >= 700;
+    final isMobile =
+        screenWidth < 700;
 
     final invalidStock =
         hasInvalidStock(
@@ -443,6 +445,10 @@ class _CheckoutScreenState
           const Color(
         0xffF5F7FB,
       ),
+
+      // =====================================
+      // APPBAR
+      // =====================================
 
       appBar: AppBar(
 
@@ -473,7 +479,7 @@ class _CheckoutScreenState
                 color:
                     Colors.black,
 
-                fontSize: 24,
+                fontSize: 20,
 
                 fontWeight:
                     FontWeight.bold,
@@ -486,19 +492,23 @@ class _CheckoutScreenState
 
             Text(
 
-              'Realtime marketplace checkout',
+              'Modern marketplace checkout',
 
               style: TextStyle(
 
                 color:
                     Colors.grey,
 
-                fontSize: 13,
+                fontSize: 12,
               ),
             ),
           ],
         ),
       ),
+
+      // =====================================
+      // BODY
+      // =====================================
 
       body: FadeTransition(
 
@@ -509,410 +519,60 @@ class _CheckoutScreenState
 
           key: _formKey,
 
-          child: Column(
+          child:
+              SingleChildScrollView(
 
-            crossAxisAlignment:
-                CrossAxisAlignment.start,
+            physics:
+                const BouncingScrollPhysics(),
 
-            children: [
+            padding:
+                EdgeInsets.all(
+              isMobile ? 14 : 20,
+            ),
 
-              Expanded(
+            child: Center(
 
-                child:
-                    SingleChildScrollView(
+              child: ConstrainedBox(
 
-                  physics:
-                      const BouncingScrollPhysics(),
+                constraints:
+                    const BoxConstraints(
+                  maxWidth: 920,
+                ),
 
-                  padding:
-                      const EdgeInsets.all(
-                    20,
-                  ),
+                child: Column(
 
-                  child: Column(
+                  crossAxisAlignment:
+                      CrossAxisAlignment
+                          .start,
 
-                    crossAxisAlignment:
-                        CrossAxisAlignment
-                            .start,
+                  children: [
 
-                    children: [
+                    // ===============================
+                    // WARNING
+                    // ===============================
 
-                      // =====================================
-                      // INVALID STOCK WARNING
-                      // =====================================
-
-                      if (invalidStock)
-
-                        Container(
-
-                          width:
-                              double.infinity,
-
-                          margin:
-                              const EdgeInsets.only(
-                            bottom: 20,
-                          ),
-
-                          padding:
-                              const EdgeInsets.all(
-                            18,
-                          ),
-
-                          decoration:
-                              BoxDecoration(
-
-                            color:
-                                Colors.red
-                                    .withOpacity(
-                              0.08,
-                            ),
-
-                            borderRadius:
-                                BorderRadius.circular(
-                              22,
-                            ),
-                          ),
-
-                          child: const Row(
-
-                            children: [
-
-                              Icon(
-
-                                Icons.warning_amber_rounded,
-
-                                color:
-                                    Colors.red,
-                              ),
-
-                              SizedBox(
-                                width: 12,
-                              ),
-
-                              Expanded(
-
-                                child: Text(
-
-                                  'Some products are sold out or exceed available stock.',
-
-                                  style:
-                                      TextStyle(
-
-                                    color:
-                                        Colors.red,
-
-                                    fontWeight:
-                                        FontWeight.w600,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-
-                      // =====================================
-                      // PROFILE CARD
-                      // =====================================
+                    if (invalidStock)
 
                       Container(
 
                         width:
                             double.infinity,
 
-                        padding:
-                            const EdgeInsets.all(
-                          20,
+                        margin:
+                            const EdgeInsets.only(
+                          bottom: 20,
                         ),
-
-                        decoration:
-                            BoxDecoration(
-
-                          borderRadius:
-                              BorderRadius.circular(
-                            28,
-                          ),
-
-                          gradient:
-                              const LinearGradient(
-
-                            colors: [
-
-                              Color(
-                                0xff2563EB,
-                              ),
-
-                              Color(
-                                0xff1D4ED8,
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        child: Row(
-
-                          children: [
-
-                            Container(
-
-                              width: 60,
-
-                              height: 60,
-
-                              decoration:
-                                  BoxDecoration(
-
-                                color:
-                                    Colors
-                                        .white
-                                        .withOpacity(
-                                  0.2,
-                                ),
-
-                                shape:
-                                    BoxShape.circle,
-                              ),
-
-                              child:
-                                  authProvider
-                                          .photoUrl
-                                          .isNotEmpty
-
-                                      ? ClipOval(
-
-                                          child:
-                                              Image.memory(
-
-                                            base64Decode(
-                                              authProvider
-                                                  .photoUrl,
-                                            ),
-
-                                            fit:
-                                                BoxFit.cover,
-                                          ),
-                                        )
-
-                                      : const Icon(
-
-                                          Icons.person,
-
-                                          color:
-                                              Colors
-                                                  .white,
-
-                                          size:
-                                              30,
-                                        ),
-                            ),
-
-                            const SizedBox(
-                              width: 16,
-                            ),
-
-                            Expanded(
-
-                              child: Column(
-
-                                crossAxisAlignment:
-                                    CrossAxisAlignment
-                                        .start,
-
-                                children: [
-
-                                  Text(
-
-                                    authProvider
-                                            .user
-                                            ?.displayName ??
-
-                                        'Member',
-
-                                    overflow:
-                                        TextOverflow
-                                            .ellipsis,
-
-                                    style:
-                                        const TextStyle(
-
-                                      color:
-                                          Colors
-                                              .white,
-
-                                      fontSize:
-                                          20,
-
-                                      fontWeight:
-                                          FontWeight.bold,
-                                    ),
-                                  ),
-
-                                  const SizedBox(
-                                    height:
-                                        4,
-                                  ),
-
-                                  Text(
-
-                                    authProvider
-                                            .email,
-
-                                    overflow:
-                                        TextOverflow
-                                            .ellipsis,
-
-                                    style:
-                                        TextStyle(
-
-                                      color:
-                                          Colors
-                                              .white
-                                              .withOpacity(
-                                        0.9,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      const SizedBox(
-                        height: 28,
-                      ),
-
-                      const Text(
-
-                        'Shipping Information',
-
-                        style: TextStyle(
-
-                          fontSize: 24,
-
-                          fontWeight:
-                              FontWeight.bold,
-                        ),
-                      ),
-
-                      const SizedBox(
-                        height: 20,
-                      ),
-
-                      _buildInputField(
-
-                        controller:
-                            nameController,
-
-                        label:
-                            'Full Name',
-
-                        icon:
-                            Icons.person,
-                      ),
-
-                      const SizedBox(
-                        height: 18,
-                      ),
-
-                      _buildInputField(
-
-                        controller:
-                            phoneController,
-
-                        label:
-                            'Phone Number',
-
-                        icon:
-                            Icons.phone,
-
-                        keyboardType:
-                            TextInputType
-                                .phone,
-                      ),
-
-                      const SizedBox(
-                        height: 18,
-                      ),
-
-                      _buildInputField(
-
-                        controller:
-                            addressController,
-
-                        label:
-                            'Shipping Address',
-
-                        icon:
-                            Icons.location_on,
-
-                        minLines:
-                            2,
-
-                        maxLines:
-                            3,
-                      ),
-
-                      const SizedBox(
-                        height: 30,
-                      ),
-
-                      const Text(
-
-                        'Payment Method',
-
-                        style: TextStyle(
-
-                          fontSize: 24,
-
-                          fontWeight:
-                              FontWeight.bold,
-                        ),
-                      ),
-
-                      const SizedBox(
-                        height: 20,
-                      ),
-
-                      Wrap(
-
-                        spacing: 16,
-
-                        runSpacing: 16,
-
-                        children: [
-
-                          _buildPaymentCard(
-                            'Cash',
-                            Icons.payments,
-                          ),
-
-                          _buildPaymentCard(
-                            'Bank Transfer',
-                            Icons.account_balance,
-                          ),
-                        ],
-                      ),
-
-                      const SizedBox(
-                        height: 30,
-                      ),
-
-                      Container(
-
-                        width:
-                            double.infinity,
 
                         padding:
                             const EdgeInsets.all(
-                          18,
+                          16,
                         ),
 
                         decoration:
                             BoxDecoration(
 
                           color:
-                              Colors.orange
+                              Colors.red
                                   .withOpacity(
                             0.08,
                           ),
@@ -923,23 +583,20 @@ class _CheckoutScreenState
                           ),
                         ),
 
-                        child: Row(
-
-                          crossAxisAlignment:
-                              CrossAxisAlignment
-                                  .start,
+                        child: const Row(
 
                           children: [
 
-                            const Icon(
+                            Icon(
 
-                              Icons.info_outline,
+                              Icons
+                                  .warning_amber_rounded,
 
                               color:
-                                  Colors.orange,
+                                  Colors.red,
                             ),
 
-                            const SizedBox(
+                            SizedBox(
                               width: 12,
                             ),
 
@@ -947,17 +604,16 @@ class _CheckoutScreenState
 
                               child: Text(
 
-                                'Orders will be validated by admin before delivery processing.',
+                                'Some products exceed available stock.',
 
-                                style: TextStyle(
+                                style:
+                                    TextStyle(
 
                                   color:
-                                      Colors
-                                          .grey
-                                          .shade800,
+                                      Colors.red,
 
-                                  height:
-                                      1.5,
+                                  fontWeight:
+                                      FontWeight.w600,
                                 ),
                               ),
                             ),
@@ -965,244 +621,651 @@ class _CheckoutScreenState
                         ),
                       ),
 
-                      const SizedBox(
-                        height: 30,
+                    // ===============================
+                    // PROFILE CARD
+                    // ===============================
+
+                    Container(
+
+                      width:
+                          double.infinity,
+
+                      padding:
+                          EdgeInsets.all(
+                        isMobile
+                            ? 18
+                            : 24,
                       ),
 
-                      const Text(
+                      decoration:
+                          BoxDecoration(
 
-                        'Order Summary',
+                        borderRadius:
+                            BorderRadius.circular(
+                          30,
+                        ),
 
-                        style: TextStyle(
+                        gradient:
+                            const LinearGradient(
 
-                          fontSize: 24,
+                          colors: [
 
-                          fontWeight:
-                              FontWeight.bold,
+                            Color(
+                              0xff2563EB,
+                            ),
+
+                            Color(
+                              0xff1D4ED8,
+                            ),
+                          ],
                         ),
                       ),
 
-                      const SizedBox(
-                        height: 20,
-                      ),
+                      child: Row(
 
-                      Container(
+                        children: [
 
-                        width:
-                            double.infinity,
+                          Container(
 
-                        padding:
-                            const EdgeInsets.all(
-                          20,
-                        ),
+                            width:
+                                isMobile
+                                    ? 56
+                                    : 64,
 
-                        decoration:
-                            BoxDecoration(
+                            height:
+                                isMobile
+                                    ? 56
+                                    : 64,
 
-                          color:
-                              Colors.white,
+                            decoration:
+                                BoxDecoration(
 
-                          borderRadius:
-                              BorderRadius.circular(
-                            28,
+                              color:
+                                  Colors.white
+                                      .withOpacity(
+                                0.16,
+                              ),
+
+                              shape:
+                                  BoxShape.circle,
+                            ),
+
+                            child:
+                                authProvider
+                                        .photoUrl
+                                        .isNotEmpty
+
+                                    ? ClipOval(
+
+                                        child:
+                                            Image.memory(
+
+                                          base64Decode(
+                                            authProvider
+                                                .photoUrl,
+                                          ),
+
+                                          fit:
+                                              BoxFit.cover,
+                                        ),
+                                      )
+
+                                    : const Icon(
+
+                                        Icons.person,
+
+                                        color:
+                                            Colors.white,
+
+                                        size:
+                                            28,
+                                      ),
                           ),
+
+                          const SizedBox(
+                            width: 16,
+                          ),
+
+                          Expanded(
+
+                            child: Column(
+
+                              crossAxisAlignment:
+                                  CrossAxisAlignment
+                                      .start,
+
+                              children: [
+
+                                Text(
+
+                                  authProvider
+                                          .user
+                                          ?.displayName ??
+
+                                      'Member',
+
+                                  overflow:
+                                      TextOverflow
+                                          .ellipsis,
+
+                                  style:
+                                      TextStyle(
+
+                                    color:
+                                        Colors
+                                            .white,
+
+                                    fontSize:
+                                        isMobile
+                                            ? 18
+                                            : 22,
+
+                                    fontWeight:
+                                        FontWeight.bold,
+                                  ),
+                                ),
+
+                                const SizedBox(
+                                  height:
+                                      4,
+                                ),
+
+                                Text(
+
+                                  authProvider
+                                      .email,
+
+                                  overflow:
+                                      TextOverflow
+                                          .ellipsis,
+
+                                  style:
+                                      TextStyle(
+
+                                    color:
+                                        Colors
+                                            .white
+                                            .withOpacity(
+                                      0.88,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(
+                      height: 26,
+                    ),
+
+                    // ===============================
+                    // SHIPPING
+                    // ===============================
+
+                    const Text(
+
+                      'Shipping Information',
+
+                      style: TextStyle(
+
+                        fontSize: 24,
+
+                        fontWeight:
+                            FontWeight.bold,
+                      ),
+                    ),
+
+                    const SizedBox(
+                      height: 20,
+                    ),
+
+                    _buildInputField(
+
+                      controller:
+                          nameController,
+
+                      label:
+                          'Full Name',
+
+                      icon:
+                          Icons.person,
+                    ),
+
+                    const SizedBox(
+                      height: 16,
+                    ),
+
+                    _buildInputField(
+
+                      controller:
+                          phoneController,
+
+                      label:
+                          'Phone Number',
+
+                      icon:
+                          Icons.phone,
+
+                      keyboardType:
+                          TextInputType
+                              .phone,
+                    ),
+
+                    const SizedBox(
+                      height: 16,
+                    ),
+
+                    _buildInputField(
+
+                      controller:
+                          addressController,
+
+                      label:
+                          'Shipping Address',
+
+                      icon:
+                          Icons.location_on,
+
+                      minLines: 3,
+
+                      maxLines: 4,
+                    ),
+
+                    const SizedBox(
+                      height: 28,
+                    ),
+
+                    // ===============================
+                    // PAYMENT
+                    // ===============================
+
+                    const Text(
+
+                      'Payment Method',
+
+                      style: TextStyle(
+
+                        fontSize: 24,
+
+                        fontWeight:
+                            FontWeight.bold,
+                      ),
+                    ),
+
+                    const SizedBox(
+                      height: 18,
+                    ),
+
+                    Wrap(
+
+                      spacing: 16,
+
+                      runSpacing: 16,
+
+                      children: [
+
+                        _buildPaymentCard(
+                          'Cash',
+                          Icons.payments,
                         ),
 
-                        child: Column(
+                        _buildPaymentCard(
+                          'Bank Transfer',
+                          Icons.account_balance,
+                        ),
+                      ],
+                    ),
 
-                          children: [
+                    const SizedBox(
+                      height: 28,
+                    ),
 
-                            ...cartProvider
-                                .items
-                                .map(
-                              (item) {
+                    // ===============================
+                    // INFO BOX
+                    // ===============================
 
-                                final product =
-                                    productProvider
-                                        .getProductById(
-                                  item.product.id,
-                                );
+                    Container(
 
-                                final soldOut =
-                                    product ==
-                                            null ||
+                      width:
+                          double.infinity,
 
-                                        product.stock <=
-                                            0;
+                      padding:
+                          const EdgeInsets.all(
+                        18,
+                      ),
 
-                                final exceedStock =
-                                    product !=
-                                            null &&
-                                        item.quantity >
-                                            product.stock;
+                      decoration:
+                          BoxDecoration(
 
-                                return Padding(
+                        color:
+                            Colors.orange
+                                .withOpacity(
+                          0.08,
+                        ),
 
-                                  padding:
-                                      const EdgeInsets.only(
-                                    bottom:
-                                        18,
-                                  ),
+                        borderRadius:
+                            BorderRadius.circular(
+                          22,
+                        ),
+                      ),
 
-                                  child: Column(
+                      child: Row(
 
-                                    children: [
+                        crossAxisAlignment:
+                            CrossAxisAlignment
+                                .start,
 
-                                      if (soldOut ||
-                                          exceedStock)
+                        children: [
+
+                          const Icon(
+
+                            Icons.info_outline,
+
+                            color:
+                                Colors.orange,
+                          ),
+
+                          const SizedBox(
+                            width: 12,
+                          ),
+
+                          Expanded(
+
+                            child: Text(
+
+                              'Orders will be validated by admin before delivery processing.',
+
+                              style:
+                                  TextStyle(
+
+                                color:
+                                    Colors.grey
+                                        .shade800,
+
+                                height: 1.5,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(
+                      height: 30,
+                    ),
+
+                    // ===============================
+                    // ORDER SUMMARY
+                    // ===============================
+
+                    const Text(
+
+                      'Order Summary',
+
+                      style: TextStyle(
+
+                        fontSize: 24,
+
+                        fontWeight:
+                            FontWeight.bold,
+                      ),
+                    ),
+
+                    const SizedBox(
+                      height: 18,
+                    ),
+
+                    Container(
+
+                      width:
+                          double.infinity,
+
+                      padding:
+                          EdgeInsets.all(
+                        isMobile
+                            ? 16
+                            : 20,
+                      ),
+
+                      decoration:
+                          BoxDecoration(
+
+                        color:
+                            Colors.white,
+
+                        borderRadius:
+                            BorderRadius.circular(
+                          28,
+                        ),
+
+                        boxShadow: [
+
+                          BoxShadow(
+
+                            color:
+                                Colors.black
+                                    .withOpacity(
+                              0.04,
+                            ),
+
+                            blurRadius: 16,
+
+                            offset:
+                                const Offset(
+                              0,
+                              8,
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      child: Column(
+
+                        children: [
+
+                          ...cartProvider
+                              .items
+                              .map(
+                            (item) {
+
+                              final product =
+                                  productProvider
+                                      .getProductById(
+                                item.product.id,
+                              );
+
+                              final soldOut =
+                                  product ==
+                                          null ||
+
+                                      product.stock <=
+                                          0;
+
+                              final exceedStock =
+                                  product !=
+                                          null &&
+                                      item.quantity >
+                                          product.stock;
+
+                              return Padding(
+
+                                padding:
+                                    const EdgeInsets.only(
+                                  bottom:
+                                      18,
+                                ),
+
+                                child: Column(
+
+                                  children: [
+
+                                    if (soldOut ||
+                                        exceedStock)
+
+                                      Container(
+
+                                        width:
+                                            double.infinity,
+
+                                        margin:
+                                            const EdgeInsets.only(
+                                          bottom:
+                                              10,
+                                        ),
+
+                                        padding:
+                                            const EdgeInsets.all(
+                                          12,
+                                        ),
+
+                                        decoration:
+                                            BoxDecoration(
+
+                                          color:
+                                              Colors.red
+                                                  .withOpacity(
+                                            0.08,
+                                          ),
+
+                                          borderRadius:
+                                              BorderRadius.circular(
+                                            16,
+                                          ),
+                                        ),
+
+                                        child:
+                                            Text(
+
+                                          soldOut
+
+                                              ? '${item.product.name} sold out'
+
+                                              : 'Available stock only ${product.stock}',
+
+                                          style:
+                                              const TextStyle(
+
+                                            color:
+                                                Colors.red,
+
+                                            fontWeight:
+                                                FontWeight.w600,
+                                          ),
+                                        ),
+                                      ),
+
+                                    Row(
+
+                                      children: [
 
                                         Container(
 
                                           width:
-                                              double.infinity,
+                                              60,
 
-                                          margin:
-                                              const EdgeInsets.only(
-                                            bottom:
-                                                10,
-                                          ),
-
-                                          padding:
-                                              const EdgeInsets.all(
-                                            12,
-                                          ),
+                                          height:
+                                              60,
 
                                           decoration:
                                               BoxDecoration(
 
-                                            color:
-                                                Colors.red
-                                                    .withOpacity(
-                                              0.08,
-                                            ),
-
                                             borderRadius:
                                                 BorderRadius.circular(
-                                              16,
+                                              18,
                                             ),
                                           ),
 
                                           child:
-                                              Text(
+                                              ClipRRect(
 
-                                            soldOut
+                                            borderRadius:
+                                                BorderRadius.circular(
+                                              18,
+                                            ),
 
-                                                ? '${item.product.name} is sold out'
+                                            child:
+                                                Image.memory(
 
-                                                : 'Available stock only ${product.stock}',
+                                              base64Decode(
+                                                item.product.imageBase64,
+                                              ),
 
-                                            style:
-                                                const TextStyle(
-
-                                              color:
-                                                  Colors.red,
-
-                                              fontWeight:
-                                                  FontWeight.w600,
+                                              fit:
+                                                  BoxFit.cover,
                                             ),
                                           ),
                                         ),
 
-                                      Row(
+                                        const SizedBox(
+                                          width:
+                                              14,
+                                        ),
 
-                                        children: [
+                                        Expanded(
 
-                                          Container(
+                                          child:
+                                              Column(
 
-                                            width:
-                                                60,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment
+                                                    .start,
 
-                                            height:
-                                                60,
+                                            children: [
 
-                                            decoration:
-                                                BoxDecoration(
+                                              Text(
 
-                                              borderRadius:
-                                                  BorderRadius.circular(
-                                                18,
+                                                item.product.name,
+
+                                                maxLines:
+                                                    2,
+
+                                                overflow:
+                                                    TextOverflow
+                                                        .ellipsis,
+
+                                                style:
+                                                    const TextStyle(
+
+                                                  fontWeight:
+                                                      FontWeight.bold,
+                                                ),
                                               ),
-                                            ),
 
-                                            child:
-                                                ClipRRect(
-
-                                              borderRadius:
-                                                  BorderRadius.circular(
-                                                18,
+                                              const SizedBox(
+                                                height:
+                                                    4,
                                               ),
 
-                                              child:
-                                                  Image.memory(
+                                              Text(
 
-                                                base64Decode(
-                                                  item.product.imageBase64,
-                                                ),
-
-                                                fit:
-                                                    BoxFit.cover,
+                                                '${item.quantity} x ${AppFormat.currency(item.product.price)}',
                                               ),
-                                            ),
+                                            ],
                                           ),
+                                        ),
 
-                                          const SizedBox(
-                                            width:
-                                                14,
-                                          ),
+                                        const SizedBox(
+                                          width:
+                                              12,
+                                        ),
 
-                                          Expanded(
+                                        Flexible(
 
-                                            child:
-                                                Column(
-
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment
-                                                      .start,
-
-                                              children: [
-
-                                                Text(
-
-                                                  item.product.name,
-
-                                                  maxLines:
-                                                      2,
-
-                                                  overflow:
-                                                      TextOverflow
-                                                          .ellipsis,
-
-                                                  style:
-                                                      const TextStyle(
-
-                                                    fontWeight:
-                                                        FontWeight.bold,
-                                                  ),
-                                                ),
-
-                                                const SizedBox(
-                                                  height:
-                                                      4,
-                                                ),
-
-                                                Text(
-
-                                                  '${item.quantity} x ${AppFormat.currency(item.product.price)}',
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-
-                                          const SizedBox(
-                                            width:
-                                                12,
-                                          ),
-
-                                          Text(
+                                          child: Text(
 
                                             AppFormat.currency(
                                               item.subtotal,
                                             ),
+
+                                            overflow:
+                                                TextOverflow
+                                                    .ellipsis,
+
+                                            textAlign:
+                                                TextAlign.right,
 
                                             style:
                                                 const TextStyle(
@@ -1211,133 +1274,153 @@ class _CheckoutScreenState
                                                   FontWeight.bold,
                                             ),
                                           ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              },
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(
+                      height: 24,
+                    ),
+
+                    // ===============================
+                    // TOTAL CARD
+                    // ===============================
+
+                    Container(
+
+                      width:
+                          double.infinity,
+
+                      padding:
+                          const EdgeInsets.all(
+                        22,
+                      ),
+
+                      decoration:
+                          BoxDecoration(
+
+                        color:
+                            Colors.white,
+
+                        borderRadius:
+                            BorderRadius.circular(
+                          28,
+                        ),
+
+                        boxShadow: [
+
+                          BoxShadow(
+
+                            color:
+                                Colors.black
+                                    .withOpacity(
+                              0.05,
                             ),
-                          ],
-                        ),
+
+                            blurRadius: 20,
+
+                            offset:
+                                const Offset(
+                              0,
+                              10,
+                            ),
+                          ),
+                        ],
                       ),
 
-                      const SizedBox(
-                        height: 24,
-                      ),
+                      child: Column(
 
-                      Container(
+                        children: [
 
-                        width:
-                            double.infinity,
+                          _buildPriceRow(
 
-                        padding:
-                            const EdgeInsets.all(
-                          20,
-                        ),
+                            title:
+                                'Subtotal',
 
-                        decoration:
-                            BoxDecoration(
-
-                          color: Colors.white,
-
-                          borderRadius:
-                              BorderRadius.circular(
-                            24,
+                            value:
+                                AppFormat.currency(
+                              cartProvider
+                                  .totalPrice,
+                            ),
                           ),
 
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black
-                                  .withOpacity(
-                                0.05,
-                              ),
-                              blurRadius:
-                                  20,
-                              offset:
-                                  const Offset(
-                                0,
-                                10,
-                              ),
-                            ),
-                          ],
-                        ),
+                          const SizedBox(
+                            height: 10,
+                          ),
 
-                        child: Column(
+                          _buildPriceRow(
 
-                          children: [
+                            title:
+                                'Shipping',
 
-                            _buildPriceRow(
+                            value:
+                                'Free',
+                          ),
 
-                              title:
-                                  'Subtotal',
+                          const Padding(
 
-                              value:
-                                  AppFormat.currency(
-                                cartProvider
-                                    .totalPrice,
-                              ),
+                            padding:
+                                EdgeInsets.symmetric(
+                              vertical:
+                                  16,
                             ),
 
-                            const SizedBox(
-                              height: 10,
-                            ),
+                            child:
+                                Divider(),
+                          ),
 
-                            _buildPriceRow(
+                          Row(
 
-                              title:
-                                  'Shipping',
+                            mainAxisAlignment:
+                                MainAxisAlignment
+                                    .spaceBetween,
 
-                              value:
-                                  'Free',
-                            ),
+                            children: [
 
-                            const Padding(
+                              const Text(
 
-                              padding:
-                                  EdgeInsets.symmetric(
-                                vertical:
-                                    16,
-                              ),
+                                'Grand Total',
 
-                              child: Divider(),
-                            ),
+                                style:
+                                    TextStyle(
 
-                            Row(
+                                  fontSize:
+                                      18,
 
-                              mainAxisAlignment:
-                                  MainAxisAlignment
-                                      .spaceBetween,
-
-                              children: [
-
-                                const Text(
-
-                                  'Grand Total',
-
-                                  style:
-                                      TextStyle(
-
-                                    fontSize:
-                                        18,
-
-                                    fontWeight:
-                                        FontWeight.bold,
-                                  ),
+                                  fontWeight:
+                                      FontWeight.bold,
                                 ),
+                              ),
 
-                                Text(
+                              Flexible(
+
+                                child: Text(
 
                                   AppFormat.currency(
                                     cartProvider
                                         .totalPrice,
                                   ),
 
+                                  overflow:
+                                      TextOverflow
+                                          .ellipsis,
+
+                                  textAlign:
+                                      TextAlign.right,
+
                                   style:
                                       const TextStyle(
 
                                     fontSize:
-                                        22,
+                                        24,
 
                                     color:
                                         AppColors.primary,
@@ -1346,117 +1429,125 @@ class _CheckoutScreenState
                                         FontWeight.bold,
                                   ),
                                 ),
-                              ],
-                            ),
+                              ),
+                            ],
+                          ),
 
-                            const SizedBox(
-                              height: 18,
-                            ),
+                          const SizedBox(
+                            height: 20,
+                          ),
 
-                            SizedBox(
+                          SizedBox(
 
-                              width:
-                                  double.infinity,
+                            width:
+                                double.infinity,
 
-                              height: 54,
+                            height: 54,
 
-                              child:
-                                  ElevatedButton(
+                            child:
+                                ElevatedButton(
 
-                                style:
-                                    ElevatedButton.styleFrom(
+                              style:
+                                  ElevatedButton.styleFrom(
 
-                                  backgroundColor:
+                                elevation:
+                                    0,
+
+                                backgroundColor:
+
+                                    invalidStock
+
+                                        ? Colors.grey
+
+                                        : AppColors.primary,
+
+                                foregroundColor:
+                                    Colors.white,
+
+                                shape:
+                                    RoundedRectangleBorder(
+
+                                  borderRadius:
+                                      BorderRadius.circular(
+                                    18,
+                                  ),
+                                ),
+                              ),
+
+                              onPressed:
+
+                                  orderProvider
+                                          .isLoading ||
 
                                       invalidStock
 
-                                          ? Colors.grey
+                                      ? null
 
-                                          : AppColors.primary,
+                                      : createOrder,
 
-                                  foregroundColor:
-                                      Colors.white,
+                              child:
+                                  orderProvider
+                                          .isLoading
 
-                                  elevation:
-                                      0,
+                                      ? const SizedBox(
 
-                                  shape:
-                                      RoundedRectangleBorder(
+                                          width:
+                                              24,
 
-                                    borderRadius:
-                                        BorderRadius.circular(
-                                      18,
-                                    ),
-                                  ),
-                                ),
+                                          height:
+                                              24,
 
-                                onPressed:
+                                          child:
+                                              CircularProgressIndicator(
 
-                                    orderProvider
-                                            .isLoading ||
+                                            color:
+                                                Colors.white,
 
-                                        invalidStock
-
-                                        ? null
-
-                                        : createOrder,
-
-                                child:
-                                    orderProvider
-                                            .isLoading
-
-                                        ? const SizedBox(
-
-                                            width:
-                                                24,
-
-                                            height:
-                                                24,
-
-                                            child:
-                                                CircularProgressIndicator(
-
-                                              color:
-                                                  Colors.white,
-
-                                              strokeWidth:
-                                                  2,
-                                            ),
-                                          )
-
-                                        : Text(
-
-                                            invalidStock
-
-                                                ? 'Stock Not Available'
-
-                                                : 'Create Order',
-
-                                            style:
-                                                const TextStyle(
-
-                                              fontSize:
-                                                  16,
-
-                                              fontWeight:
-                                                  FontWeight.bold,
-                                            ),
+                                            strokeWidth:
+                                                2,
                                           ),
-                              ),
+                                        )
+
+                                      : Text(
+
+                                          invalidStock
+
+                                              ? 'Stock Not Available'
+
+                                              : 'Create Order',
+
+                                          style:
+                                              const TextStyle(
+
+                                            fontSize:
+                                                16,
+
+                                            fontWeight:
+                                                FontWeight.bold,
+                                          ),
+                                        ),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+
+                    const SizedBox(
+                      height: 30,
+                    ),
+                  ],
                 ),
               ),
-            ],
+            ),
           ),
         ),
       ),
     );
   }
+
+  // =========================================
+  // INPUT
+  // =========================================
 
   Widget _buildInputField({
 
@@ -1473,7 +1564,6 @@ class _CheckoutScreenState
     int minLines = 1,
 
     int maxLines = 1,
-
   }) {
 
     return TextFormField(
@@ -1499,11 +1589,18 @@ class _CheckoutScreenState
         prefixIcon:
             Icon(icon),
 
-        filled:
-            true,
+        filled: true,
 
         fillColor:
             Colors.white,
+
+        contentPadding:
+            const EdgeInsets.symmetric(
+
+          horizontal: 18,
+
+          vertical: 18,
+        ),
 
         border:
             OutlineInputBorder(
@@ -1534,6 +1631,10 @@ class _CheckoutScreenState
     );
   }
 
+  // =========================================
+  // PAYMENT CARD
+  // =========================================
+
   Widget _buildPaymentCard(
     String title,
     IconData icon,
@@ -1554,16 +1655,16 @@ class _CheckoutScreenState
         });
       },
 
-      child: AnimatedContainer(
+      child:
+          AnimatedContainer(
 
         duration:
             const Duration(
           milliseconds:
-              250,
+              220,
         ),
 
-        width:
-            170,
+        width: 170,
 
         padding:
             const EdgeInsets.all(
@@ -1574,6 +1675,7 @@ class _CheckoutScreenState
             BoxDecoration(
 
           color:
+
               selected
 
                   ? AppColors.primary
@@ -1591,13 +1693,13 @@ class _CheckoutScreenState
           border: Border.all(
 
             color:
+
                 selected
 
                     ? AppColors
                         .primary
 
-                    : Colors
-                        .grey
+                    : Colors.grey
                         .shade200,
 
             width: 2,
@@ -1615,6 +1717,7 @@ class _CheckoutScreenState
               size: 34,
 
               color:
+
                   selected
 
                       ? AppColors
@@ -1641,6 +1744,7 @@ class _CheckoutScreenState
                     FontWeight.bold,
 
                 color:
+
                     selected
 
                         ? AppColors
@@ -1655,12 +1759,15 @@ class _CheckoutScreenState
     );
   }
 
+  // =========================================
+  // PRICE ROW
+  // =========================================
+
   Widget _buildPriceRow({
 
     required String title,
 
     required String value,
-
   }) {
 
     return Row(
@@ -1671,17 +1778,38 @@ class _CheckoutScreenState
 
       children: [
 
-        Text(title),
-
         Text(
 
-          value,
+          title,
 
           style:
-              const TextStyle(
+              TextStyle(
 
-            fontWeight:
-                FontWeight.bold,
+            color:
+                Colors.grey
+                    .shade700,
+          ),
+        ),
+
+        Flexible(
+
+          child: Text(
+
+            value,
+
+            overflow:
+                TextOverflow
+                    .ellipsis,
+
+            textAlign:
+                TextAlign.right,
+
+            style:
+                const TextStyle(
+
+              fontWeight:
+                  FontWeight.bold,
+            ),
           ),
         ),
       ],
