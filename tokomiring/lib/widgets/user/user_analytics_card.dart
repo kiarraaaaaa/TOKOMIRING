@@ -1,6 +1,6 @@
 // =====================================================
 // lib/widgets/user/user_analytics_card.dart
-// ULTRA AESTHETIC GLASSMORPHISM PREMIUM VERSION
+// COMPACT PREMIUM VERSION
 // =====================================================
 
 import 'dart:ui';
@@ -91,374 +91,170 @@ class _UserAnalyticsCardState
 
         duration:
             const Duration(
-          milliseconds: 260,
+          milliseconds: 220,
         ),
 
         curve:
-            Curves.easeOutCubic,
+            Curves.easeOut,
 
         transform:
             Matrix4.identity()
               ..translate(
                 0.0,
-                hovered ? -4 : 0,
+                hovered ? -2 : 0,
               ),
 
         width:
             isMobile
                 ? double.infinity
-                : 210,
+                : 190,
 
-        child: GestureDetector(
+        child:
+            GestureDetector(
 
           onTap:
               widget.onTap,
 
-          child: Stack(
-
-            children: [
-
-              // =====================================
-              // GLOW EFFECT
-              // =====================================
-
-              Positioned.fill(
-
-                child:
-                    AnimatedOpacity(
-
-                  duration:
-                      const Duration(
-                    milliseconds:
-                        260,
-                  ),
-
-                  opacity:
-                      hovered
-                          ? 1
-                          : 0.75,
-
-                  child: Container(
-
-                    decoration:
-                        BoxDecoration(
-
-                      borderRadius:
-                          BorderRadius.circular(
-                        28,
-                      ),
-
-                      gradient:
-                          RadialGradient(
-
-                        radius: 1.1,
-
-                        colors: [
-
-                          widget.color
-                              .withOpacity(
-                            0.28,
-                          ),
-
-                          Colors
-                              .transparent,
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-
-              // =====================================
-              // MAIN CARD
-              // =====================================
-
+          child:
               ClipRRect(
 
-                borderRadius:
-                    BorderRadius.circular(
-                  28,
+            borderRadius:
+                BorderRadius.circular(
+              22,
+            ),
+
+            child:
+                BackdropFilter(
+
+              filter:
+                  ImageFilter.blur(
+
+                sigmaX: 10,
+
+                sigmaY: 10,
+              ),
+
+              child:
+                  AnimatedContainer(
+
+                duration:
+                    const Duration(
+                  milliseconds:
+                      220,
                 ),
 
-                child: BackdropFilter(
+                padding:
+                    EdgeInsets.all(
+                  isMobile
+                      ? 14
+                      : 16,
+                ),
 
-                  filter:
-                      ImageFilter.blur(
+                decoration:
+                    BoxDecoration(
 
-                    sigmaX: 12,
+                  gradient:
 
-                    sigmaY: 12,
-                  ),
+                      widget.gradient ??
 
-                  child:
-                      AnimatedContainer(
+                          LinearGradient(
 
-                    duration:
-                        const Duration(
-                      milliseconds:
-                          260,
-                    ),
+                            begin:
+                                Alignment.topLeft,
 
-                    padding:
-                        EdgeInsets.all(
-                      isMobile
-                          ? 16
-                          : 18,
-                    ),
+                            end:
+                                Alignment.bottomRight,
 
-                    decoration:
-                        BoxDecoration(
+                            colors: [
 
-                      gradient:
+                              widget.color,
 
-                          widget.gradient ??
-
-                              LinearGradient(
-
-                                begin:
-                                    Alignment.topLeft,
-
-                                end:
-                                    Alignment.bottomRight,
-
-                                colors: [
-
-                                  widget.color,
-
-                                  widget.color
-                                      .withOpacity(
-                                    0.82,
-                                  ),
-
-                                  widget.color
-                                      .withOpacity(
-                                    0.72,
-                                  ),
-                                ],
-                              ),
-
-                      borderRadius:
-                          BorderRadius.circular(
-                        28,
-                      ),
-
-                      border: Border.all(
-
-                        color:
-                            Colors.white
-                                .withOpacity(
-                          0.16,
-                        ),
-
-                        width: 1,
-                      ),
-
-                      boxShadow: [
-
-                        BoxShadow(
-
-                          color:
                               widget.color
                                   .withOpacity(
-                            hovered
-                                ? 0.30
-                                : 0.18,
+                                0.88,
+                              ),
+                            ],
                           ),
 
-                          blurRadius:
-                              hovered
-                                  ? 30
-                                  : 18,
+                  borderRadius:
+                      BorderRadius.circular(
+                    22,
+                  ),
 
-                          offset:
-                              Offset(
-                            0,
-                            hovered
-                                ? 16
-                                : 8,
-                          ),
-                        ),
-                      ],
+                  boxShadow: [
+
+                    BoxShadow(
+
+                      color:
+                          widget.color
+                              .withOpacity(
+                        hovered
+                            ? 0.24
+                            : 0.14,
+                      ),
+
+                      blurRadius:
+                          hovered
+                              ? 18
+                              : 12,
+
+                      offset:
+                          Offset(
+                        0,
+                        hovered
+                            ? 10
+                            : 6,
+                      ),
                     ),
+                  ],
+                ),
 
-                    child: Column(
+                child: Column(
 
-                      crossAxisAlignment:
-                          CrossAxisAlignment
-                              .start,
+                  crossAxisAlignment:
+                      CrossAxisAlignment
+                          .start,
+
+                  children: [
+
+                    // TOP
+
+                    Row(
 
                       children: [
 
-                        // =================================
-                        // TOP
-                        // =================================
+                        Expanded(
 
-                        Row(
+                          child: Container(
 
-                          children: [
+                            padding:
+                                const EdgeInsets.symmetric(
 
-                            Expanded(
+                              horizontal:
+                                  9,
 
-                              child: Container(
-
-                                padding:
-                                    const EdgeInsets.symmetric(
-
-                                  horizontal:
-                                      10,
-
-                                  vertical:
-                                      6,
-                                ),
-
-                                decoration:
-                                    BoxDecoration(
-
-                                  color:
-                                      Colors.white
-                                          .withOpacity(
-                                    0.14,
-                                  ),
-
-                                  borderRadius:
-                                      BorderRadius.circular(
-                                    18,
-                                  ),
-                                ),
-
-                                child: Text(
-
-                                  widget.title,
-
-                                  maxLines: 1,
-
-                                  overflow:
-                                      TextOverflow
-                                          .ellipsis,
-
-                                  style:
-                                      const TextStyle(
-
-                                    color:
-                                        Colors
-                                            .white,
-
-                                    fontWeight:
-                                        FontWeight.bold,
-
-                                    letterSpacing:
-                                        0.3,
-
-                                    fontSize:
-                                        10,
-                                  ),
-                                ),
-                              ),
+                              vertical:
+                                  5,
                             ),
 
-                            const SizedBox(
-                              width: 10,
-                            ),
+                            decoration:
+                                BoxDecoration(
 
-                            AnimatedContainer(
-
-                              duration:
-                                  const Duration(
-                                milliseconds:
-                                    260,
-                              ),
-
-                              width:
-                                  hovered
-                                      ? 46
-                                      : 42,
-
-                              height:
-                                  hovered
-                                      ? 46
-                                      : 42,
-
-                              decoration:
-                                  BoxDecoration(
-
-                                color:
-                                    Colors.white
-                                        .withOpacity(
-                                  hovered
-                                      ? 0.20
-                                      : 0.14,
-                                ),
-
-                                borderRadius:
-                                    BorderRadius.circular(
-                                  16,
-                                ),
-                              ),
-
-                              child: Icon(
-
-                                widget.icon,
-
-                                color:
-                                    Colors.white,
-
-                                size:
-                                    isMobile
-                                        ? 18
-                                        : 20,
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        SizedBox(
-                          height:
-                              isMobile
-                                  ? 18
-                                  : 22,
-                        ),
-
-                        // =================================
-                        // VALUE
-                        // =================================
-
-                        AnimatedSwitcher(
-
-                          duration:
-                              const Duration(
-                            milliseconds:
-                                260,
-                          ),
-
-                          child: ShaderMask(
-
-                            shaderCallback:
-                                (bounds) {
-
-                              return LinearGradient(
-
-                                colors: [
-
-                                  Colors.white,
-
+                              color:
                                   Colors.white
                                       .withOpacity(
-                                    0.88,
-                                  ),
-                                ],
-                              ).createShader(
-                                bounds,
-                              );
-                            },
+                                0.14,
+                              ),
+
+                              borderRadius:
+                                  BorderRadius.circular(
+                                14,
+                              ),
+                            ),
 
                             child: Text(
 
-                              widget.value,
-
-                              key:
-                                  ValueKey(
-                                widget.value,
-                              ),
+                              widget.title,
 
                               maxLines: 1,
 
@@ -467,208 +263,302 @@ class _UserAnalyticsCardState
                                       .ellipsis,
 
                               style:
-                                  TextStyle(
+                                  const TextStyle(
 
                                 color:
                                     Colors.white,
-
-                                fontSize:
-
-                                    isMobile
-                                        ? 24
-                                        : 28,
 
                                 fontWeight:
-                                    FontWeight
-                                        .w900,
+                                    FontWeight.bold,
 
-                                height: 1,
+                                fontSize:
+                                    9,
                               ),
                             ),
                           ),
                         ),
 
-                        if (widget.subtitle !=
-                            null) ...[
+                        const SizedBox(
+                          width: 8,
+                        ),
 
-                          const SizedBox(
-                            height: 8,
+                        AnimatedContainer(
+
+                          duration:
+                              const Duration(
+                            milliseconds:
+                                220,
                           ),
 
-                          Text(
+                          width:
+                              hovered
+                                  ? 40
+                                  : 36,
 
-                            widget.subtitle!,
-
-                            maxLines: 2,
-
-                            overflow:
-                                TextOverflow
-                                    .ellipsis,
-
-                            style:
-                                TextStyle(
-
-                              color:
-                                  Colors.white
-                                      .withOpacity(
-                                0.82,
-                              ),
-
-                              fontSize:
-                                  isMobile
-                                      ? 10
-                                      : 11,
-
-                              height: 1.4,
-                            ),
-                          ),
-                        ],
-
-                        SizedBox(
                           height:
-                              isMobile
-                                  ? 16
-                                  : 20,
-                        ),
+                              hovered
+                                  ? 40
+                                  : 36,
 
-                        // =================================
-                        // FOOTER
-                        // =================================
+                          decoration:
+                              BoxDecoration(
 
-                        Row(
-
-                          children: [
-
-                            Container(
-
-                              padding:
-                                  const EdgeInsets.symmetric(
-
-                                horizontal:
-                                    10,
-
-                                vertical:
-                                    6,
-                              ),
-
-                              decoration:
-                                  BoxDecoration(
-
-                                color:
-                                    Colors.white
-                                        .withOpacity(
-                                  0.12,
-                                ),
-
-                                borderRadius:
-                                    BorderRadius.circular(
-                                  18,
-                                ),
-                              ),
-
-                              child: Row(
-
-                                mainAxisSize:
-                                    MainAxisSize
-                                        .min,
-
-                                children: const [
-
-                                  Icon(
-
-                                    Icons
-                                        .trending_up_rounded,
-
-                                    size: 13,
-
-                                    color:
-                                        Colors
-                                            .white,
-                                  ),
-
-                                  SizedBox(
-                                    width:
-                                        4,
-                                  ),
-
-                                  Text(
-
-                                    'Live',
-
-                                    style:
-                                        TextStyle(
-
-                                      color:
-                                          Colors
-                                              .white,
-
-                                      fontWeight:
-                                          FontWeight
-                                              .bold,
-
-                                      fontSize:
-                                          9,
-                                    ),
-                                  ),
-                                ],
-                              ),
+                            color:
+                                Colors.white
+                                    .withOpacity(
+                              0.14,
                             ),
 
-                            const Spacer(),
-
-                            AnimatedContainer(
-
-                              duration:
-                                  const Duration(
-                                milliseconds:
-                                    260,
-                              ),
-
-                              width:
-                                  hovered
-                                      ? 40
-                                      : 34,
-
-                              height:
-                                  hovered
-                                      ? 40
-                                      : 34,
-
-                              decoration:
-                                  BoxDecoration(
-
-                                color:
-                                    Colors.white
-                                        .withOpacity(
-                                  hovered
-                                      ? 0.20
-                                      : 0.12,
-                                ),
-
-                                shape:
-                                    BoxShape.circle,
-                              ),
-
-                              child:
-                                  const Icon(
-
-                                Icons
-                                    .arrow_forward_rounded,
-
-                                color:
-                                    Colors.white,
-
-                                size: 18,
-                              ),
+                            borderRadius:
+                                BorderRadius.circular(
+                              14,
                             ),
-                          ],
+                          ),
+
+                          child: Icon(
+
+                            widget.icon,
+
+                            color:
+                                Colors.white,
+
+                            size:
+                                isMobile
+                                    ? 16
+                                    : 18,
+                          ),
                         ),
                       ],
                     ),
-                  ),
+
+                    SizedBox(
+                      height:
+                          isMobile
+                              ? 14
+                              : 16,
+                    ),
+
+                    // VALUE
+
+                    AnimatedSwitcher(
+
+                      duration:
+                          const Duration(
+                        milliseconds:
+                            220,
+                      ),
+
+                      child: Text(
+
+                        widget.value,
+
+                        key:
+                            ValueKey(
+                          widget.value,
+                        ),
+
+                        maxLines: 1,
+
+                        overflow:
+                            TextOverflow
+                                .ellipsis,
+
+                        style:
+                            TextStyle(
+
+                          color:
+                              Colors.white,
+
+                          fontSize:
+
+                              isMobile
+                                  ? 22
+                                  : 24,
+
+                          fontWeight:
+                              FontWeight
+                                  .w900,
+
+                          height: 1,
+                        ),
+                      ),
+                    ),
+
+                    if (widget.subtitle !=
+                        null) ...[
+
+                      const SizedBox(
+                        height: 6,
+                      ),
+
+                      Text(
+
+                        widget.subtitle!,
+
+                        maxLines: 2,
+
+                        overflow:
+                            TextOverflow
+                                .ellipsis,
+
+                        style:
+                            TextStyle(
+
+                          color:
+                              Colors.white
+                                  .withOpacity(
+                            0.80,
+                          ),
+
+                          fontSize:
+                              isMobile
+                                  ? 9
+                                  : 10,
+
+                          height: 1.35,
+                        ),
+                      ),
+                    ],
+
+                    SizedBox(
+                      height:
+                          isMobile
+                              ? 12
+                              : 14,
+                    ),
+
+                    // FOOTER
+
+                    Row(
+
+                      children: [
+
+                        Container(
+
+                          padding:
+                              const EdgeInsets.symmetric(
+
+                            horizontal:
+                                8,
+
+                            vertical:
+                                5,
+                          ),
+
+                          decoration:
+                              BoxDecoration(
+
+                            color:
+                                Colors.white
+                                    .withOpacity(
+                              0.12,
+                            ),
+
+                            borderRadius:
+                                BorderRadius.circular(
+                              14,
+                            ),
+                          ),
+
+                          child: Row(
+
+                            mainAxisSize:
+                                MainAxisSize
+                                    .min,
+
+                            children: const [
+
+                              Icon(
+
+                                Icons
+                                    .trending_up_rounded,
+
+                                size: 11,
+
+                                color:
+                                    Colors
+                                        .white,
+                              ),
+
+                              SizedBox(
+                                width:
+                                    3,
+                              ),
+
+                              Text(
+
+                                'Live',
+
+                                style:
+                                    TextStyle(
+
+                                  color:
+                                      Colors
+                                          .white,
+
+                                  fontWeight:
+                                      FontWeight
+                                          .bold,
+
+                                  fontSize:
+                                      8,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        const Spacer(),
+
+                        AnimatedContainer(
+
+                          duration:
+                              const Duration(
+                            milliseconds:
+                                220,
+                          ),
+
+                          width:
+                              hovered
+                                  ? 34
+                                  : 30,
+
+                          height:
+                              hovered
+                                  ? 34
+                                  : 30,
+
+                          decoration:
+                              BoxDecoration(
+
+                            color:
+                                Colors.white
+                                    .withOpacity(
+                              0.12,
+                            ),
+
+                            shape:
+                                BoxShape.circle,
+                          ),
+
+                          child:
+                              const Icon(
+
+                            Icons
+                                .arrow_forward_rounded,
+
+                            color:
+                                Colors.white,
+
+                            size: 15,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
-            ],
+            ),
           ),
         ),
       ),

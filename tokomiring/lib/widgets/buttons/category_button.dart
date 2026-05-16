@@ -1,4 +1,7 @@
+// =====================================================
 // lib/widgets/buttons/category_button.dart
+// COMPACT PREMIUM VERSION
+// =====================================================
 
 import 'package:flutter/material.dart';
 
@@ -16,10 +19,6 @@ class CategoryButton
   final IconData? icon;
 
   final EdgeInsetsGeometry? margin;
-
-  // =====================================================
-  // CONSTRUCTOR
-  // =====================================================
 
   const CategoryButton({
 
@@ -47,7 +46,7 @@ class CategoryButton
           margin ??
 
               const EdgeInsets.only(
-            right: 12,
+            right: 8,
           ),
 
       child: GestureDetector(
@@ -60,7 +59,7 @@ class CategoryButton
 
           duration:
               const Duration(
-            milliseconds: 250,
+            milliseconds: 180,
           ),
 
           curve:
@@ -69,9 +68,9 @@ class CategoryButton
           padding:
               const EdgeInsets.symmetric(
 
-            horizontal: 18,
+            horizontal: 14,
 
-            vertical: 12,
+            vertical: 9,
           ),
 
           decoration:
@@ -101,7 +100,7 @@ class CategoryButton
 
             borderRadius:
                 BorderRadius.circular(
-              18,
+              14,
             ),
 
             border:
@@ -114,6 +113,8 @@ class CategoryButton
 
                       : Colors.grey
                           .shade300,
+
+              width: 1,
             ),
 
             boxShadow: [
@@ -125,23 +126,23 @@ class CategoryButton
 
                         ? AppColors.primary
                             .withOpacity(
-                          0.22,
+                          0.14,
                         )
 
                         : Colors.black
                             .withOpacity(
-                          0.04,
+                          0.025,
                         ),
 
                 blurRadius:
                     isSelected
-                        ? 18
-                        : 8,
+                        ? 10
+                        : 5,
 
                 offset:
                     const Offset(
                   0,
-                  6,
+                  3,
                 ),
               ),
             ],
@@ -154,9 +155,7 @@ class CategoryButton
 
             children: [
 
-              // =========================================
               // ICON
-              // =========================================
 
               if (icon != null) ...[
 
@@ -164,7 +163,7 @@ class CategoryButton
 
                   icon,
 
-                  size: 18,
+                  size: 15,
 
                   color:
                       isSelected
@@ -175,19 +174,17 @@ class CategoryButton
                 ),
 
                 const SizedBox(
-                  width: 8,
+                  width: 5,
                 ),
               ],
 
-              // =========================================
               // TITLE
-              // =========================================
 
               AnimatedDefaultTextStyle(
 
                 duration:
                     const Duration(
-                  milliseconds: 250,
+                  milliseconds: 180,
                 ),
 
                 style: TextStyle(
@@ -200,9 +197,9 @@ class CategoryButton
                           : AppColors.dark,
 
                   fontWeight:
-                      FontWeight.bold,
+                      FontWeight.w700,
 
-                  fontSize: 14,
+                  fontSize: 11,
                 ),
 
                 child: Text(

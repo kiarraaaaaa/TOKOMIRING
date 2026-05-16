@@ -1,7 +1,9 @@
 // =====================================================
 // lib/screens/user/user_home_screen.dart
-// ULTRA CLEAN PREMIUM RESPONSIVE VERSION
+// FINAL COMPACT PREMIUM VERSION
 // =====================================================
+
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -17,28 +19,26 @@ import '../../providers/product_provider.dart';
 import '../../routes/app_routes.dart';
 
 import '../../widgets/cards/dashboard_card.dart';
-import '../../widgets/cards/product_card.dart';
+import '../../widgets/cards/product_grid.dart';
+
 import '../../widgets/user/user_sidebar.dart';
 
 import 'cart_screen.dart';
 
-class UserHomeScreen
-    extends StatefulWidget {
+class UserHomeScreen extends StatefulWidget {
 
   const UserHomeScreen({
     super.key,
   });
 
   @override
-  State<UserHomeScreen>
-      createState() =>
-          _UserHomeScreenState();
+  State<UserHomeScreen> createState() =>
+      _UserHomeScreenState();
 }
 
 class _UserHomeScreenState
     extends State<UserHomeScreen>
-    with
-        TickerProviderStateMixin {
+    with TickerProviderStateMixin {
 
   late AnimationController
       _fadeController;
@@ -47,10 +47,6 @@ class _UserHomeScreenState
       _fadeAnimation;
 
   int _selectedIndex = 0;
-
-  // =========================================
-  // INIT
-  // =========================================
 
   @override
   void initState() {
@@ -64,7 +60,7 @@ class _UserHomeScreenState
 
       duration:
           const Duration(
-        milliseconds: 600,
+        milliseconds: 450,
       ),
     );
 
@@ -93,10 +89,6 @@ class _UserHomeScreenState
     });
   }
 
-  // =========================================
-  // DISPOSE
-  // =========================================
-
   @override
   void dispose() {
 
@@ -104,10 +96,6 @@ class _UserHomeScreenState
 
     super.dispose();
   }
-
-  // =========================================
-  // BUILD
-  // =========================================
 
   @override
   Widget build(
@@ -138,66 +126,19 @@ class _UserHomeScreenState
         width >= 700 &&
             width < 1200;
 
-    // =====================================
-    // PRODUCT DISPLAY
-    // =====================================
-
     final displayProducts =
-
-        productProvider.searchQuery
-                    .isEmpty &&
+        productProvider.searchQuery.isEmpty &&
                 productProvider
                         .selectedCategory ==
                     'All'
-
             ? (productProvider
                     .popularProducts
                     .isNotEmpty
-
                 ? productProvider
                     .popularProducts
-
                 : productProvider
                     .products)
-
-            : productProvider
-                .products;
-
-    // =====================================
-    // GRID
-    // =====================================
-
-    int gridCount = 2;
-
-    double aspectRatio = 0.72;
-
-    if (width >= 1700) {
-
-      gridCount = 6;
-
-      aspectRatio = 0.84;
-    }
-
-    else if (width >= 1450) {
-
-      gridCount = 5;
-
-      aspectRatio = 0.82;
-    }
-
-    else if (width >= 1150) {
-
-      gridCount = 4;
-
-      aspectRatio = 0.80;
-    }
-
-    else if (width >= 850) {
-
-      gridCount = 3;
-
-      aspectRatio = 0.76;
-    }
+            : productProvider.products;
 
     return Scaffold(
 
@@ -206,13 +147,13 @@ class _UserHomeScreenState
         0xffF4F7FC,
       ),
 
-      // =====================================
-      // FLOATING CART
-      // =====================================
-
       floatingActionButtonLocation:
           FloatingActionButtonLocation
               .centerFloat,
+
+      // =================================================
+      // PREMIUM MINI CART
+      // =================================================
 
       floatingActionButton:
 
@@ -239,16 +180,14 @@ class _UserHomeScreenState
                   child: Container(
 
                     width:
+
                         isMobile
                             ? width * 0.90
-                            : 320,
+                            : 340,
 
                     padding:
-                        const EdgeInsets.symmetric(
-
-                      horizontal: 16,
-
-                      vertical: 12,
+                        const EdgeInsets.all(
+                      12,
                     ),
 
                     decoration:
@@ -256,6 +195,12 @@ class _UserHomeScreenState
 
                       gradient:
                           const LinearGradient(
+
+                        begin:
+                            Alignment.topLeft,
+
+                        end:
+                            Alignment.bottomRight,
 
                         colors: [
 
@@ -284,7 +229,8 @@ class _UserHomeScreenState
                             0.18,
                           ),
 
-                          blurRadius: 24,
+                          blurRadius:
+                              20,
 
                           offset:
                               const Offset(
@@ -299,92 +245,150 @@ class _UserHomeScreenState
 
                       children: [
 
-                        Container(
+                        // =====================
+                        // IMAGE
+                        // =====================
 
-                          padding:
-                              const EdgeInsets.all(
-                            10,
-                          ),
+                        Stack(
 
-                          decoration:
-                              BoxDecoration(
+                          children: [
 
-                            color:
-                                Colors.white
-                                    .withOpacity(
-                              0.14,
-                            ),
+                            Container(
 
-                            shape:
-                                BoxShape.circle,
-                          ),
+                              width: 54,
 
-                          child: Stack(
+                              height: 54,
 
-                            clipBehavior:
-                                Clip.none,
-
-                            children: [
-
-                              const Icon(
-
-                                Icons
-                                    .shopping_cart_rounded,
+                              decoration:
+                                  BoxDecoration(
 
                                 color:
-                                    Colors.white,
+                                    Colors.white
+                                        .withOpacity(
+                                  0.12,
+                                ),
 
-                                size: 20,
+                                borderRadius:
+                                    BorderRadius.circular(
+                                  16,
+                                ),
                               ),
 
-                              Positioned(
+                              child:
+                                  ClipRRect(
 
-                                top: -4,
+                                borderRadius:
+                                    BorderRadius.circular(
+                                  16,
+                                ),
 
-                                right: -4,
+                                child:
 
-                                child: Container(
+                                    cartProvider
+                                            .items
+                                            .isNotEmpty
 
-                                  padding:
-                                      const EdgeInsets.all(
-                                    4,
+                                        ? Image.memory(
+
+                                            base64Decode(
+
+                                              cartProvider
+                                                  .items
+                                                  .last
+                                                  .productImage,
+                                            ),
+
+                                            fit:
+                                                BoxFit.cover,
+                                          )
+
+                                        : const Icon(
+
+                                            Icons
+                                                .shopping_bag_rounded,
+
+                                            color:
+                                                Colors
+                                                    .white,
+                                          ),
+                              ),
+                            ),
+
+                            Positioned(
+
+                              top: -2,
+
+                              right: -2,
+
+                              child:
+                                  Container(
+
+                                padding:
+                                    const EdgeInsets.symmetric(
+
+                                  horizontal:
+                                      6,
+
+                                  vertical:
+                                      3,
+                                ),
+
+                                decoration:
+                                    BoxDecoration(
+
+                                  color:
+                                      Colors.red,
+
+                                  borderRadius:
+                                      BorderRadius.circular(
+                                    30,
                                   ),
 
-                                  decoration:
-                                      const BoxDecoration(
+                                  border:
+                                      Border.all(
 
                                     color:
-                                        Colors.red,
+                                        Colors
+                                            .white,
 
-                                    shape:
-                                        BoxShape.circle,
+                                    width:
+                                        1.5,
                                   ),
+                                ),
 
-                                  child: Text(
+                                child: Text(
 
-                                    '${cartProvider.totalItems}',
+                                  cartProvider
+                                      .totalItems
+                                      .toString(),
 
-                                    style:
-                                        const TextStyle(
+                                  style:
+                                      const TextStyle(
 
-                                      color:
-                                          Colors.white,
+                                    color:
+                                        Colors
+                                            .white,
 
-                                      fontSize: 9,
+                                    fontSize:
+                                        9,
 
-                                      fontWeight:
-                                          FontWeight.bold,
-                                    ),
+                                    fontWeight:
+                                        FontWeight
+                                            .bold,
                                   ),
                                 ),
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
 
                         const SizedBox(
                           width: 12,
                         ),
+
+                        // =====================
+                        // CONTENT
+                        // =====================
 
                         Expanded(
 
@@ -393,6 +397,10 @@ class _UserHomeScreenState
                             crossAxisAlignment:
                                 CrossAxisAlignment
                                     .start,
+
+                            mainAxisSize:
+                                MainAxisSize
+                                    .min,
 
                             children: [
 
@@ -413,7 +421,8 @@ class _UserHomeScreenState
                                   fontWeight:
                                       FontWeight.bold,
 
-                                  fontSize: 13,
+                                  fontSize:
+                                      13,
                                 ),
                               ),
 
@@ -423,7 +432,12 @@ class _UserHomeScreenState
 
                               Text(
 
-                                '${cartProvider.totalItems} items',
+                                cartProvider
+                                    .items
+                                    .last
+                                    .productName,
+
+                                maxLines: 1,
 
                                 overflow:
                                     TextOverflow
@@ -438,58 +452,207 @@ class _UserHomeScreenState
                                     0.84,
                                   ),
 
-                                  fontSize: 11,
+                                  fontSize:
+                                      10,
                                 ),
+                              ),
+
+                              const SizedBox(
+                                height: 6,
+                              ),
+
+                              Row(
+
+                                children: [
+
+                                  Container(
+
+                                    padding:
+                                        const EdgeInsets.symmetric(
+
+                                      horizontal:
+                                          8,
+
+                                      vertical:
+                                          4,
+                                    ),
+
+                                    decoration:
+                                        BoxDecoration(
+
+                                      color:
+                                          Colors.white
+                                              .withOpacity(
+                                        0.12,
+                                      ),
+
+                                      borderRadius:
+                                          BorderRadius.circular(
+                                        20,
+                                      ),
+                                    ),
+
+                                    child: Text(
+
+                                      '${cartProvider.totalItems} Items',
+
+                                      style:
+                                          const TextStyle(
+
+                                        color:
+                                            Colors
+                                                .white,
+
+                                        fontWeight:
+                                            FontWeight
+                                                .w600,
+
+                                        fontSize:
+                                            8,
+                                      ),
+                                    ),
+                                  ),
+
+                                  const SizedBox(
+                                    width: 6,
+                                  ),
+
+                                  Container(
+
+                                    padding:
+                                        const EdgeInsets.symmetric(
+
+                                      horizontal:
+                                          8,
+
+                                      vertical:
+                                          4,
+                                    ),
+
+                                    decoration:
+                                        BoxDecoration(
+
+                                      color:
+                                          Colors.white
+                                              .withOpacity(
+                                        0.12,
+                                      ),
+
+                                      borderRadius:
+                                          BorderRadius.circular(
+                                        20,
+                                      ),
+                                    ),
+
+                                    child:
+                                        const Text(
+
+                                      'Checkout',
+
+                                      style:
+                                          TextStyle(
+
+                                        color:
+                                            Colors
+                                                .white,
+
+                                        fontWeight:
+                                            FontWeight
+                                                .w600,
+
+                                        fontSize:
+                                            8,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
                         ),
 
-                        Flexible(
+                        const SizedBox(
+                          width: 10,
+                        ),
 
-                          child: Text(
+                        // =====================
+                        // PRICE
+                        // =====================
 
-                            AppFormat.currency(
-                              cartProvider
-                                  .totalPrice,
+                        Column(
+
+                          crossAxisAlignment:
+                              CrossAxisAlignment
+                                  .end,
+
+                          children: [
+
+                            Text(
+
+                              AppFormat.currency(
+                                cartProvider
+                                    .totalPrice,
+                              ),
+
+                              style:
+                                  const TextStyle(
+
+                                color:
+                                    Colors.white,
+
+                                fontWeight:
+                                    FontWeight.bold,
+
+                                fontSize:
+                                    14,
+                              ),
                             ),
 
-                            overflow:
-                                TextOverflow
-                                    .ellipsis,
-
-                            textAlign:
-                                TextAlign.right,
-
-                            style:
-                                const TextStyle(
-
-                              color:
-                                  Colors.white,
-
-                              fontWeight:
-                                  FontWeight.bold,
-
-                              fontSize: 14,
+                            const SizedBox(
+                              height: 4,
                             ),
-                          ),
+
+                            Container(
+
+                              width: 30,
+
+                              height: 30,
+
+                              decoration:
+                                  BoxDecoration(
+
+                                color:
+                                    Colors.white
+                                        .withOpacity(
+                                  0.14,
+                                ),
+
+                                shape:
+                                    BoxShape.circle,
+                              ),
+
+                              child:
+                                  const Icon(
+
+                                Icons
+                                    .arrow_forward_rounded,
+
+                                color:
+                                    Colors.white,
+
+                                size: 16,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
                   ),
                 ),
 
-      // =====================================
-      // BODY
-      // =====================================
-
       body: Row(
 
         children: [
-
-          // =================================
-          // SIDEBAR
-          // =================================
 
           if (!isMobile)
 
@@ -498,7 +661,9 @@ class _UserHomeScreenState
               selectedIndex:
                   _selectedIndex,
 
-              onSelected: (index) {
+              onSelected: (
+                index,
+              ) {
 
                 setState(() {
 
@@ -556,10 +721,6 @@ class _UserHomeScreenState
               },
             ),
 
-          // =================================
-          // CONTENT
-          // =================================
-
           Expanded(
 
             child: FadeTransition(
@@ -577,9 +738,10 @@ class _UserHomeScreenState
 
                   padding:
                       EdgeInsets.all(
+
                     isMobile
-                        ? 14
-                        : 20,
+                        ? 12
+                        : 18,
                   ),
 
                   child: Column(
@@ -590,17 +752,18 @@ class _UserHomeScreenState
 
                     children: [
 
-                      // ===========================
                       // HEADER
-                      // ===========================
 
                       Container(
 
                         padding:
-                            EdgeInsets.all(
-                          isMobile
-                              ? 16
-                              : 20,
+                            const EdgeInsets.symmetric(
+
+                          horizontal:
+                              18,
+
+                          vertical:
+                              14,
                         ),
 
                         decoration:
@@ -611,7 +774,7 @@ class _UserHomeScreenState
 
                           borderRadius:
                               BorderRadius.circular(
-                            24,
+                            20,
                           ),
 
                           boxShadow: [
@@ -621,15 +784,16 @@ class _UserHomeScreenState
                               color:
                                   Colors.black
                                       .withOpacity(
-                                0.04,
+                                0.03,
                               ),
 
-                              blurRadius: 18,
+                              blurRadius:
+                                  12,
 
                               offset:
                                   const Offset(
                                 0,
-                                8,
+                                5,
                               ),
                             ),
                           ],
@@ -660,12 +824,13 @@ class _UserHomeScreenState
                                           Colors.grey
                                               .shade600,
 
-                                      fontSize: 12,
+                                      fontSize:
+                                          10,
                                     ),
                                   ),
 
                                   const SizedBox(
-                                    height: 4,
+                                    height: 2,
                                   ),
 
                                   Text(
@@ -673,7 +838,6 @@ class _UserHomeScreenState
                                     authProvider
                                             .user
                                             ?.displayName ??
-
                                         'User',
 
                                     overflow:
@@ -684,9 +848,10 @@ class _UserHomeScreenState
                                         TextStyle(
 
                                       fontSize:
+
                                           isMobile
-                                              ? 22
-                                              : 26,
+                                              ? 20
+                                              : 23,
 
                                       fontWeight:
                                           FontWeight.bold,
@@ -700,7 +865,7 @@ class _UserHomeScreenState
 
                               padding:
                                   const EdgeInsets.all(
-                                12,
+                                9,
                               ),
 
                               decoration:
@@ -712,17 +877,16 @@ class _UserHomeScreenState
 
                                 borderRadius:
                                     BorderRadius.circular(
-                                  16,
+                                  13,
                                 ),
                               ),
 
-                              child:
-                                  const Icon(
+                              child: const Icon(
 
                                 Icons
                                     .notifications_none_rounded,
 
-                                size: 22,
+                                size: 18,
                               ),
                             ),
                           ],
@@ -730,12 +894,10 @@ class _UserHomeScreenState
                       ),
 
                       const SizedBox(
-                        height: 20,
+                        height: 16,
                       ),
 
-                      // ===========================
                       // HERO
-                      // ===========================
 
                       Container(
 
@@ -743,10 +905,8 @@ class _UserHomeScreenState
                             double.infinity,
 
                         padding:
-                            EdgeInsets.all(
-                          isMobile
-                              ? 22
-                              : 28,
+                            const EdgeInsets.all(
+                          22,
                         ),
 
                         decoration:
@@ -754,7 +914,7 @@ class _UserHomeScreenState
 
                           borderRadius:
                               BorderRadius.circular(
-                            30,
+                            26,
                           ),
 
                           gradient:
@@ -792,9 +952,11 @@ class _UserHomeScreenState
                               padding:
                                   const EdgeInsets.symmetric(
 
-                                horizontal: 12,
+                                horizontal:
+                                    10,
 
-                                vertical: 7,
+                                vertical:
+                                    5,
                               ),
 
                               decoration:
@@ -803,12 +965,12 @@ class _UserHomeScreenState
                                 color:
                                     Colors.white
                                         .withOpacity(
-                                  0.14,
+                                  0.12,
                                 ),
 
                                 borderRadius:
                                     BorderRadius.circular(
-                                  24,
+                                  20,
                                 ),
                               ),
 
@@ -826,13 +988,14 @@ class _UserHomeScreenState
                                   fontWeight:
                                       FontWeight.bold,
 
-                                  fontSize: 11,
+                                  fontSize:
+                                      9,
                                 ),
                               ),
                             ),
 
                             const SizedBox(
-                              height: 20,
+                              height: 14,
                             ),
 
                             Text(
@@ -849,19 +1012,20 @@ class _UserHomeScreenState
                                     FontWeight.bold,
 
                                 fontSize:
+
                                     isMobile
-                                        ? 24
-                                        : 34,
+                                        ? 22
+                                        : 28,
                               ),
                             ),
 
                             const SizedBox(
-                              height: 10,
+                              height: 6,
                             ),
 
                             Text(
 
-                              'Responsive shopping marketplace with realtime analytics and premium UI.',
+                              'Responsive marketplace with compact premium interface.',
 
                               style:
                                   TextStyle(
@@ -869,15 +1033,14 @@ class _UserHomeScreenState
                                 color:
                                     Colors.white
                                         .withOpacity(
-                                  0.88,
+                                  0.84,
                                 ),
 
                                 fontSize:
-                                    isMobile
-                                        ? 12
-                                        : 14,
+                                    11,
 
-                                height: 1.5,
+                                height:
+                                    1.4,
                               ),
                             ),
                           ],
@@ -885,12 +1048,10 @@ class _UserHomeScreenState
                       ),
 
                       const SizedBox(
-                        height: 22,
+                        height: 18,
                       ),
 
-                      // ===========================
-                      // ANALYTICS
-                      // ===========================
+                      // DASHBOARD
 
                       GridView.count(
 
@@ -902,93 +1063,77 @@ class _UserHomeScreenState
                         crossAxisCount:
 
                             isMobile
+
                                 ? 2
+
                                 : isTablet
+
                                     ? 2
+
                                     : 4,
 
                         crossAxisSpacing:
-                            14,
+                            12,
 
                         mainAxisSpacing:
-                            14,
+                            12,
 
                         childAspectRatio:
 
                             isMobile
-                                ? 1.40
-                                : 1.65,
+                                ? 1.42
+                                : 1.70,
 
                         children: [
 
                           DashboardCard(
-
                             title:
                                 'Products',
-
                             value:
                                 '${productProvider.products.length}',
-
                             icon:
                                 Icons.inventory_2_rounded,
-
                             color:
                                 Colors.blue,
-
                             subtitle:
                                 'Available products',
                           ),
 
                           DashboardCard(
-
                             title:
                                 'Orders',
-
                             value:
                                 '${orderProvider.orders.length}',
-
                             icon:
                                 Icons.receipt_long_rounded,
-
                             color:
                                 Colors.orange,
-
                             subtitle:
                                 'Total orders',
                           ),
 
                           DashboardCard(
-
                             title:
                                 'Cart',
-
                             value:
                                 '${cartProvider.totalItems}',
-
                             icon:
                                 Icons.shopping_cart_rounded,
-
                             color:
                                 Colors.green,
-
                             subtitle:
                                 'Items in cart',
                           ),
 
                           DashboardCard(
-
                             title:
                                 'Favorites',
-
                             value:
                                 '${productProvider.favorites.length}',
-
                             icon:
                                 Icons.favorite_rounded,
-
                             color:
                                 Colors.pink,
-
                             subtitle:
                                 'Wishlist items',
                           ),
@@ -996,12 +1141,10 @@ class _UserHomeScreenState
                       ),
 
                       const SizedBox(
-                        height: 24,
+                        height: 18,
                       ),
 
-                      // ===========================
                       // SEARCH
-                      // ===========================
 
                       Container(
 
@@ -1013,28 +1156,8 @@ class _UserHomeScreenState
 
                           borderRadius:
                               BorderRadius.circular(
-                            18,
+                            16,
                           ),
-
-                          boxShadow: [
-
-                            BoxShadow(
-
-                              color:
-                                  Colors.black
-                                      .withOpacity(
-                                0.03,
-                              ),
-
-                              blurRadius: 12,
-
-                              offset:
-                                  const Offset(
-                                0,
-                                5,
-                              ),
-                            ),
-                          ],
                         ),
 
                         child: TextField(
@@ -1052,6 +1175,7 @@ class _UserHomeScreenState
                             prefixIcon:
                                 Icon(
                               Icons.search,
+                              size: 18,
                             ),
 
                             border:
@@ -1060,28 +1184,27 @@ class _UserHomeScreenState
                             contentPadding:
                                 EdgeInsets.symmetric(
 
-                              horizontal: 16,
+                              horizontal:
+                                  14,
 
-                              vertical: 15,
+                              vertical:
+                                  13,
                             ),
                           ),
                         ),
                       ),
 
                       const SizedBox(
-                        height: 18,
+                        height: 16,
                       ),
 
-                      // ===========================
                       // CATEGORY
-                      // ===========================
 
                       SizedBox(
 
-                        height: 42,
+                        height: 36,
 
-                        child:
-                            ListView.builder(
+                        child: ListView.builder(
 
                           scrollDirection:
                               Axis.horizontal,
@@ -1111,10 +1234,11 @@ class _UserHomeScreenState
 
                               padding:
                                   const EdgeInsets.only(
-                                right: 10,
+                                right: 8,
                               ),
 
-                              child: ChoiceChip(
+                              child:
+                                  ChoiceChip(
 
                                 label:
                                     Text(
@@ -1128,8 +1252,7 @@ class _UserHomeScreenState
                                     false,
 
                                 selectedColor:
-                                    AppColors
-                                        .primary,
+                                    AppColors.primary,
 
                                 backgroundColor:
                                     Colors.white,
@@ -1138,17 +1261,21 @@ class _UserHomeScreenState
                                     TextStyle(
 
                                   color:
+
                                       selected
 
-                                          ? Colors.white
+                                          ? Colors
+                                              .white
 
-                                          : Colors.black87,
+                                          : Colors
+                                              .black87,
 
                                   fontWeight:
-                                      FontWeight.w600,
+                                      FontWeight
+                                          .w600,
 
                                   fontSize:
-                                      12,
+                                      10,
                                 ),
 
                                 shape:
@@ -1156,7 +1283,7 @@ class _UserHomeScreenState
 
                                   borderRadius:
                                       BorderRadius.circular(
-                                    14,
+                                    11,
                                   ),
                                 ),
 
@@ -1175,12 +1302,10 @@ class _UserHomeScreenState
                       ),
 
                       const SizedBox(
-                        height: 24,
+                        height: 20,
                       ),
 
-                      // ===========================
                       // TITLE
-                      // ===========================
 
                       Row(
 
@@ -1190,38 +1315,24 @@ class _UserHomeScreenState
 
                         children: [
 
-                          const Expanded(
+                          const Text(
 
-                            child: Text(
+                            'Recommended Products',
 
-                              'Recommended Products',
+                            style:
+                                TextStyle(
 
-                              overflow:
-                                  TextOverflow
-                                      .ellipsis,
+                              fontSize:
+                                  17,
 
-                              style:
-                                  TextStyle(
-
-                                fontSize: 22,
-
-                                fontWeight:
-                                    FontWeight.bold,
-                              ),
+                              fontWeight:
+                                  FontWeight.bold,
                             ),
-                          ),
-
-                          const SizedBox(
-                            width: 12,
                           ),
 
                           Text(
 
                             '${displayProducts.length} items',
-
-                            overflow:
-                                TextOverflow
-                                    .ellipsis,
 
                             style:
                                 TextStyle(
@@ -1230,139 +1341,26 @@ class _UserHomeScreenState
                                   Colors.grey
                                       .shade600,
 
-                              fontSize: 12,
+                              fontSize:
+                                  10,
                             ),
                           ),
                         ],
                       ),
 
                       const SizedBox(
-                        height: 18,
+                        height: 14,
                       ),
 
-                      // ===========================
-                      // PRODUCTS
-                      // ===========================
+                      // PRODUCT GRID
 
-                      productProvider
-                              .isLoading
-
-                          ? const Padding(
-
-                              padding:
-                                  EdgeInsets.all(
-                                60,
-                              ),
-
-                              child: Center(
-
-                                child:
-                                    CircularProgressIndicator(),
-                              ),
-                            )
-
-                          : displayProducts
-                                  .isEmpty
-
-                              ? Padding(
-
-                                  padding:
-                                      const EdgeInsets.symmetric(
-                                    vertical:
-                                        90,
-                                  ),
-
-                                  child: Center(
-
-                                    child:
-                                        Column(
-
-                                      children: [
-
-                                        Icon(
-
-                                          Icons
-                                              .inventory_2_outlined,
-
-                                          size:
-                                              82,
-
-                                          color:
-                                              Colors.grey
-                                                  .shade400,
-                                        ),
-
-                                        const SizedBox(
-                                          height:
-                                              16,
-                                        ),
-
-                                        const Text(
-
-                                          'No Products Found',
-
-                                          style:
-                                              TextStyle(
-
-                                            fontSize:
-                                                22,
-
-                                            fontWeight:
-                                                FontWeight.bold,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                )
-
-                              : GridView.builder(
-
-                                  shrinkWrap:
-                                      true,
-
-                                  physics:
-                                      const NeverScrollableScrollPhysics(),
-
-                                  itemCount:
-                                      displayProducts
-                                          .length,
-
-                                  gridDelegate:
-                                      SliverGridDelegateWithFixedCrossAxisCount(
-
-                                    crossAxisCount:
-                                        gridCount,
-
-                                    crossAxisSpacing:
-                                        16,
-
-                                    mainAxisSpacing:
-                                        16,
-
-                                    childAspectRatio:
-                                        aspectRatio,
-                                  ),
-
-                                  itemBuilder:
-                                      (
-                                    context,
-                                    index,
-                                  ) {
-
-                                    final product =
-                                        displayProducts[
-                                            index];
-
-                                    return ProductCard(
-                                      product:
-                                          product,
-                                    );
-                                  },
-                                ),
+                      ProductGrid(
+                        products:
+                            displayProducts,
+                      ),
 
                       const SizedBox(
-                        height: 120,
+                        height: 100,
                       ),
                     ],
                   ),

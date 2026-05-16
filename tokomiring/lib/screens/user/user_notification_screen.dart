@@ -140,7 +140,7 @@ class _UserNotificationScreenState extends State<UserNotificationScreen>
                               const Text(
                                 'No notifications yet',
                                 style: TextStyle(
-                                  fontSize: 18,
+                                  fontSize: 16,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),

@@ -1,6 +1,6 @@
 // =====================================================
 // lib/screens/user/user_order_screen.dart
-// FINAL ULTRA COMPACT AESTHETIC VERSION
+// FINAL ULTRA COMPACT PREMIUM VERSION
 // =====================================================
 
 import 'dart:convert';
@@ -50,7 +50,7 @@ class _UserOrderScreenState
 
       duration:
           const Duration(
-        milliseconds: 500,
+        milliseconds: 420,
       ),
     );
 
@@ -112,6 +112,14 @@ class _UserOrderScreenState
       user.uid,
     );
 
+    final width =
+        MediaQuery.of(context)
+            .size
+            .width;
+
+    final isMobile =
+        width < 700;
+
     return Scaffold(
 
       backgroundColor:
@@ -129,9 +137,9 @@ class _UserOrderScreenState
         surfaceTintColor:
             Colors.transparent,
 
-        titleSpacing: 20,
+        titleSpacing: 18,
 
-        title: const Column(
+        title: Column(
 
           crossAxisAlignment:
               CrossAxisAlignment
@@ -148,15 +156,18 @@ class _UserOrderScreenState
                 color:
                     Colors.black,
 
-                fontSize: 20,
+                fontSize:
+                    isMobile
+                        ? 19
+                        : 21,
 
                 fontWeight:
                     FontWeight.bold,
               ),
             ),
 
-            SizedBox(
-              height: 2,
+            const SizedBox(
+              height: 1,
             ),
 
             Text(
@@ -168,7 +179,10 @@ class _UserOrderScreenState
                 color:
                     Colors.grey,
 
-                fontSize: 11,
+                fontSize:
+                    isMobile
+                        ? 10
+                        : 11,
               ),
             ),
           ],
@@ -189,7 +203,7 @@ class _UserOrderScreenState
 
                       padding:
                           const EdgeInsets.all(
-                        24,
+                        22,
                       ),
 
                       child: Column(
@@ -202,9 +216,9 @@ class _UserOrderScreenState
 
                           Container(
 
-                            width: 140,
+                            width: 100,
 
-                            height: 140,
+                            height: 100,
 
                             decoration:
                                 BoxDecoration(
@@ -220,13 +234,13 @@ class _UserOrderScreenState
                                   AppColors
                                       .primary
                                       .withOpacity(
-                                    0.15,
+                                    0.14,
                                   ),
 
                                   AppColors
                                       .primary
                                       .withOpacity(
-                                    0.05,
+                                    0.04,
                                   ),
                                 ],
                               ),
@@ -238,7 +252,7 @@ class _UserOrderScreenState
                               Icons
                                   .receipt_long,
 
-                              size: 64,
+                              size: 54,
 
                               color:
                                   AppColors
@@ -247,7 +261,7 @@ class _UserOrderScreenState
                           ),
 
                           const SizedBox(
-                            height: 20,
+                            height: 18,
                           ),
 
                           const Text(
@@ -259,7 +273,7 @@ class _UserOrderScreenState
 
                             style: TextStyle(
 
-                              fontSize: 22,
+                              fontSize: 18,
 
                               fontWeight:
                                   FontWeight.bold,
@@ -267,12 +281,12 @@ class _UserOrderScreenState
                           ),
 
                           const SizedBox(
-                            height: 10,
+                            height: 8,
                           ),
 
                           Text(
 
-                            'Your transaction history will appear here after checkout.',
+                            'Your transaction history will appear here.',
 
                             textAlign:
                                 TextAlign.center,
@@ -284,7 +298,7 @@ class _UserOrderScreenState
                                       .grey
                                       .shade600,
 
-                              fontSize: 13,
+                              fontSize: 12,
                             ),
                           ),
                         ],
@@ -298,21 +312,23 @@ class _UserOrderScreenState
                         const BouncingScrollPhysics(),
 
                     padding:
-                        const EdgeInsets.all(
-                      14,
+                        EdgeInsets.all(
+                      isMobile
+                          ? 12
+                          : 16,
                     ),
 
                     children: [
 
-                      // =====================================
+                      // =================================
                       // ANALYTICS
-                      // =====================================
+                      // =================================
 
                       Wrap(
 
-                        spacing: 12,
+                        spacing: 10,
 
-                        runSpacing: 12,
+                        runSpacing: 10,
 
                         children: [
 
@@ -325,7 +341,7 @@ class _UserOrderScreenState
                                 '${orders.where((e) => e.status == 'Waiting Admin Validation').length}',
 
                             icon:
-                                Icons.pending_actions,
+                                Icons.pending_actions_rounded,
 
                             color:
                                 Colors.orange,
@@ -340,7 +356,7 @@ class _UserOrderScreenState
                                 '${orders.where((e) => e.status == 'Processing Delivery').length}',
 
                             icon:
-                                Icons.verified,
+                                Icons.verified_rounded,
 
                             color:
                                 Colors.blue,
@@ -355,7 +371,7 @@ class _UserOrderScreenState
                                 '${orders.where((e) => e.status == 'Completed').length}',
 
                             icon:
-                                Icons.check_circle,
+                                Icons.check_circle_rounded,
 
                             color:
                                 Colors.green,
@@ -370,7 +386,7 @@ class _UserOrderScreenState
                                 '${orders.where((e) => e.status == 'Rejected').length}',
 
                             icon:
-                                Icons.cancel,
+                                Icons.cancel_rounded,
 
                             color:
                                 Colors.red,
@@ -379,12 +395,12 @@ class _UserOrderScreenState
                       ),
 
                       const SizedBox(
-                        height: 20,
+                        height: 18,
                       ),
 
-                      // =====================================
-                      // ORDERS
-                      // =====================================
+                      // =================================
+                      // ORDER LIST
+                      // =================================
 
                       ...orders.map(
                         (order) {
@@ -393,7 +409,7 @@ class _UserOrderScreenState
 
                             margin:
                                 const EdgeInsets.only(
-                              bottom: 16,
+                              bottom: 14,
                             ),
 
                             decoration:
@@ -404,7 +420,7 @@ class _UserOrderScreenState
 
                               borderRadius:
                                   BorderRadius.circular(
-                                24,
+                                22,
                               ),
 
                               border: Border.all(
@@ -425,12 +441,12 @@ class _UserOrderScreenState
                                   ),
 
                                   blurRadius:
-                                      12,
+                                      10,
 
                                   offset:
                                       const Offset(
                                     0,
-                                    6,
+                                    5,
                                   ),
                                 ),
                               ],
@@ -442,19 +458,19 @@ class _UserOrderScreenState
                                   const EdgeInsets.symmetric(
 
                                 horizontal:
-                                    16,
+                                    14,
 
                                 vertical:
-                                    8,
+                                    4,
                               ),
 
                               childrenPadding:
                                   const EdgeInsets.fromLTRB(
 
-                                16,
+                                14,
                                 0,
-                                16,
-                                16,
+                                14,
+                                14,
                               ),
 
                               shape:
@@ -462,7 +478,7 @@ class _UserOrderScreenState
 
                                 borderRadius:
                                     BorderRadius.circular(
-                                  24,
+                                  22,
                                 ),
                               ),
 
@@ -471,7 +487,7 @@ class _UserOrderScreenState
 
                                 borderRadius:
                                     BorderRadius.circular(
-                                  24,
+                                  22,
                                 ),
                               ),
 
@@ -506,27 +522,21 @@ class _UserOrderScreenState
                                                 FontWeight.bold,
 
                                             fontSize:
-                                                14,
+                                                13,
                                           ),
                                         ),
                                       ),
 
-                                      AnimatedContainer(
-
-                                        duration:
-                                            const Duration(
-                                          milliseconds:
-                                              250,
-                                        ),
+                                      Container(
 
                                         padding:
                                             const EdgeInsets.symmetric(
 
                                           horizontal:
-                                              10,
+                                              9,
 
                                           vertical:
-                                              6,
+                                              5,
                                         ),
 
                                         decoration:
@@ -541,7 +551,7 @@ class _UserOrderScreenState
 
                                           borderRadius:
                                               BorderRadius.circular(
-                                            12,
+                                            11,
                                           ),
                                         ),
 
@@ -565,7 +575,7 @@ class _UserOrderScreenState
                                                 FontWeight.bold,
 
                                             fontSize:
-                                                10,
+                                                9,
                                           ),
                                         ),
                                       ),
@@ -573,7 +583,7 @@ class _UserOrderScreenState
                                   ),
 
                                   const SizedBox(
-                                    height: 8,
+                                    height: 7,
                                   ),
 
                                   Text(
@@ -591,12 +601,12 @@ class _UserOrderScreenState
                                               .shade600,
 
                                       fontSize:
-                                          11,
+                                          10,
                                     ),
                                   ),
 
                                   const SizedBox(
-                                    height: 12,
+                                    height: 10,
                                   ),
 
                                   Row(
@@ -620,7 +630,7 @@ class _UserOrderScreenState
                                                   .shade700,
 
                                           fontSize:
-                                              12,
+                                              11,
                                         ),
                                       ),
 
@@ -651,7 +661,7 @@ class _UserOrderScreenState
                                                 FontWeight.bold,
 
                                             fontSize:
-                                                16,
+                                                15,
                                           ),
                                         ),
                                       ),
@@ -663,13 +673,13 @@ class _UserOrderScreenState
                               children: [
 
                                 const Divider(
-                                  height: 24,
+                                  height: 22,
                                 ),
 
                                 _buildInfoTile(
 
                                   icon:
-                                      Icons.location_on,
+                                      Icons.location_on_outlined,
 
                                   title:
                                       'Shipping Address',
@@ -679,13 +689,13 @@ class _UserOrderScreenState
                                 ),
 
                                 const SizedBox(
-                                  height: 14,
+                                  height: 12,
                                 ),
 
                                 _buildInfoTile(
 
                                   icon:
-                                      Icons.payments,
+                                      Icons.payments_outlined,
 
                                   title:
                                       'Payment Method',
@@ -695,7 +705,7 @@ class _UserOrderScreenState
                                 ),
 
                                 const SizedBox(
-                                  height: 18,
+                                  height: 16,
                                 ),
 
                                 const Align(
@@ -715,13 +725,13 @@ class _UserOrderScreenState
                                           FontWeight.bold,
 
                                       fontSize:
-                                          15,
+                                          14,
                                     ),
                                   ),
                                 ),
 
                                 const SizedBox(
-                                  height: 14,
+                                  height: 12,
                                 ),
 
                                 ...order.items.map(
@@ -732,12 +742,12 @@ class _UserOrderScreenState
                                       margin:
                                           const EdgeInsets.only(
                                         bottom:
-                                            12,
+                                            10,
                                       ),
 
                                       padding:
                                           const EdgeInsets.all(
-                                        12,
+                                        10,
                                       ),
 
                                       decoration:
@@ -764,7 +774,7 @@ class _UserOrderScreenState
 
                                         borderRadius:
                                             BorderRadius.circular(
-                                          18,
+                                          16,
                                         ),
                                       ),
 
@@ -779,17 +789,17 @@ class _UserOrderScreenState
                                           Container(
 
                                             width:
-                                                58,
+                                                54,
 
                                             height:
-                                                58,
+                                                54,
 
                                             decoration:
                                                 BoxDecoration(
 
                                               borderRadius:
                                                   BorderRadius.circular(
-                                                14,
+                                                12,
                                               ),
                                             ),
 
@@ -798,7 +808,7 @@ class _UserOrderScreenState
 
                                               borderRadius:
                                                   BorderRadius.circular(
-                                                14,
+                                                12,
                                               ),
 
                                               child:
@@ -823,7 +833,7 @@ class _UserOrderScreenState
                                                               const Icon(
                                                             Icons.image,
                                                             size:
-                                                                18,
+                                                                16,
                                                           ),
                                                         ),
                                             ),
@@ -831,7 +841,7 @@ class _UserOrderScreenState
 
                                           const SizedBox(
                                             width:
-                                                12,
+                                                10,
                                           ),
 
                                           Expanded(
@@ -861,13 +871,13 @@ class _UserOrderScreenState
                                                         FontWeight.bold,
 
                                                     fontSize:
-                                                        13,
+                                                        12,
                                                   ),
                                                 ),
 
                                                 const SizedBox(
                                                   height:
-                                                      5,
+                                                      4,
                                                 ),
 
                                                 Text(
@@ -881,13 +891,13 @@ class _UserOrderScreenState
                                                         Colors.grey.shade600,
 
                                                     fontSize:
-                                                        11,
+                                                        10,
                                                   ),
                                                 ),
 
                                                 const SizedBox(
                                                   height:
-                                                      8,
+                                                      6,
                                                 ),
 
                                                 Text(
@@ -906,7 +916,7 @@ class _UserOrderScreenState
                                                         FontWeight.bold,
 
                                                     fontSize:
-                                                        14,
+                                                        13,
                                                   ),
                                                 ),
                                               ],
@@ -919,7 +929,7 @@ class _UserOrderScreenState
                                 ),
 
                                 const Divider(
-                                  height: 24,
+                                  height: 22,
                                 ),
 
                                 Row(
@@ -941,7 +951,7 @@ class _UserOrderScreenState
                                             FontWeight.bold,
 
                                         fontSize:
-                                            15,
+                                            14,
                                       ),
                                     ),
 
@@ -972,7 +982,7 @@ class _UserOrderScreenState
                                               FontWeight.bold,
 
                                           fontSize:
-                                              18,
+                                              17,
                                         ),
                                       ),
                                     ),
@@ -985,7 +995,7 @@ class _UserOrderScreenState
                       ),
 
                       const SizedBox(
-                        height: 30,
+                        height: 24,
                       ),
                     ],
                   ),
@@ -1013,7 +1023,7 @@ class _UserOrderScreenState
 
           padding:
               const EdgeInsets.all(
-            10,
+            9,
           ),
 
           decoration:
@@ -1027,7 +1037,7 @@ class _UserOrderScreenState
 
             borderRadius:
                 BorderRadius.circular(
-              14,
+              12,
             ),
           ),
 
@@ -1038,12 +1048,12 @@ class _UserOrderScreenState
             color:
                 AppColors.primary,
 
-            size: 18,
+            size: 16,
           ),
         ),
 
         const SizedBox(
-          width: 12,
+          width: 10,
         ),
 
         Expanded(
@@ -1068,12 +1078,12 @@ class _UserOrderScreenState
                           .shade600,
 
                   fontSize:
-                      11,
+                      10,
                 ),
               ),
 
               const SizedBox(
-                height: 3,
+                height: 2,
               ),
 
               Text(
@@ -1087,7 +1097,7 @@ class _UserOrderScreenState
                       FontWeight.bold,
 
                   fontSize:
-                      13,
+                      12,
                 ),
               ),
             ],
@@ -1110,11 +1120,11 @@ class _UserOrderScreenState
 
     return Container(
 
-      width: 138,
+      width: 128,
 
       padding:
           const EdgeInsets.all(
-        14,
+        12,
       ),
 
       decoration:
@@ -1141,7 +1151,7 @@ class _UserOrderScreenState
 
         borderRadius:
             BorderRadius.circular(
-          22,
+          18,
         ),
 
         border: Border.all(
@@ -1162,12 +1172,12 @@ class _UserOrderScreenState
               0.03,
             ),
 
-            blurRadius: 12,
+            blurRadius: 10,
 
             offset:
                 const Offset(
               0,
-              5,
+              4,
             ),
           ),
         ],
@@ -1187,9 +1197,9 @@ class _UserOrderScreenState
 
               Container(
 
-                width: 38,
+                width: 34,
 
-                height: 38,
+                height: 34,
 
                 decoration:
                     BoxDecoration(
@@ -1201,7 +1211,7 @@ class _UserOrderScreenState
 
                   borderRadius:
                       BorderRadius.circular(
-                    12,
+                    10,
                   ),
                 ),
 
@@ -1209,7 +1219,7 @@ class _UserOrderScreenState
 
                   icon,
 
-                  size: 18,
+                  size: 16,
 
                   color:
                       color,
@@ -1220,9 +1230,9 @@ class _UserOrderScreenState
 
               Container(
 
-                width: 8,
+                width: 7,
 
-                height: 8,
+                height: 7,
 
                 decoration:
                     BoxDecoration(
@@ -1238,7 +1248,7 @@ class _UserOrderScreenState
           ),
 
           const SizedBox(
-            height: 14,
+            height: 12,
           ),
 
           Text(
@@ -1252,7 +1262,7 @@ class _UserOrderScreenState
             style:
                 const TextStyle(
 
-              fontSize: 18,
+              fontSize: 16,
 
               fontWeight:
                   FontWeight.bold,
@@ -1260,7 +1270,7 @@ class _UserOrderScreenState
           ),
 
           const SizedBox(
-            height: 3,
+            height: 2,
           ),
 
           Text(
@@ -1278,7 +1288,7 @@ class _UserOrderScreenState
                   Colors.grey
                       .shade600,
 
-              fontSize: 11,
+              fontSize: 10,
 
               fontWeight:
                   FontWeight.w500,

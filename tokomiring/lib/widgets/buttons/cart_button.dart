@@ -1,7 +1,6 @@
 // =====================================================
 // lib/widgets/buttons/cart_button.dart
-// ULTRA PREMIUM FLOATING CART BUTTON
-// COMPACT + AESTHETIC + MODERN VERSION
+// FINAL PREMIUM COMPACT VERSION
 // =====================================================
 
 import 'dart:ui';
@@ -9,7 +8,6 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../core/constants/app_colors.dart';
 import '../../core/utils/app_format.dart';
 
 import '../../providers/cart_provider.dart';
@@ -106,8 +104,11 @@ class _CartButtonState
             duration:
                 const Duration(
               milliseconds:
-                  220,
+                  180,
             ),
+
+            curve:
+                Curves.easeOut,
 
             transform:
                 Matrix4.identity()
@@ -123,21 +124,23 @@ class _CartButtonState
                 widget.showTotalPrice
 
                     ? (isMobile
-                        ? width * 0.90
-                        : 300)
+                        ? width * 0.88
+                        : 290)
 
                     : null,
 
-            child: Material(
+            child:
+                Material(
 
               color:
                   Colors.transparent,
 
-              child: InkWell(
+              child:
+                  InkWell(
 
                 borderRadius:
                     BorderRadius.circular(
-                  24,
+                  20,
                 ),
 
                 onTap:
@@ -148,7 +151,7 @@ class _CartButtonState
 
                   borderRadius:
                       BorderRadius.circular(
-                    24,
+                    20,
                   ),
 
                   child:
@@ -157,9 +160,9 @@ class _CartButtonState
                     filter:
                         ImageFilter.blur(
 
-                      sigmaX: 8,
+                      sigmaX: 5,
 
-                      sigmaY: 8,
+                      sigmaY: 5,
                     ),
 
                     child:
@@ -168,7 +171,7 @@ class _CartButtonState
                       duration:
                           const Duration(
                         milliseconds:
-                            220,
+                            180,
                       ),
 
                       padding:
@@ -177,14 +180,14 @@ class _CartButtonState
                         horizontal:
 
                             isMobile
-                                ? 14
-                                : 16,
+                                ? 12
+                                : 14,
 
                         vertical:
 
                             isMobile
-                                ? 12
-                                : 13,
+                                ? 10
+                                : 11,
                       ),
 
                       decoration:
@@ -210,25 +213,12 @@ class _CartButtonState
                             const Color(
                               0xff1D4ED8,
                             ),
-
-                            const Color(
-                              0xff1E40AF,
-                            ),
                           ],
                         ),
 
                         borderRadius:
                             BorderRadius.circular(
-                          24,
-                        ),
-
-                        border: Border.all(
-
-                          color:
-                              Colors.white
-                                  .withOpacity(
-                            0.10,
-                          ),
+                          20,
                         ),
 
                         boxShadow: [
@@ -240,28 +230,29 @@ class _CartButtonState
                                     .withOpacity(
 
                               hovered
-                                  ? 0.28
-                                  : 0.18,
+                                  ? 0.20
+                                  : 0.13,
                             ),
 
                             blurRadius:
 
                                 hovered
-                                    ? 24
-                                    : 16,
+                                    ? 18
+                                    : 12,
 
                             offset:
                                 Offset(
                               0,
                               hovered
-                                  ? 12
-                                  : 8,
+                                  ? 8
+                                  : 5,
                             ),
                           ),
                         ],
                       ),
 
-                      child: Row(
+                      child:
+                          Row(
 
                         mainAxisSize:
 
@@ -291,18 +282,18 @@ class _CartButtonState
                                 duration:
                                     const Duration(
                                   milliseconds:
-                                      220,
+                                      180,
                                 ),
 
                                 width:
                                     hovered
-                                        ? 46
-                                        : 42,
+                                        ? 38
+                                        : 35,
 
                                 height:
                                     hovered
-                                        ? 46
-                                        : 42,
+                                        ? 38
+                                        : 35,
 
                                 decoration:
                                     BoxDecoration(
@@ -310,16 +301,17 @@ class _CartButtonState
                                   color:
                                       Colors.white
                                           .withOpacity(
-                                    0.14,
+                                    0.15,
                                   ),
 
                                   borderRadius:
                                       BorderRadius.circular(
-                                    16,
+                                    12,
                                   ),
                                 ),
 
-                                child: Icon(
+                                child:
+                                    Icon(
 
                                   Icons
                                       .shopping_bag_rounded,
@@ -331,33 +323,27 @@ class _CartButtonState
                                               .white,
 
                                   size:
-                                      20,
+                                      16,
                                 ),
                               ),
 
                               Positioned(
 
-                                right: -4,
+                                right: -3,
 
-                                top: -4,
+                                top: -3,
 
                                 child:
-                                    AnimatedContainer(
-
-                                  duration:
-                                      const Duration(
-                                    milliseconds:
-                                        220,
-                                  ),
+                                    Container(
 
                                   padding:
                                       const EdgeInsets.symmetric(
 
                                     horizontal:
-                                        6,
+                                        5,
 
                                     vertical:
-                                        3,
+                                        2,
                                   ),
 
                                   decoration:
@@ -368,7 +354,7 @@ class _CartButtonState
 
                                     borderRadius:
                                         BorderRadius.circular(
-                                      30,
+                                      20,
                                     ),
 
                                     border:
@@ -379,11 +365,12 @@ class _CartButtonState
                                               .white,
 
                                       width:
-                                          1.5,
+                                          1.3,
                                     ),
                                   ),
 
-                                  child: Text(
+                                  child:
+                                      Text(
 
                                     cartProvider
                                         .totalItems
@@ -397,7 +384,7 @@ class _CartButtonState
                                               .white,
 
                                       fontSize:
-                                          9,
+                                          8,
 
                                       fontWeight:
                                           FontWeight
@@ -418,12 +405,13 @@ class _CartButtonState
                             ...[
 
                               const SizedBox(
-                                width: 14,
+                                width: 11,
                               ),
 
                               Expanded(
 
-                                child: Column(
+                                child:
+                                    Column(
 
                                   crossAxisAlignment:
                                       CrossAxisAlignment
@@ -455,18 +443,18 @@ class _CartButtonState
                                                 .bold,
 
                                         fontSize:
-                                            13,
+                                            12,
                                       ),
                                     ),
 
                                     const SizedBox(
                                       height:
-                                          2,
+                                          1,
                                     ),
 
                                     Text(
 
-                                      '${cartProvider.totalItems} products added',
+                                      '${cartProvider.totalItems} products',
 
                                       overflow:
                                           TextOverflow
@@ -479,11 +467,11 @@ class _CartButtonState
                                             Colors
                                                 .white
                                                 .withOpacity(
-                                          0.82,
+                                          0.80,
                                         ),
 
                                         fontSize:
-                                            10,
+                                            9,
                                       ),
                                     ),
                                   ],
@@ -491,8 +479,12 @@ class _CartButtonState
                               ),
 
                               const SizedBox(
-                                width: 10,
+                                width: 8,
                               ),
+
+                              // =================================
+                              // PRICE
+                              // =================================
 
                               Column(
 
@@ -525,18 +517,13 @@ class _CartButtonState
                                               .bold,
 
                                       fontSize:
-                                          15,
+                                          13,
                                     ),
-                                  ),
-
-                                  const SizedBox(
-                                    height:
-                                        2,
                                   ),
 
                                   Text(
 
-                                    'Checkout now',
+                                    'Checkout',
 
                                     style:
                                         TextStyle(
@@ -545,18 +532,18 @@ class _CartButtonState
                                           Colors
                                               .white
                                               .withOpacity(
-                                        0.74,
+                                        0.72,
                                       ),
 
                                       fontSize:
-                                          9,
+                                          8,
                                     ),
                                   ),
                                 ],
                               ),
 
                               const SizedBox(
-                                width: 10,
+                                width: 8,
                               ),
 
                               AnimatedContainer(
@@ -564,18 +551,18 @@ class _CartButtonState
                                 duration:
                                     const Duration(
                                   milliseconds:
-                                      220,
+                                      180,
                                 ),
 
                                 width:
                                     hovered
-                                        ? 36
-                                        : 32,
+                                        ? 30
+                                        : 27,
 
                                 height:
                                     hovered
-                                        ? 36
-                                        : 32,
+                                        ? 30
+                                        : 27,
 
                                 decoration:
                                     BoxDecoration(
@@ -597,7 +584,7 @@ class _CartButtonState
                                       .arrow_forward_rounded,
 
                                   size:
-                                      16,
+                                      14,
 
                                   color:
                                       Colors

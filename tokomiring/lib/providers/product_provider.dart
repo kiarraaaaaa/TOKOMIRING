@@ -1,6 +1,7 @@
 // =====================================================
 // lib/providers/product_provider.dart
-// CLEAN OPTIMIZED PREMIUM VERSION
+// FINAL CLEAN OPTIMIZED PREMIUM VERSION
+// FIXED REALTIME + NOTIFY + REFRESH VERSION
 // =====================================================
 
 import 'dart:async';
@@ -361,6 +362,8 @@ class ProductProvider
         _applyFilters();
 
         _setLoading(false);
+
+        notifyListeners();
       },
 
       onError: (error) {
@@ -369,6 +372,8 @@ class ProductProvider
             error.toString();
 
         _setLoading(false);
+
+        notifyListeners();
       },
     );
   }
@@ -416,6 +421,8 @@ class ProductProvider
 
           _setLoading(false);
 
+          notifyListeners();
+
           if (!completer
               .isCompleted) {
 
@@ -429,6 +436,8 @@ class ProductProvider
               error.toString();
 
           _setLoading(false);
+
+          notifyListeners();
 
           if (!completer
               .isCompleted) {
@@ -449,6 +458,8 @@ class ProductProvider
           e.toString();
 
       _setLoading(false);
+
+      notifyListeners();
     }
   }
 
@@ -665,6 +676,8 @@ class ProductProvider
 
       _applyFilters();
 
+      notifyListeners();
+
       return true;
 
     } catch (e) {
@@ -719,6 +732,8 @@ class ProductProvider
 
       _applyFilters();
 
+      notifyListeners();
+
       return true;
 
     } catch (e) {
@@ -764,7 +779,13 @@ class ProductProvider
         },
       );
 
+      _wishlistIds.remove(
+        productId,
+      );
+
       _applyFilters();
+
+      notifyListeners();
 
       return true;
 
@@ -829,10 +850,15 @@ class ProductProvider
 
           stock:
               safeStock,
+
+          isAvailable:
+              safeStock > 0,
         );
       }
 
       _applyFilters();
+
+      notifyListeners();
 
       return true;
 
@@ -905,17 +931,13 @@ class ProductProvider
               quantity;
 
       await _databaseService
-          .updateProductStockAndSold(
-
-        productId:
-            productId,
-
-        stock:
-            newStock,
-
-        sold:
-            newSold,
-      );
+          .updateProduct(
+            product.copyWith(
+              stock: newStock,
+              sold: newSold,
+              isAvailable: newStock > 0,
+            ),
+          );
 
       final index =
           _products.indexWhere(
@@ -945,6 +967,8 @@ class ProductProvider
       }
 
       _applyFilters();
+
+      notifyListeners();
 
       return true;
 
@@ -994,17 +1018,13 @@ class ProductProvider
       }
 
       await _databaseService
-          .updateProductStockAndSold(
-
-        productId:
-            productId,
-
-        stock:
-            newStock,
-
-        sold:
-            newSold,
-      );
+          .updateProduct(
+            product.copyWith(
+              stock: newStock,
+              sold: newSold,
+              isAvailable: true,
+            ),
+          );
 
       final index =
           _products.indexWhere(
@@ -1034,6 +1054,8 @@ class ProductProvider
       }
 
       _applyFilters();
+
+      notifyListeners();
 
       return true;
 

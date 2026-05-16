@@ -1,6 +1,6 @@
 // =====================================================
 // lib/widgets/user/user_dashboard_header.dart
-// MODERN CLEAN RESPONSIVE VERSION
+// COMPACT PREMIUM VERSION
 // =====================================================
 
 import 'dart:convert';
@@ -9,7 +9,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../core/constants/app_colors.dart';
-
 import '../../providers/auth_provider.dart';
 
 class UserDashboardHeader
@@ -71,7 +70,7 @@ class _UserDashboardHeaderState
 
       duration:
           const Duration(
-        milliseconds: 450,
+        milliseconds: 400,
       ),
     );
 
@@ -139,8 +138,9 @@ class _UserDashboardHeaderState
 
         width: double.infinity,
 
-        padding: EdgeInsets.all(
-          isMobile ? 18 : 24,
+        padding:
+            EdgeInsets.all(
+          isMobile ? 16 : 20,
         ),
 
         decoration:
@@ -167,7 +167,7 @@ class _UserDashboardHeaderState
 
           borderRadius:
               BorderRadius.circular(
-            30,
+            24,
           ),
 
           boxShadow: [
@@ -176,14 +176,16 @@ class _UserDashboardHeaderState
 
               color:
                   AppColors.primary
-                      .withOpacity(0.20),
+                      .withOpacity(
+                0.16,
+              ),
 
-              blurRadius: 28,
+              blurRadius: 20,
 
               offset:
                   const Offset(
                 0,
-                14,
+                10,
               ),
             ),
           ],
@@ -196,10 +198,6 @@ class _UserDashboardHeaderState
 
           children: [
 
-            // =========================================
-            // TOP SECTION
-            // =========================================
-
             Row(
 
               crossAxisAlignment:
@@ -207,19 +205,13 @@ class _UserDashboardHeaderState
 
               children: [
 
-                // =====================================
-                // USER INFO
-                // =====================================
-
                 Expanded(
 
                   child: Row(
 
                     children: [
 
-                      // =================================
                       // AVATAR
-                      // =================================
 
                       Hero(
 
@@ -230,13 +222,13 @@ class _UserDashboardHeaderState
 
                           width:
                               isMobile
-                                  ? 54
-                                  : 64,
+                                  ? 48
+                                  : 56,
 
                           height:
                               isMobile
-                                  ? 54
-                                  : 64,
+                                  ? 48
+                                  : 56,
 
                           decoration:
                               BoxDecoration(
@@ -249,10 +241,10 @@ class _UserDashboardHeaderState
                               color:
                                   Colors.white
                                       .withOpacity(
-                                0.22,
+                                0.20,
                               ),
 
-                              width: 2,
+                              width: 1.5,
                             ),
                           ),
 
@@ -278,7 +270,7 @@ class _UserDashboardHeaderState
                                         color:
                                             Colors.white
                                                 .withOpacity(
-                                          0.16,
+                                          0.14,
                                         ),
 
                                         child: Icon(
@@ -287,8 +279,8 @@ class _UserDashboardHeaderState
 
                                           size:
                                               isMobile
-                                                  ? 26
-                                                  : 32,
+                                                  ? 22
+                                                  : 26,
 
                                           color:
                                               Colors.white,
@@ -299,12 +291,10 @@ class _UserDashboardHeaderState
                       ),
 
                       const SizedBox(
-                        width: 14,
+                        width: 12,
                       ),
 
-                      // =================================
                       // TEXT
-                      // =================================
 
                       Expanded(
 
@@ -321,9 +311,9 @@ class _UserDashboardHeaderState
                               padding:
                                   const EdgeInsets.symmetric(
 
-                                horizontal: 10,
+                                horizontal: 9,
 
-                                vertical: 5,
+                                vertical: 4,
                               ),
 
                               decoration:
@@ -332,12 +322,12 @@ class _UserDashboardHeaderState
                                 color:
                                     Colors.white
                                         .withOpacity(
-                                  0.14,
+                                  0.12,
                                 ),
 
                                 borderRadius:
                                     BorderRadius.circular(
-                                  20,
+                                  18,
                                 ),
                               ),
 
@@ -355,13 +345,13 @@ class _UserDashboardHeaderState
                                   fontWeight:
                                       FontWeight.bold,
 
-                                  fontSize: 10,
+                                  fontSize: 9,
                                 ),
                               ),
                             ),
 
                             const SizedBox(
-                              height: 10,
+                              height: 8,
                             ),
 
                             Text(
@@ -382,8 +372,8 @@ class _UserDashboardHeaderState
 
                                 fontSize:
                                     isMobile
-                                        ? 20
-                                        : 28,
+                                        ? 18
+                                        : 24,
 
                                 fontWeight:
                                     FontWeight.bold,
@@ -391,14 +381,14 @@ class _UserDashboardHeaderState
                             ),
 
                             const SizedBox(
-                              height: 5,
+                              height: 3,
                             ),
 
                             Text(
 
                               subtitle,
 
-                              maxLines: 2,
+                              maxLines: 1,
 
                               overflow:
                                   TextOverflow
@@ -410,13 +400,13 @@ class _UserDashboardHeaderState
                                 color:
                                     Colors.white
                                         .withOpacity(
-                                  0.84,
+                                  0.82,
                                 ),
 
                                 fontSize:
                                     isMobile
-                                        ? 12
-                                        : 14,
+                                        ? 11
+                                        : 12,
                               ),
                             ),
                           ],
@@ -425,10 +415,6 @@ class _UserDashboardHeaderState
                     ],
                   ),
                 ),
-
-                // =====================================
-                // ACTION BUTTONS
-                // =====================================
 
                 Row(
 
@@ -444,7 +430,7 @@ class _UserDashboardHeaderState
                     ),
 
                     const SizedBox(
-                      width: 8,
+                      width: 6,
                     ),
 
                     Stack(
@@ -464,16 +450,16 @@ class _UserDashboardHeaderState
 
                         Positioned(
 
-                          top: 0,
+                          top: 1,
 
-                          right: 0,
+                          right: 1,
 
                           child:
                               Container(
 
-                            width: 9,
+                            width: 8,
 
-                            height: 9,
+                            height: 8,
 
                             decoration:
                                 const BoxDecoration(
@@ -494,18 +480,14 @@ class _UserDashboardHeaderState
             ),
 
             const SizedBox(
-              height: 22,
+              height: 18,
             ),
-
-            // =========================================
-            // MINI CARDS
-            // =========================================
 
             Wrap(
 
-              spacing: 12,
+              spacing: 10,
 
-              runSpacing: 12,
+              runSpacing: 10,
 
               children: [
 
@@ -552,10 +534,6 @@ class _UserDashboardHeaderState
     );
   }
 
-  // =========================================
-  // ACTION BUTTON
-  // =========================================
-
   Widget buildActionButton({
 
     required IconData icon,
@@ -566,31 +544,28 @@ class _UserDashboardHeaderState
     return InkWell(
 
       borderRadius:
-          BorderRadius.circular(16),
+          BorderRadius.circular(
+        14,
+      ),
 
       onTap: onTap,
 
       child: Container(
 
-        width: 46,
+        width: 40,
 
-        height: 46,
+        height: 40,
 
         decoration:
             BoxDecoration(
 
           color:
               Colors.white
-                  .withOpacity(0.14),
+                  .withOpacity(0.12),
 
           borderRadius:
-              BorderRadius.circular(16),
-
-          border: Border.all(
-
-            color:
-                Colors.white
-                    .withOpacity(0.12),
+              BorderRadius.circular(
+            14,
           ),
         ),
 
@@ -601,15 +576,11 @@ class _UserDashboardHeaderState
           color:
               Colors.white,
 
-          size: 21,
+          size: 19,
         ),
       ),
     );
   }
-
-  // =========================================
-  // MINI CARD
-  // =========================================
 
   Widget buildMiniCard({
 
@@ -624,11 +595,13 @@ class _UserDashboardHeaderState
 
       constraints:
           const BoxConstraints(
-        minWidth: 150,
+        minWidth: 130,
       ),
 
       padding:
-          const EdgeInsets.all(14),
+          const EdgeInsets.all(
+        12,
+      ),
 
       decoration:
           BoxDecoration(
@@ -638,13 +611,8 @@ class _UserDashboardHeaderState
                 .withOpacity(0.10),
 
         borderRadius:
-            BorderRadius.circular(22),
-
-        border: Border.all(
-
-          color:
-              Colors.white
-                  .withOpacity(0.10),
+            BorderRadius.circular(
+          18,
         ),
       ),
 
@@ -658,18 +626,22 @@ class _UserDashboardHeaderState
           Container(
 
             padding:
-                const EdgeInsets.all(10),
+                const EdgeInsets.all(
+              8,
+            ),
 
             decoration:
                 BoxDecoration(
 
               color:
                   Colors.white
-                      .withOpacity(0.12),
+                      .withOpacity(
+                0.12,
+              ),
 
               borderRadius:
                   BorderRadius.circular(
-                16,
+                12,
               ),
             ),
 
@@ -680,12 +652,12 @@ class _UserDashboardHeaderState
               color:
                   Colors.white,
 
-              size: 18,
+              size: 16,
             ),
           ),
 
           const SizedBox(
-            width: 12,
+            width: 10,
           ),
 
           Flexible(
@@ -693,7 +665,8 @@ class _UserDashboardHeaderState
             child: Column(
 
               crossAxisAlignment:
-                  CrossAxisAlignment.start,
+                  CrossAxisAlignment
+                      .start,
 
               children: [
 
@@ -714,12 +687,12 @@ class _UserDashboardHeaderState
                     fontWeight:
                         FontWeight.bold,
 
-                    fontSize: 13,
+                    fontSize: 12,
                   ),
                 ),
 
                 const SizedBox(
-                  height: 3,
+                  height: 2,
                 ),
 
                 Text(
@@ -735,9 +708,11 @@ class _UserDashboardHeaderState
 
                     color:
                         Colors.white
-                            .withOpacity(0.78),
+                            .withOpacity(
+                      0.75,
+                    ),
 
-                    fontSize: 10,
+                    fontSize: 9,
                   ),
                 ),
               ],

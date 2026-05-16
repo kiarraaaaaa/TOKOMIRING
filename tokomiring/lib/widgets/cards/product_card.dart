@@ -1,6 +1,6 @@
 // =====================================================
 // lib/widgets/cards/product_card.dart
-// ULTRA COMPACT PREMIUM MARKETPLACE VERSION
+// COMPACT PREMIUM VERSION
 // =====================================================
 
 import 'dart:convert';
@@ -16,8 +16,7 @@ import '../../models/product_model.dart';
 import '../../providers/cart_provider.dart';
 import '../../providers/product_provider.dart';
 
-class ProductCard
-    extends StatefulWidget {
+class ProductCard extends StatefulWidget {
 
   final ProductModel product;
 
@@ -29,9 +28,8 @@ class ProductCard
   });
 
   @override
-  State<ProductCard>
-      createState() =>
-          _ProductCardState();
+  State<ProductCard> createState() =>
+      _ProductCardState();
 }
 
 class _ProductCardState
@@ -41,28 +39,18 @@ class _ProductCardState
 
   bool adding = false;
 
-  // =========================================
-  // STOCK COLOR
-  // =========================================
-
   Color getStockColor() {
 
     if (widget.product.stock <= 0) {
-
       return AppColors.danger;
     }
 
     if (widget.product.stock <= 5) {
-
       return AppColors.warning;
     }
 
     return AppColors.success;
   }
-
-  // =========================================
-  // ADD TO CART
-  // =========================================
 
   Future<void> addToCart(
     BuildContext context,
@@ -83,9 +71,8 @@ class _ProductCardState
     );
 
     await Future.delayed(
-
       const Duration(
-        milliseconds: 550,
+        milliseconds: 500,
       ),
     );
 
@@ -95,90 +82,7 @@ class _ProductCardState
 
       adding = false;
     });
-
-    ScaffoldMessenger.of(
-      context,
-    ).hideCurrentSnackBar();
-
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(
-
-      SnackBar(
-
-        behavior:
-            SnackBarBehavior
-                .floating,
-
-        backgroundColor:
-            AppColors.primary,
-
-        margin:
-            const EdgeInsets.all(
-          14,
-        ),
-
-        shape:
-            RoundedRectangleBorder(
-
-          borderRadius:
-              BorderRadius.circular(
-            14,
-          ),
-        ),
-
-        content: Row(
-
-          children: [
-
-            const Icon(
-
-              Icons.check_circle,
-
-              color:
-                  Colors.white,
-
-              size: 18,
-            ),
-
-            const SizedBox(
-              width: 10,
-            ),
-
-            Expanded(
-
-              child: Text(
-
-                '${widget.product.name} added to cart',
-
-                overflow:
-                    TextOverflow
-                        .ellipsis,
-
-                style:
-                    const TextStyle(
-
-                  color:
-                      Colors.white,
-
-                  fontSize: 12,
-                ),
-              ),
-            ),
-          ],
-        ),
-
-        duration:
-            const Duration(
-          seconds: 1,
-        ),
-      ),
-    );
   }
-
-  // =========================================
-  // BUILD
-  // =========================================
 
   @override
   Widget build(
@@ -202,10 +106,10 @@ class _ProductCardState
     final imageHeight =
 
         isDesktop
-            ? 108.0
+            ? 90.0
             : isTablet
-                ? 100.0
-                : 92.0;
+                ? 84.0
+                : 78.0;
 
     final isFavorite =
         productProvider
@@ -236,7 +140,7 @@ class _ProductCardState
 
         duration:
             const Duration(
-          milliseconds: 220,
+          milliseconds: 180,
         ),
 
         transform:
@@ -254,7 +158,7 @@ class _ProductCardState
 
           borderRadius:
               BorderRadius.circular(
-            20,
+            18,
           ),
 
           border: Border.all(
@@ -263,14 +167,12 @@ class _ProductCardState
 
                 hovered
 
-                    ? AppColors
-                        .primary
+                    ? AppColors.primary
                         .withOpacity(
-                      0.10,
+                      0.08,
                     )
 
-                    : Colors
-                        .transparent,
+                    : Colors.transparent,
           ),
 
           boxShadow: [
@@ -281,21 +183,21 @@ class _ProductCardState
                   Colors.black
                       .withOpacity(
                 hovered
-                    ? 0.06
-                    : 0.035,
+                    ? 0.05
+                    : 0.03,
               ),
 
               blurRadius:
                   hovered
-                      ? 18
-                      : 10,
+                      ? 14
+                      : 8,
 
               offset:
                   Offset(
                 0,
                 hovered
-                    ? 10
-                    : 5,
+                    ? 8
+                    : 4,
               ),
             ),
           ],
@@ -309,9 +211,7 @@ class _ProductCardState
 
           children: [
 
-            // =====================================
             // IMAGE
-            // =====================================
 
             SizedBox(
 
@@ -332,12 +232,12 @@ class _ProductCardState
 
                         topLeft:
                             Radius.circular(
-                          20,
+                          18,
                         ),
 
                         topRight:
                             Radius.circular(
-                          20,
+                          18,
                         ),
                       ),
 
@@ -360,7 +260,7 @@ class _ProductCardState
                                         .image_outlined,
 
                                     size:
-                                        32,
+                                        26,
 
                                     color:
                                         Colors.grey
@@ -386,162 +286,18 @@ class _ProductCardState
 
                                     fit:
                                         BoxFit.cover,
-
-                                    filterQuality:
-                                        FilterQuality
-                                            .medium,
-
-                                    errorBuilder:
-                                        (
-
-                                      context,
-
-                                      error,
-
-                                      stackTrace,
-
-                                    ) {
-
-                                      return Container(
-
-                                        color:
-                                            Colors.grey
-                                                .shade200,
-
-                                        child:
-                                            Icon(
-
-                                          Icons
-                                              .broken_image_outlined,
-
-                                          size:
-                                              30,
-
-                                          color:
-                                              Colors.grey
-                                                  .shade500,
-                                        ),
-                                      );
-                                    },
                                   ),
                                 ),
                     ),
                   ),
 
-                  // =================================
-                  // OVERLAY
-                  // =================================
-
-                  Positioned.fill(
-
-                    child: Container(
-
-                      decoration:
-                          BoxDecoration(
-
-                        borderRadius:
-                            const BorderRadius.only(
-
-                          topLeft:
-                              Radius.circular(
-                            20,
-                          ),
-
-                          topRight:
-                              Radius.circular(
-                            20,
-                          ),
-                        ),
-
-                        gradient:
-                            LinearGradient(
-
-                          begin:
-                              Alignment.bottomCenter,
-
-                          end:
-                              Alignment.topCenter,
-
-                          colors: [
-
-                            Colors.black
-                                .withOpacity(
-                              0.14,
-                            ),
-
-                            Colors
-                                .transparent,
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  // =================================
-                  // CATEGORY
-                  // =================================
-
-                  Positioned(
-
-                    top: 8,
-
-                    left: 8,
-
-                    child: Container(
-
-                      padding:
-                          const EdgeInsets.symmetric(
-
-                        horizontal: 8,
-
-                        vertical: 4,
-                      ),
-
-                      decoration:
-                          BoxDecoration(
-
-                        color:
-                            Colors.black
-                                .withOpacity(
-                          0.55,
-                        ),
-
-                        borderRadius:
-                            BorderRadius.circular(
-                          18,
-                        ),
-                      ),
-
-                      child: Text(
-
-                        widget
-                            .product
-                            .category,
-
-                        style:
-                            const TextStyle(
-
-                          color:
-                              Colors.white,
-
-                          fontSize: 8,
-
-                          fontWeight:
-                              FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  // =================================
                   // FAVORITE
-                  // =================================
 
                   Positioned(
 
-                    top: 8,
+                    top: 6,
 
-                    right: 8,
+                    right: 6,
 
                     child:
                         GestureDetector(
@@ -550,16 +306,15 @@ class _ProductCardState
 
                         productProvider
                             .toggleFavorite(
-                          widget
-                              .product,
+                          widget.product,
                         );
                       },
 
                       child: Container(
 
-                        width: 28,
+                        width: 24,
 
-                        height: 28,
+                        height: 24,
 
                         decoration:
                             BoxDecoration(
@@ -588,58 +343,50 @@ class _ProductCardState
 
                                   ? Colors.red
 
-                                  : Colors
-                                      .black54,
+                                  : Colors.black54,
 
-                          size: 14,
+                          size: 12,
                         ),
                       ),
                     ),
                   ),
 
-                  // =================================
-                  // STOCK BADGE
-                  // =================================
+                  // CATEGORY
 
                   Positioned(
 
-                    left: 8,
+                    top: 6,
 
-                    bottom: 8,
+                    left: 6,
 
                     child: Container(
 
                       padding:
                           const EdgeInsets.symmetric(
 
-                        horizontal: 8,
+                        horizontal: 7,
 
-                        vertical: 4,
+                        vertical: 3,
                       ),
 
                       decoration:
                           BoxDecoration(
 
                         color:
-                            getStockColor(),
+                            Colors.black
+                                .withOpacity(
+                          0.55,
+                        ),
 
                         borderRadius:
                             BorderRadius.circular(
-                          18,
+                          14,
                         ),
                       ),
 
                       child: Text(
 
-                        widget.product.stock <= 0
-
-                            ? 'Sold Out'
-
-                            : widget.product.stock <= 5
-
-                                ? 'Low'
-
-                                : 'Ready',
+                        widget.product.category,
 
                         style:
                             const TextStyle(
@@ -647,7 +394,7 @@ class _ProductCardState
                           color:
                               Colors.white,
 
-                          fontSize: 8,
+                          fontSize: 7,
 
                           fontWeight:
                               FontWeight.bold,
@@ -659,9 +406,7 @@ class _ProductCardState
               ),
             ),
 
-            // =====================================
             // CONTENT
-            // =====================================
 
             Expanded(
 
@@ -669,7 +414,7 @@ class _ProductCardState
 
                 padding:
                     const EdgeInsets.all(
-                  10,
+                  9,
                 ),
 
                 child: Column(
@@ -679,10 +424,6 @@ class _ProductCardState
                           .start,
 
                   children: [
-
-                    // =================================
-                    // NAME
-                    // =================================
 
                     Text(
 
@@ -700,23 +441,19 @@ class _ProductCardState
                         fontSize:
 
                             isTablet
-                                ? 13
-                                : 12,
+                                ? 12
+                                : 11,
 
                         fontWeight:
                             FontWeight.w700,
 
-                        height: 1.25,
+                        height: 1.2,
                       ),
                     ),
 
                     const SizedBox(
-                      height: 6,
+                      height: 5,
                     ),
-
-                    // =================================
-                    // PRICE
-                    // =================================
 
                     Text(
 
@@ -731,33 +468,28 @@ class _ProductCardState
                       style:
                           const TextStyle(
 
-                        fontSize: 15,
+                        fontSize: 14,
 
                         fontWeight:
                             FontWeight.bold,
 
                         color:
-                            AppColors
-                                .success,
+                            AppColors.success,
                       ),
                     ),
 
                     const SizedBox(
-                      height: 8,
+                      height: 6,
                     ),
-
-                    // =================================
-                    // STOCK
-                    // =================================
 
                     Container(
 
                       padding:
                           const EdgeInsets.symmetric(
 
-                        horizontal: 8,
+                        horizontal: 7,
 
-                        vertical: 6,
+                        vertical: 5,
                       ),
 
                       decoration:
@@ -771,7 +503,7 @@ class _ProductCardState
 
                         borderRadius:
                             BorderRadius.circular(
-                          10,
+                          9,
                         ),
                       ),
 
@@ -784,14 +516,14 @@ class _ProductCardState
                             Icons
                                 .inventory_2_rounded,
 
-                            size: 13,
+                            size: 11,
 
                             color:
                                 getStockColor(),
                           ),
 
                           const SizedBox(
-                            width: 5,
+                            width: 4,
                           ),
 
                           Expanded(
@@ -807,7 +539,7 @@ class _ProductCardState
                               style:
                                   TextStyle(
 
-                                fontSize: 10,
+                                fontSize: 9,
 
                                 color:
                                     getStockColor(),
@@ -823,16 +555,12 @@ class _ProductCardState
 
                     const Spacer(),
 
-                    // =================================
-                    // BUTTON
-                    // =================================
-
                     SizedBox(
 
                       width:
                           double.infinity,
 
-                      height: 36,
+                      height: 32,
 
                       child:
                           ElevatedButton.icon(
@@ -848,16 +576,14 @@ class _ProductCardState
 
                                   ? Colors.grey
 
-                                  : AppColors
-                                      .primary,
+                                  : AppColors.primary,
 
                           foregroundColor:
                               Colors.white,
 
                           padding:
                               const EdgeInsets.symmetric(
-
-                            horizontal: 10,
+                            horizontal: 8,
                           ),
 
                           shape:
@@ -865,7 +591,7 @@ class _ProductCardState
 
                             borderRadius:
                                 BorderRadius.circular(
-                              12,
+                              10,
                             ),
                           ),
                         ),
@@ -890,17 +616,16 @@ class _ProductCardState
                                 ? const SizedBox(
 
                                     width:
-                                        14,
+                                        12,
 
                                     height:
-                                        14,
+                                        12,
 
                                     child:
                                         CircularProgressIndicator(
 
                                       color:
-                                          Colors
-                                              .white,
+                                          Colors.white,
 
                                       strokeWidth:
                                           2,
@@ -913,7 +638,7 @@ class _ProductCardState
                                         .shopping_cart_rounded,
 
                                     size:
-                                        15,
+                                        13,
                                   ),
 
                         label: Text(
@@ -935,7 +660,7 @@ class _ProductCardState
                           style:
                               const TextStyle(
 
-                            fontSize: 11,
+                            fontSize: 10,
 
                             fontWeight:
                                 FontWeight.bold,

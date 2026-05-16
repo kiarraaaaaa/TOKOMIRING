@@ -1,7 +1,6 @@
 // =====================================================
 // lib/screens/user/user_profile_screen.dart
-// ULTRA PREMIUM COMPACT PROFILE SCREEN
-// FULL REVISED VERSION
+// FINAL ULTRA COMPACT PREMIUM PROFILE
 // =====================================================
 
 import 'dart:convert';
@@ -49,7 +48,7 @@ class _UserProfileScreenState
 
       duration:
           const Duration(
-        milliseconds: 500,
+        milliseconds: 420,
       ),
     );
 
@@ -126,7 +125,7 @@ class _UserProfileScreenState
         surfaceTintColor:
             Colors.transparent,
 
-        titleSpacing: 20,
+        titleSpacing: 18,
 
         title: Column(
 
@@ -147,8 +146,8 @@ class _UserProfileScreenState
 
                 fontSize:
                     isMobile
-                        ? 20
-                        : 24,
+                        ? 19
+                        : 22,
 
                 fontWeight:
                     FontWeight.bold,
@@ -156,12 +155,12 @@ class _UserProfileScreenState
             ),
 
             const SizedBox(
-              height: 2,
+              height: 1,
             ),
 
             Text(
 
-              'Premium member dashboard',
+              'Compact premium dashboard',
 
               style: TextStyle(
 
@@ -170,8 +169,8 @@ class _UserProfileScreenState
 
                 fontSize:
                     isMobile
-                        ? 11
-                        : 13,
+                        ? 10
+                        : 11,
               ),
             ),
           ],
@@ -193,8 +192,8 @@ class _UserProfileScreenState
               EdgeInsets.all(
 
             isMobile
-                ? 14
-                : 20,
+                ? 12
+                : 18,
           ),
 
           child: Column(
@@ -202,7 +201,7 @@ class _UserProfileScreenState
             children: [
 
               // ===================================================
-              // HEADER CARD
+              // HEADER
               // ===================================================
 
               Container(
@@ -215,7 +214,7 @@ class _UserProfileScreenState
 
                   isMobile
                       ? 16
-                      : 20,
+                      : 18,
                 ),
 
                 decoration:
@@ -223,7 +222,7 @@ class _UserProfileScreenState
 
                   borderRadius:
                       BorderRadius.circular(
-                    28,
+                    24,
                   ),
 
                   gradient:
@@ -244,10 +243,6 @@ class _UserProfileScreenState
                       Color(
                         0xff1D4ED8,
                       ),
-
-                      Color(
-                        0xff1E40AF,
-                      ),
                     ],
                   ),
 
@@ -259,16 +254,16 @@ class _UserProfileScreenState
                           const Color(
                         0xff2563EB,
                       ).withOpacity(
-                        0.18,
+                        0.16,
                       ),
 
                       blurRadius:
-                          24,
+                          18,
 
                       offset:
                           const Offset(
                         0,
-                        10,
+                        8,
                       ),
                     ),
                   ],
@@ -278,9 +273,9 @@ class _UserProfileScreenState
 
                   children: [
 
-                    // ===========================================
+                    // =====================================
                     // AVATAR
-                    // ===========================================
+                    // =====================================
 
                     Stack(
 
@@ -293,13 +288,13 @@ class _UserProfileScreenState
 
                           width:
                               isMobile
-                                  ? 92
-                                  : 100,
+                                  ? 84
+                                  : 92,
 
                           height:
                               isMobile
-                                  ? 92
-                                  : 100,
+                                  ? 84
+                                  : 92,
 
                           decoration:
                               BoxDecoration(
@@ -315,21 +310,6 @@ class _UserProfileScreenState
 
                               width: 3,
                             ),
-
-                            boxShadow: [
-
-                              BoxShadow(
-
-                                color:
-                                    Colors.black
-                                        .withOpacity(
-                                  0.12,
-                                ),
-
-                                blurRadius:
-                                    16,
-                              ),
-                            ],
                           ),
 
                           child:
@@ -364,8 +344,8 @@ class _UserProfileScreenState
 
                                           size:
                                               isMobile
-                                                  ? 44
-                                                  : 52,
+                                                  ? 40
+                                                  : 44,
 
                                           color:
                                               Colors
@@ -375,20 +355,18 @@ class _UserProfileScreenState
                           ),
                         ),
 
-                        // VERIFIED
-
                         Positioned(
 
-                          bottom: 4,
+                          bottom: 0,
 
                           right: 0,
 
                           child:
                               Container(
 
-                            width: 26,
+                            width: 24,
 
-                            height: 26,
+                            height: 24,
 
                             decoration:
                                 BoxDecoration(
@@ -416,7 +394,7 @@ class _UserProfileScreenState
 
                               Icons.check,
 
-                              size: 14,
+                              size: 12,
 
                               color:
                                   Colors.white,
@@ -424,78 +402,46 @@ class _UserProfileScreenState
                           ),
                         ),
 
-                        // CAMERA BUTTON
-
                         Positioned(
 
-                          bottom: -6,
+                          bottom: -4,
 
-                          right: 18,
+                          right: 16,
 
                           child:
                               GestureDetector(
 
-                            onTap: () async {
-
-                              // image picker nanti sambung
-                            },
+                            onTap: () {},
 
                             child:
                                 Container(
 
                               padding:
                                   const EdgeInsets.all(
-                                8,
+                                7,
                               ),
 
                               decoration:
                                   BoxDecoration(
 
-                                gradient:
-                                    const LinearGradient(
-
-                                  colors: [
-
-                                    Color(
-                                      0xff2563EB,
-                                    ),
-
-                                    Color(
-                                      0xff4F46E5,
-                                    ),
-                                  ],
-                                ),
+                                color:
+                                    Colors.white,
 
                                 shape:
                                     BoxShape.circle,
-
-                                border:
-                                    Border.all(
-
-                                  color:
-                                      Colors.white,
-
-                                  width: 2,
-                                ),
 
                                 boxShadow: [
 
                                   BoxShadow(
 
                                     color:
-                                        Colors.blue
+                                        Colors.black
                                             .withOpacity(
-                                      0.24,
+                                      0.10,
                                     ),
 
                                     blurRadius:
-                                        12,
-
-                                    offset:
-                                        const Offset(
-                                      0,
-                                      4,
-                                    ),
+                                        10,
                                   ),
                                 ],
                               ),
@@ -506,10 +452,11 @@ class _UserProfileScreenState
                                 Icons
                                     .camera_alt_rounded,
 
-                                size: 14,
+                                size: 13,
 
                                 color:
-                                    Colors.white,
+                                    AppColors
+                                        .primary,
                               ),
                             ),
                           ),
@@ -518,7 +465,7 @@ class _UserProfileScreenState
                     ),
 
                     const SizedBox(
-                      height: 18,
+                      height: 16,
                     ),
 
                     Text(
@@ -536,8 +483,8 @@ class _UserProfileScreenState
 
                         fontSize:
                             isMobile
-                                ? 22
-                                : 24,
+                                ? 20
+                                : 22,
 
                         fontWeight:
                             FontWeight.bold,
@@ -545,7 +492,7 @@ class _UserProfileScreenState
                     ),
 
                     const SizedBox(
-                      height: 4,
+                      height: 3,
                     ),
 
                     Text(
@@ -561,18 +508,18 @@ class _UserProfileScreenState
                         color:
                             Colors.white
                                 .withOpacity(
-                          0.88,
+                          0.86,
                         ),
 
                         fontSize:
                             isMobile
-                                ? 12
-                                : 13,
+                                ? 11
+                                : 12,
                       ),
                     ),
 
                     const SizedBox(
-                      height: 14,
+                      height: 12,
                     ),
 
                     Container(
@@ -580,9 +527,9 @@ class _UserProfileScreenState
                       padding:
                           const EdgeInsets.symmetric(
 
-                        horizontal: 14,
+                        horizontal: 12,
 
-                        vertical: 8,
+                        vertical: 7,
                       ),
 
                       decoration:
@@ -596,7 +543,7 @@ class _UserProfileScreenState
 
                         borderRadius:
                             BorderRadius.circular(
-                          24,
+                          20,
                         ),
                       ),
 
@@ -619,7 +566,7 @@ class _UserProfileScreenState
                           fontWeight:
                               FontWeight.bold,
 
-                          fontSize: 11,
+                          fontSize: 10,
                         ),
                       ),
                     ),
@@ -628,64 +575,65 @@ class _UserProfileScreenState
               ),
 
               const SizedBox(
-                height: 22,
+                height: 18,
               ),
 
               // ===================================================
               // ANALYTICS
               // ===================================================
 
-              Wrap(
-
-                spacing: 12,
-
-                runSpacing: 12,
-
-                alignment:
-                    WrapAlignment.center,
+              Row(
 
                 children: [
 
-                  _buildAnalyticsCard(
+                  Expanded(
 
-                    title: 'Role',
+                    child:
+                        _buildAnalyticsCard(
 
-                    value: user.role,
+                      title: 'Role',
 
-                    icon:
-                        Icons.workspace_premium,
+                      value:
+                          user.role,
 
-                    color:
-                        Colors.orange,
+                      icon:
+                          Icons.workspace_premium,
 
-                    isMobile:
-                        isMobile,
+                      color:
+                          Colors.orange,
+                    ),
                   ),
 
-                  _buildAnalyticsCard(
+                  const SizedBox(
+                    width: 10,
+                  ),
 
-                    title: 'Status',
+                  Expanded(
 
-                    value: 'Verified',
+                    child:
+                        _buildAnalyticsCard(
 
-                    icon:
-                        Icons.verified,
+                      title: 'Status',
 
-                    color:
-                        Colors.green,
+                      value:
+                          'Verified',
 
-                    isMobile:
-                        isMobile,
+                      icon:
+                          Icons.verified,
+
+                      color:
+                          Colors.green,
+                    ),
                   ),
                 ],
               ),
 
               const SizedBox(
-                height: 22,
+                height: 18,
               ),
 
               // ===================================================
-              // PROFILE INFO
+              // INFO
               // ===================================================
 
               Container(
@@ -697,8 +645,8 @@ class _UserProfileScreenState
                     EdgeInsets.all(
 
                   isMobile
-                      ? 16
-                      : 20,
+                      ? 15
+                      : 18,
                 ),
 
                 decoration:
@@ -709,7 +657,7 @@ class _UserProfileScreenState
 
                   borderRadius:
                       BorderRadius.circular(
-                    28,
+                    24,
                   ),
 
                   boxShadow: [
@@ -723,12 +671,12 @@ class _UserProfileScreenState
                       ),
 
                       blurRadius:
-                          16,
+                          14,
 
                       offset:
                           const Offset(
                         0,
-                        8,
+                        6,
                       ),
                     ),
                   ],
@@ -751,13 +699,13 @@ class _UserProfileScreenState
                     ),
 
                     const Divider(
-                      height: 26,
+                      height: 24,
                     ),
 
                     _buildProfileItem(
 
                       title:
-                          'Phone Number',
+                          'Phone',
 
                       value:
                           user.phone.isEmpty
@@ -771,7 +719,7 @@ class _UserProfileScreenState
                     ),
 
                     const Divider(
-                      height: 26,
+                      height: 24,
                     ),
 
                     _buildProfileItem(
@@ -791,7 +739,7 @@ class _UserProfileScreenState
                     ),
 
                     const Divider(
-                      height: 26,
+                      height: 24,
                     ),
 
                     _buildProfileItem(
@@ -810,7 +758,7 @@ class _UserProfileScreenState
               ),
 
               const SizedBox(
-                height: 22,
+                height: 18,
               ),
 
               // ===================================================
@@ -825,7 +773,7 @@ class _UserProfileScreenState
 
                     child: SizedBox(
 
-                      height: 50,
+                      height: 46,
 
                       child:
                           ElevatedButton.icon(
@@ -846,7 +794,7 @@ class _UserProfileScreenState
 
                             borderRadius:
                                 BorderRadius.circular(
-                              18,
+                              16,
                             ),
                           ),
                         ),
@@ -863,7 +811,7 @@ class _UserProfileScreenState
 
                           Icons.edit,
 
-                          size: 16,
+                          size: 15,
                         ),
 
                         label:
@@ -874,7 +822,7 @@ class _UserProfileScreenState
                           style:
                               TextStyle(
 
-                            fontSize: 13,
+                            fontSize: 12,
 
                             fontWeight:
                                 FontWeight.bold,
@@ -885,14 +833,14 @@ class _UserProfileScreenState
                   ),
 
                   const SizedBox(
-                    width: 12,
+                    width: 10,
                   ),
 
                   Expanded(
 
                     child: SizedBox(
 
-                      height: 50,
+                      height: 46,
 
                       child:
                           ElevatedButton.icon(
@@ -913,7 +861,7 @@ class _UserProfileScreenState
 
                             borderRadius:
                                 BorderRadius.circular(
-                              18,
+                              16,
                             ),
                           ),
                         ),
@@ -933,7 +881,7 @@ class _UserProfileScreenState
 
                           Icons.receipt_long,
 
-                          size: 16,
+                          size: 15,
                         ),
 
                         label:
@@ -944,7 +892,7 @@ class _UserProfileScreenState
                           style:
                               TextStyle(
 
-                            fontSize: 13,
+                            fontSize: 12,
 
                             fontWeight:
                                 FontWeight.bold,
@@ -957,7 +905,7 @@ class _UserProfileScreenState
               ),
 
               const SizedBox(
-                height: 14,
+                height: 12,
               ),
 
               SizedBox(
@@ -965,7 +913,7 @@ class _UserProfileScreenState
                 width:
                     double.infinity,
 
-                height: 50,
+                height: 46,
 
                 child:
                     OutlinedButton.icon(
@@ -982,7 +930,7 @@ class _UserProfileScreenState
                       color:
                           Colors.red
                               .withOpacity(
-                        0.22,
+                        0.20,
                       ),
                     ),
 
@@ -991,7 +939,7 @@ class _UserProfileScreenState
 
                       borderRadius:
                           BorderRadius.circular(
-                        18,
+                        16,
                       ),
                     ),
                   ),
@@ -1026,7 +974,7 @@ class _UserProfileScreenState
 
                     Icons.logout,
 
-                    size: 16,
+                    size: 15,
                   ),
 
                   label:
@@ -1037,7 +985,7 @@ class _UserProfileScreenState
                     style:
                         TextStyle(
 
-                      fontSize: 13,
+                      fontSize: 12,
 
                       fontWeight:
                           FontWeight.bold,
@@ -1047,7 +995,7 @@ class _UserProfileScreenState
               ),
 
               const SizedBox(
-                height: 32,
+                height: 24,
               ),
             ],
           ),
@@ -1055,10 +1003,6 @@ class _UserProfileScreenState
       ),
     );
   }
-
-  // =====================================================
-  // PROFILE ITEM
-  // =====================================================
 
   Widget _buildProfileItem({
 
@@ -1078,9 +1022,9 @@ class _UserProfileScreenState
 
         Container(
 
-          width: 42,
+          width: 38,
 
-          height: 42,
+          height: 38,
 
           decoration:
               BoxDecoration(
@@ -1093,7 +1037,7 @@ class _UserProfileScreenState
 
             borderRadius:
                 BorderRadius.circular(
-              14,
+              12,
             ),
           ),
 
@@ -1104,12 +1048,12 @@ class _UserProfileScreenState
             color:
                 AppColors.primary,
 
-            size: 18,
+            size: 16,
           ),
         ),
 
         const SizedBox(
-          width: 14,
+          width: 12,
         ),
 
         Expanded(
@@ -1133,12 +1077,12 @@ class _UserProfileScreenState
                       Colors.grey
                           .shade600,
 
-                  fontSize: 11,
+                  fontSize: 10,
                 ),
               ),
 
               const SizedBox(
-                height: 4,
+                height: 3,
               ),
 
               Text(
@@ -1148,7 +1092,7 @@ class _UserProfileScreenState
                 style:
                     const TextStyle(
 
-                  fontSize: 14,
+                  fontSize: 13,
 
                   fontWeight:
                       FontWeight.w600,
@@ -1161,10 +1105,6 @@ class _UserProfileScreenState
     );
   }
 
-  // =====================================================
-  // ANALYTICS CARD
-  // =====================================================
-
   Widget _buildAnalyticsCard({
 
     required String title,
@@ -1174,16 +1114,9 @@ class _UserProfileScreenState
     required IconData icon,
 
     required Color color,
-
-    required bool isMobile,
   }) {
 
     return Container(
-
-      width:
-          isMobile
-              ? double.infinity
-              : 145,
 
       padding:
           const EdgeInsets.all(
@@ -1198,7 +1131,7 @@ class _UserProfileScreenState
 
         borderRadius:
             BorderRadius.circular(
-          22,
+          20,
         ),
 
         border: Border.all(
@@ -1220,12 +1153,12 @@ class _UserProfileScreenState
             ),
 
             blurRadius:
-                12,
+                10,
 
             offset:
                 const Offset(
               0,
-              5,
+              4,
             ),
           ),
         ],
@@ -1241,9 +1174,9 @@ class _UserProfileScreenState
 
           Container(
 
-            width: 42,
+            width: 38,
 
-            height: 42,
+            height: 38,
 
             decoration:
                 BoxDecoration(
@@ -1255,7 +1188,7 @@ class _UserProfileScreenState
 
               borderRadius:
                   BorderRadius.circular(
-                14,
+                12,
               ),
             ),
 
@@ -1263,7 +1196,7 @@ class _UserProfileScreenState
 
               icon,
 
-              size: 18,
+              size: 16,
 
               color:
                   color,
@@ -1271,7 +1204,7 @@ class _UserProfileScreenState
           ),
 
           const SizedBox(
-            height: 14,
+            height: 12,
           ),
 
           Text(
@@ -1285,12 +1218,9 @@ class _UserProfileScreenState
             maxLines: 1,
 
             style:
-                TextStyle(
+                const TextStyle(
 
-              fontSize:
-                  isMobile
-                      ? 18
-                      : 20,
+              fontSize: 15,
 
               fontWeight:
                   FontWeight.bold,
@@ -1298,7 +1228,7 @@ class _UserProfileScreenState
           ),
 
           const SizedBox(
-            height: 3,
+            height: 2,
           ),
 
           Text(
@@ -1316,17 +1246,13 @@ class _UserProfileScreenState
                   Colors.grey
                       .shade600,
 
-              fontSize: 11,
+              fontSize: 10,
             ),
           ),
         ],
       ),
     );
   }
-
-  // =====================================================
-  // EDIT DIALOG
-  // =====================================================
 
   void _showEditProfileDialog(
     BuildContext context,

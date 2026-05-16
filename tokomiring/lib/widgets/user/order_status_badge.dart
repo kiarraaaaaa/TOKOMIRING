@@ -1,4 +1,7 @@
+// =====================================================
 // lib/widgets/user/order_status_badge.dart
+// COMPACT PREMIUM VERSION
+// =====================================================
 
 import 'package:flutter/material.dart';
 
@@ -50,10 +53,6 @@ class _OrderStatusBadgeState
   late Animation<double>
       _scaleAnimation;
 
-  // =====================================================
-  // INIT
-  // =====================================================
-
   @override
   void initState() {
 
@@ -66,7 +65,7 @@ class _OrderStatusBadgeState
 
       duration:
           const Duration(
-        milliseconds: 450,
+        milliseconds: 300,
       ),
     );
 
@@ -77,7 +76,7 @@ class _OrderStatusBadgeState
           _animationController,
 
       curve:
-          Curves.easeOutBack,
+          Curves.easeOut,
     );
 
     if (widget.animated) {
@@ -87,10 +86,6 @@ class _OrderStatusBadgeState
     }
   }
 
-  // =====================================================
-  // DISPOSE
-  // =====================================================
-
   @override
   void dispose() {
 
@@ -99,10 +94,6 @@ class _OrderStatusBadgeState
 
     super.dispose();
   }
-
-  // =====================================================
-  // STATUS COLOR
-  // =====================================================
 
   Color getStatusColor() {
 
@@ -132,10 +123,6 @@ class _OrderStatusBadgeState
         return Colors.grey;
     }
   }
-
-  // =====================================================
-  // STATUS ICON
-  // =====================================================
 
   IconData getStatusIcon() {
 
@@ -172,10 +159,6 @@ class _OrderStatusBadgeState
     }
   }
 
-  // =====================================================
-  // BUILD
-  // =====================================================
-
   @override
   Widget build(
     BuildContext context,
@@ -189,16 +172,16 @@ class _OrderStatusBadgeState
 
     final textSize =
         widget.fontSize ??
-            12;
+            10;
 
     final badgePadding =
         widget.padding ??
 
             const EdgeInsets.symmetric(
 
-              horizontal: 14,
+              horizontal: 10,
 
-              vertical: 9,
+              vertical: 6,
             );
 
     return ScaleTransition(
@@ -217,7 +200,7 @@ class _OrderStatusBadgeState
 
         duration:
             const Duration(
-          milliseconds: 250,
+          milliseconds: 180,
         ),
 
         padding:
@@ -228,35 +211,23 @@ class _OrderStatusBadgeState
 
           color:
               color.withOpacity(
-            0.12,
+            0.10,
           ),
 
           borderRadius:
               BorderRadius.circular(
-            30,
+            18,
           ),
 
           border: Border.all(
 
             color:
                 color.withOpacity(
-              0.22,
+              0.16,
             ),
+
+            width: 1,
           ),
-
-          boxShadow: [
-
-            BoxShadow(
-
-              color:
-                  color.withOpacity(
-                0.12,
-              ),
-
-              blurRadius:
-                  12,
-            ),
-          ],
         ),
 
         child: Row(
@@ -266,21 +237,13 @@ class _OrderStatusBadgeState
 
           children: [
 
-            // =============================================
             // ICON
-            // =============================================
 
-            AnimatedContainer(
+            Container(
 
-              duration:
-                  const Duration(
-                milliseconds:
-                    250,
-              ),
+              width: 20,
 
-              width: 26,
-
-              height: 26,
+              height: 20,
 
               decoration:
                   BoxDecoration(
@@ -299,17 +262,15 @@ class _OrderStatusBadgeState
                 color:
                     Colors.white,
 
-                size: 15,
+                size: 11,
               ),
             ),
 
             const SizedBox(
-              width: 10,
+              width: 7,
             ),
 
-            // =============================================
             // TEXT
-            // =============================================
 
             Flexible(
 
@@ -330,7 +291,7 @@ class _OrderStatusBadgeState
                       color,
 
                   fontWeight:
-                      FontWeight.bold,
+                      FontWeight.w700,
 
                   fontSize:
                       textSize,
@@ -338,15 +299,13 @@ class _OrderStatusBadgeState
               ),
             ),
 
-            // =============================================
             // VALIDATED
-            // =============================================
 
             if (widget.isValidated)
               ...[
 
                 const SizedBox(
-                  width: 10,
+                  width: 7,
                 ),
 
                 Container(
@@ -354,9 +313,9 @@ class _OrderStatusBadgeState
                   padding:
                       const EdgeInsets.symmetric(
 
-                    horizontal: 10,
+                    horizontal: 7,
 
-                    vertical: 6,
+                    vertical: 4,
                   ),
 
                   decoration:
@@ -367,7 +326,7 @@ class _OrderStatusBadgeState
 
                     borderRadius:
                         BorderRadius.circular(
-                      20,
+                      14,
                     ),
                   ),
 
@@ -386,11 +345,11 @@ class _OrderStatusBadgeState
                         color:
                             Colors.white,
 
-                        size: 14,
+                        size: 10,
                       ),
 
                       SizedBox(
-                        width: 5,
+                        width: 4,
                       ),
 
                       Text(
@@ -407,7 +366,7 @@ class _OrderStatusBadgeState
                               FontWeight.bold,
 
                           fontSize:
-                              10,
+                              8,
                         ),
                       ),
                     ],
